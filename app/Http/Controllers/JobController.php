@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Feature;
+use App\Material;
+use App\StyleGroup;
+use Barryvdh\Snappy\Facades\SnappyPdf;
 use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
@@ -12,6 +16,8 @@ use App\Style;
 use App\Removal;
 use DB;
 use Illuminate\Support\Facades\Input;
+use PDF;
+
 
 class JobController extends Controller
 {
@@ -172,7 +178,7 @@ class JobController extends Controller
                         FROM leads
                         WHERE appointment >= DATE(now()) AND appointment < ADDDATE(DATE(NOW()), INTERVAL 1 WEEK)");
 
-            return view('jobs', ['jobs' => $jobs]);
+            return view('job.index', compact('jobs'));
         }
 
         /*         $admins = DB::table('users')
@@ -185,14 +191,17 @@ class JobController extends Controller
     {
         $this->authorize('edit-job');
 
-    	$lead = Lead::findOrFail($id);
+        $job = new Job;
+        $lead = Lead::find($id);
          return view('job/create',
         	[
-    		'property_types' => DB::table('property_types')->get(),
-            'customer_types' => DB::table('customer_types')->get(),
-            'job_types' => DB::table('job_types')->Orderby('name', 'asc')->get(),
-            'features' => DB::table('features')->Orderby('name', 'asc')->get(),
-            'lead_id' => $lead->id
+                'property_types' => DB::table('property_types')->get(),
+                'customer_types' => DB::table('customer_types')->get(),
+                'job_types' => DB::table('job_types')->Orderby('name', 'asc')->get(),
+                'features' => DB::table('features')->Orderby('name', 'asc')->get(),
+                'lead' => $lead,
+                'job' => $job,
+                'features' => Feature::all()
         	]); 
     }
 
@@ -202,30 +211,11 @@ class JobController extends Controller
         // return var_dump($request);
         $this->authorize('edit-job');
 
+        $result = true;
         $job = new Job;
 		$job->lead_id = $request->leadid;
-		$job->size = $request->size;
-		$job->customer_type = $request->customertype;
-		$job->contractor = $request->contractor;
-		$job->date_sold = $request->datesold;
-		$job->job_type = $request->jobtype;
-		$job->sqft_price = $request->sqftprice;
-		$job->proposal_amount = $request->proposalamount;
-		$job->invoiced_amount = $request->invoicedamount;
-		$job->pavers_ordered = ($request->paversordered == 'true');
-		$job->prelien = ($request->prelien == 'true');
-		$job->bluestakes = ($request->bluestakes == 'true');
-		$job->property_type = $request->propertytype;
 
-        $job->portlands = $request->portland;
-        $job->crew = $request->crew;
-        $job->downpayment_done = $request->downpayment;
-        $job->pavers_orderedby = $request->orderedby;
-        $job->pavers_handledby = $request->handledby;
-        $job->delivered_at = $this->dbDate($request->delivered);
-        $job->delivery_note = $request->placementnote;
-
-		$result = $job->save();
+		$job = $this->update_job($job, $request);
 
 		$feat_arr = [];
 
@@ -235,39 +225,34 @@ class JobController extends Controller
 		}
 		DB::table('feature_job')->insert($feat_arr);
 
-		foreach($request->styles as $s)
-		{
-			$style = new Style;
-			$style->style = $s['style'];
-			$style->color = $s['color'];
-			$style->manufacturer = $s['manu'];
-			$style->size = $s['size'];
-			$style->job_id = $job->id;
-            $style->sqft = $s['sqft'];
-            $style->weight = $s['weight'];
-            $style->price = $s['price'];
-            $style->palets = $s['palets'];
-            $style->tumbled = $s['tumbled'];
-			$style->save();
+        if (count($request->stylegroups) > 0)//doesn't break if style is empty
+        {
+            $result &= $this->update_styles($request->stylegroups, $job->id);
 		}
 
 		if($request->removals  != null)
-        foreach($request->removals as $r)
         {
-            $removal = new Removal();
-            $removal->name = $r['name'];
-            $removal->job_id = $job->id;
-            $removal->save();
+            $result &= $this->update_removals($request->removals, $job);
         }
-        
 
-        if($request->note != "")
+        if($request->materials  != null)
         {
-        	$note = new Note;
-			$note->note = $request->note;
-			$note->job_id = $job->id;
-			$result &= $note->save();
+            $result &= $this->update_materials($request->materials, $job->id);
         }
+
+        $message['text'] = 'Job created successufully';
+        $message['class'] = 'alert-success';
+        $message['title'] = 'Info!';
+
+        if($result == false)
+        {
+            $message['text'] = 'Error trying to create job';
+            $message['class'] = 'alert-danger';
+            $message['title'] = 'Error!';
+        }
+
+        \Session::flash('message', $message);
+
         $result = ($result == true)? 'success': 'failed';
         return response()->json(['result' => $result ]);
     }
@@ -278,32 +263,10 @@ class JobController extends Controller
 
         $id = $request->id;
     	$job = Job::findOrFail($id);
-		$job->size = $request->size;
-		$job->customer_type = $request->customertype;
-		$job->contractor = $request->contractor;
-		$job->date_sold = $this->dbDate($request->datesold);
-		$job->job_type = $request->jobtype;
-		$job->sqft_price = $request->sqftprice;
-		$job->proposal_amount = $request->proposalamount;
-		$job->invoiced_amount = $request->invoicedamount;
-		$job->pavers_ordered = ($request->paversordered == 'true');
-		$job->prelien = ($request->prelien == 'true');
-		$job->bluestakes = ($request->bluestakes == 'true');
-		$job->property_type = $request->propertytype;
-        $job->portlands = $request->portland;
-        $job->crew = $request->crew;
-        $job->downpayment_done = $request->downpayment;
-        $job->pavers_orderedby = $request->orderedby;
-        $job->pavers_handledby = $request->handledby;
-        $job->delivered_at = $this->dbDate($request->delivered);
-        $job->delivery_note = $request->placementnote;
 
-		/* @var Job $job*/
-		$result = $job->save();
+        $job = $this->update_job($job, $request);
 
-		$feat_arr = [];
-		// var_dump($request->features);
-		// return;
+        $result = ($job != null);
 
 		foreach($request->features as $k => $v)
 		{
@@ -312,50 +275,125 @@ class JobController extends Controller
 				->update(['active' => ($v == 'true')]);
 		}
 
-		if (count($request->styles) > 0)//doesn't break if style is empty 
+		if (count($request->stylegroups) > 0)//doesn't break if style is empty
 		{
-			//return var_dump($request->styles);
-			foreach($request->styles as $s)
-			{
-				$id = $s['id'];
-				$style = new Style;
-				if($id != '0')
-				{
-					$style = $job->styles->find($id);
-				}
-				$style->job_id = $job->id;
-				$style->style = $s['style'];
-				$style->color = $s['color'];
-				$style->manufacturer = $s['manu'];
-				$style->size = $s['size'];
-                $style->sqft = $s['sqft'];
-                $style->weight = $s['weight'];
-                $style->price = $s['price'];
-                $style->palets = $s['palets'];
-                $style->tumbled = $s['tumbled'];
-				$style->save();
-			}
+            $result &= $this->update_styles($request->stylegroups, $job->id);
         }
 
 		if (count($request->removals) > 0)//doesn't break if removal is empty
 		{
-			//return var_dump($request->styles);
-			foreach($request->removals as $r)
-			{
-				$id = $r['id'];
-				$removal = new Removal;
-				if($id != '0')
-				{
-					$removal = $job->removals->find($id);
-				}
-				$removal->job_id = $job->id;
-				$removal->name = $r['name'];
-				$removal->save();
-			}
+            $result &= $this->update_removals($request->removals, $job);
 		}
+
+        if($request->materials  != null)
+        {
+            $result &= $this->update_materials($request->materials, $job->id);
+        }
 
         $result = ($result == true)? 'success': 'failed';
         return response()->json(['result' => $result ]);
+    }
+
+    private function update_styles($stylegroups, $job_id)
+    {
+        //return var_dump($request->styles);
+        $result = true;
+        foreach($stylegroups as $sgroup)
+        {
+            //update group
+            $id = $sgroup['id'];
+            $group = new StyleGroup();
+            if($id != 0)
+            {
+                $group = StyleGroup::find($id);
+            }
+            $group->manufacturer = $sgroup['manu'];
+            $group->portlands = $sgroup['portland'];
+            $group->orderedby = $sgroup['orderedby'];
+            $group->handledby = $sgroup['handledby'];
+            $group->delivery_at = $sgroup['delivery'];
+            $group->note = $sgroup['note'];
+            $group->job_id = $job_id;
+            $result &= $group->save();
+
+            if(isset($sgroup['styles']))
+                foreach($sgroup['styles'] as $s)
+                {
+                    $sid = $s['id'];
+                    $style = new Style;
+                    if($sid != 0)
+                    {
+                        $style = Style::find($sid);
+                    }
+                    $style->group_id = $group->id;
+                    $style->style = $s['style'];
+                    $style->color = $s['color'];
+//                    $style->manufacturer = $s['manu'];
+                    $style->size = $s['size'];
+                    $style->sqft = $s['sqft'];
+                    $style->weight = $s['weight'];
+                    $style->price = $s['price'];
+                    $style->palets = $s['palets'];
+                    $style->tumbled = $s['tumbled'];
+                    $result &= $style->save();
+                }
+        }
+        return $result;
+    }
+
+    private function update_removals($removals, $job)
+    {
+        //return var_dump($request->styles);
+        $result = true;
+        foreach($removals as $r)
+        {
+            $id = $r['id'];
+            $removal = new Removal;
+            if($id != '0')
+            {
+                $removal = $job->removals->find($id);
+            }
+            $removal->job_id = $job->id;
+            $removal->name = $r['name'];
+
+            $result &= $removal->save();
+        }
+        return $result;
+    }
+
+    private function update_materials($materials, $job_id)
+    {
+        $result = true;
+        foreach($materials as $material)
+        {
+            $mat = Material::findOrNew($material['id']);
+            $mat->job_id = $job_id;
+            $mat->name = $material['name'];
+            $mat->qty = $material['qty'];
+            $result &= $mat->save();
+        }
+        return $result;
+    }
+
+    private function update_job(Job $job, Request $request)
+    {
+        $job->size = $request->size;
+        $job->customer_type = $request->customertype;
+        $job->contractor = $request->contractor;
+        $job->date_sold = $this->dbDate($request->datesold);
+        $job->job_type = $request->jobtype;
+        $job->sqft_price = $request->sqftprice;
+        $job->proposal_amount = $request->proposalamount;
+        $job->invoiced_amount = $request->invoicedamount;
+        $job->pavers_ordered = ($request->paversordered == 'true');
+        $job->prelien = ($request->prelien == 'true');
+        $job->bluestakes = ($request->bluestakes == 'true');
+        $job->property_type = $request->propertytype;
+        $job->crew = $request->crew;
+        $job->downpayment_done = $request->downpayment;
+
+        $job->save();
+        return $job;
     }
 
     private function dbDate($datestr)
@@ -363,6 +401,39 @@ class JobController extends Controller
         $date = strtotime($datestr);
         return date('Y-m-d H:i:s', $date);
     }
+
+    public  function style_print($id)
+    {
+        $stylegroup = StyleGroup::find($id);
+
+        $jobname = $this->job_name($stylegroup);
+        $pdf = PDF::loadView('pdf.style', compact('stylegroup', 'jobname'));
+        $pdf->setPaper('letter', 'portrait');
+        return $pdf->inline();
+
+//      return view('pdf.style', compact('stylegroup', 'jobname'));
+    }
+
+    public  function style_view($id)
+    {
+        $stylegroup = StyleGroup::find($id);
+        $jobname = $this->job_name($stylegroup);
+
+        return view('pdf.stylehtml', compact('stylegroup', 'jobname'));
+    }
+
+    private function job_name($sgroup)
+    {
+        if($sgroup->job['customer_type'] == 'Contractor')
+        {
+            return $sgroup->job['contractor'];
+        }
+        else
+        {
+            return $sgroup->job->lead['customer_name'];
+        }
+    }
+
 
 //    public function upload($lead_id)
 //    {

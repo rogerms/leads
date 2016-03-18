@@ -10,4 +10,9 @@ class StyleGroup extends Model
     {
         return $this->hasMany('App\Style', 'group_id');
     }
+
+    public function job()
+    {
+        return $this->belongsTo('App\Job');
+    }
 }

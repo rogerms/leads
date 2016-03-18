@@ -64,6 +64,31 @@
         }
     }
 
+    if(!function_exists('format_date'))
+    {
+        function format_date($time)
+        {
+            $zero = new DateTime('0000-00-00 00:00:00');
+            if(! $time instanceof Datetime)
+            {
+                if(is_int($time ))
+                {
+                    $tmp = new DateTime();
+                    $tmp->setTimestamp($time);
+                    $time = $tmp;
+                }
+                else{
+                    $time = new Datetime($time);
+                }
+            }
+            if($time == $zero)
+            {
+                return '';
+            }
+            return $time->format('m/d/Y');
+        }
+    }
+
 
     //convert date from database to show in form input type date 2015-01-02
     if(!function_exists('toInputDate'))
@@ -102,6 +127,7 @@
 	{
 		function isChecked($value)
         {
+            if($value == null) return '';
 			if($value) 
 				return 'checked';
 			return '';

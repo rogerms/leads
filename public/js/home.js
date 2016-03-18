@@ -6,7 +6,7 @@ var _newLine = margin;
 var _xgap = 4;
 var _SUBLINEOFF = 7;
 var _LEFTMARGIN = 7;
-function process()
+function processPDF()
 {
 	
 	var doc = new jsPDF({format: 'legal', unit: 'mm'});

@@ -111,7 +111,11 @@ Route::group(['middleware' => 'web'], function () {
 
     Route::any('job/store', 'JobController@store');
 
-    Route::any('job/update', 'JobController@update');
+    Route::post('job/update', 'JobController@update');
 
     Route::any('jobs', 'JobController@index');
+
+    Route::any('style/pdf/{id}', 'JobController@style_print');
+
+    Route::any('style/html/{id}', 'JobController@style_view');
 });

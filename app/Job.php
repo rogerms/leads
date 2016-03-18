@@ -30,4 +30,9 @@ class Job extends Model
     {
         return $this->hasMany('App\Removal');
     }
+
+    public function materials()
+    {
+        return $this->hasMany('App\Material');
+    }
 }

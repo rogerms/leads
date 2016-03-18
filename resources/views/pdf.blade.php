@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
-<script src="js/jspdf.js"></script>
-<script src="js/home.js"></script>
+<script src="/js/jspdf.js"></script>
+<script src="/js/home.js"></script>
 <body>
 <div>
     <form>
@@ -19,6 +19,11 @@
     </form>
 </div>
 <br>
+{{ var_dump($stylegroup) }}
+<hr>
+{{ var_dump($stylegroup->job) }}
+<hr>
+{{ var_dump($stylegroup->job->lead) }}
 <div>
     <input type="button" value="Create PDF" onclick="process()" />
 </div>

@@ -161,6 +161,9 @@ return [
         //IDE helper
         Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
 
+        //PDF
+        Barryvdh\Snappy\ServiceProvider::class,
+
     ],
 
     /*
@@ -206,7 +209,8 @@ return [
         'URL'       => Illuminate\Support\Facades\URL::class,
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View'      => Illuminate\Support\Facades\View::class,
-
+        'PDF'       => Barryvdh\Snappy\Facades\SnappyPdf::class,
+        'Image'     => Barryvdh\Snappy\Facades\SnappyImage::class,
 
     ],
 

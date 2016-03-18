@@ -45,7 +45,7 @@ class LeadController extends Controller
 //        if (\Gate::denies('read-job', $lead)) {
 //            $lead->job = null;
 //        }
-        return view('lead', 
+        return view('lead.lead',
         	[
         	'lead' => $lead,
         	'statuses' => Status::orderBy('name')->get(),
@@ -212,7 +212,7 @@ class LeadController extends Controller
                         FROM leads
                         WHERE appointment >= DATE(now()) AND appointment < ADDDATE(DATE(NOW()), INTERVAL 1 WEEK)");
 
-            return view('leads', ['leads' => $leads, 'status_count' => $status, 'reps_count' => $reps, 'appts' => $appts[0]]);
+            return view('lead.index', ['leads' => $leads, 'status_count' => $status, 'reps_count' => $reps, 'appts' => $appts[0]]);
         }
 
 /*         $admins = DB::table('users')
@@ -230,7 +230,7 @@ class LeadController extends Controller
     {
 
         $this->authorize('edit');
-        return view('create',
+        return view('lead.create',
                 [
                     'statuses' => Status::all(),
                     'salesreps' => SalesRep::all(),
@@ -259,7 +259,6 @@ class LeadController extends Controller
 
         $result = $lead->save();
 
-        
         if($request->note != "")
         {
             $note = new Note;
@@ -274,7 +273,17 @@ class LeadController extends Controller
 
         $r = ($result)? ['created' => $lead->id]: [];
 
-        return redirect()->action('LeadController@showall', $r);
+        $message['text'] = 'Lead created successufully';
+        $message['class'] = 'alert-success';
+        $message['title'] = 'Info!';
+
+        if($result == false)
+        {
+            $message['text'] = 'Error trying to create lead';
+            $message['class'] = 'alert-danger';
+            $message['title'] = 'Error!';
+        }
+        return redirect()->action('LeadController@index', $r)->with('message', $message);
     }
 
     public function update(Request $request)
@@ -341,7 +350,7 @@ class LeadController extends Controller
             $tmp = [];
             $cities = DB::table('cities')->select('name')->get();
             foreach ($cities as $key => $citie) {
-                $tmp = $citie->name;
+                $tmp[] = $citie->name;
             }
             return $tmp;
         });
@@ -434,7 +443,7 @@ class LeadController extends Controller
     public function services()
     {
         echo "Page";
-        echo hello('james');
+        echo hello('james'); //testing  function inside customHelper
         //echo Hello::show('Joe');
 //        Cache::forever('leads_pages',
 //      //      ['name' => 'Mary', 'age' => 25]);

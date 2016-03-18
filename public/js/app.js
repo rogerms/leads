@@ -4,95 +4,139 @@ var processingSearch = false;
 var autocompleteLists = [];
 
 $(function () {
-    $.ajaxSetup({
-        headers: {
-            "X-CSRF-TOKEN": $("input[name='_token']").val()
-        }
-    });
+    processingSearch = false;
+    setupAjaxHeader();
+    setAutoComplete();
+    fixAppointmentViewFormat();
+    //needs to add listener after a new job is added if using modal form
+	$('#leadnote,.jobnote').keypress(addnote);
 
+    $('#addremoval').on('click', addremovals);
+
+    $('div[name=notes]').on('click', '.delete-note', deletenote);
+
+    $('#printlead').on('click', processPDF);
+
+	$('.stylesgroups').on('click', '.add-style',addStyle);
+
+    $('.add-style-group').click(addStyleGroup);
+
+	$("#savebt").on("click", saveLead);
+
+	$("#createjob").on('click', createJob);
+
+	$('#updatelead').click(updateLead);
+
+	$('.updatejob').click(updateJob);
+
+    $("#leadstb tbody").on("click", "tr", tableRowGoto);
+
+    $('#addImageModal').on('show.bs.modal', addImage);
+
+    $('.sketch-group').on('click', '.sketch-tbn', viewImage);
+
+	$('#searchbt').on('click', searchLeads);
+
+    $('#searchtx').keypress(seachLeadsEnter);
+
+    addSearchAutoComplete();
+
+    $('[data-toggle="offcanvas"]').click(function () {$('.row-offcanvas').toggleClass('active')}); //todo cleanup
+
+    $('.tbfilter').on('change', searchLeads);
+
+    $('.searchby').on('click', changeSearchBy);
+
+    $('body').on('click', hideContextMenu);
+
+    $('#drawings').on("contextmenu", '.sketch-nail', showContextMenu);
+
+    $("#contextMenu").on("click", "a", runContextMenuAction);
+
+    $('ul.j-pager li').on('click', 'a', updatePagination);
+
+    $('#add-material').on('click', addmaterial);
+
+    $('.toggle-box').on('click', toggleStyles);
+
+});
+
+
+function toggleStyles()
+{
+    var id = $(this).attr('id');
+    var name = '[name=ss'+id+']';
+    if($(this).hasClass('glyphicon-minus-sign'))
+    {
+        $(this).removeClass('glyphicon-minus-sign');
+        $(this).addClass('glyphicon-plus-sign');
+    }
+    else
+    {
+        $(this).removeClass('glyphicon-plus-sign');
+        $(this).addClass('glyphicon-minus-sign');
+    }
+    $(name).toggle();
+}
+
+function fixAppointmentViewFormat()
+{
     if($('#appointment').prop('type') == 'text')
     {
         var date = formDate($('#appointment').val());
         $('#appointment').val(date);
     }
+}
 
-    processingSearch = false;
-    var param = parseQueryString();
-    if(param['created'] > 0)
-    {
-        window.location.replace('/leads');
-        showResult('New lead created!');
-    }
-
-    var getcities = function () {
-        $.ajax({
-            url: "/getcities",
-            type: 'POST'
-        })
-        .done(function (data)
-        {
-            console.log(data);
-            // auto complete for cities 
-            $('#city').autocomplete({
-                source: data['cities'],
-                minLength: 1
-            });
-
-            $('input[name=paverstyle]').autocomplete({
-                source: data['styles'],
-                minLength: 1
-            });
-
-            $('input[name=manufacturer]').autocomplete({
-                source: data['manus'],
-                minLength: 1
-            });
-
-            $('input[name=pavercolor]').autocomplete({
-                source: data['colors'],
-                minLength: 1
-            });
-
-            $('input[name=paversize]').autocomplete({
-                source: data['sizes'],
-                minLength: 1
-            });
-            autocompleteLists = data;
-        });
-    };
-
-    //needs to add listener after a new job is added if using modal form
-	$('#leadnote,.jobnote').keypress(addnote);
-
-	$('#addjobbt').click(function () {
-	    window.location.href = "/job/create/" + $('#leadid').val();
-	});
-
-    $('#addremoval').on('click', function(){
-
-        var tag = '<input type="text" class="form-control inline-control" name="removal" data-removalid="0" value="" placeholder="removal...">';
-        $(this).before(tag);
-
-        $('input[name=removal]').each(function(){
-            if ($(this).autocomplete( "instance" ) == undefined) //add only if it doesn't have one already
-                $(this).autocomplete({source: autocompleteLists['removals']});
-        });
+function setupAjaxHeader()
+{
+    $.ajaxSetup({
+        headers: {
+            "X-CSRF-TOKEN": $("input[name='_token']").val()
+        }
     });
+}
 
-    $('div[name=notes]').on('click', '.delete-note', function (event){
-        event.preventDefault();
-        var noteid = $(this).data('noteid');
-        var tag = $(this).parent('a');
+function updatePagination (event)
+{
+    //todo check if this function is used
+    event.preventDefault();
+    event.stopPropagation();
+    var page = $(this).prop('href').match(/\d+/g)[0];
+    console.log(page);
 
-        var dialog = $('#delete-confirmation');
+    $.ajax({
+        url: "/getpagi",
+        data: { page: page },
+        type: 'POST'
+    }).done(function (msg) {
+        $('#leadstb > tbody').html(msg.leads);
+        var pager = $(this).parents('ul');
+        pager.find('a:nth-child(1)').prop('href', msg.prev);
+        pager.find('a:nth-child(2)').prop('href', msg.next);
+    });
+}
 
-        //remove any listener leftover from older calls
-        dialog.find('#confirmOk').off('click');
-        //delete item if OK button is pressed
-        dialog.find('#confirmOk').on('click', function () {
+function hideContextMenu ()
+{
+    $("#contextMenu").hide();
+}
 
-            dialog.modal('hide');
-            $(this).off( "click");
+function deletenote (event)
+{
+    event.preventDefault();
+    var noteid = $(this).data('noteid');
+    var tag = $(this).parent('a');
+
+    var dialog = $('#delete-confirmation');
+
+    //remove any listener leftover from older calls
+    dialog.find('#confirmOk').off('click');
+    //delete item if OK button is pressed
+    dialog.find('#confirmOk').on('click', function () {
+
+        dialog.modal('hide');
+        $(this).off( "click");
 
         $.ajax({
                 url: '/note/delete/'+noteid,
@@ -110,402 +154,60 @@ $(function () {
                     showResult('Note deleted');
                 }
             });
-        });
-
-        dialog.modal('show');
     });
 
-    $('#printlead').on('click', function(){
-        process();
+    dialog.modal('show');
+}
+
+function addStyle()
+{
+    var slist = $(this).parents('.style-sheet').find('.style-rows');
+    var tag = $('#templates').find('.style-row').first().clone();
+
+    slist.append(tag);
+    //add autocomplete to new ones
+    tag.find('#paverstyle').autocomplete({source: autocompleteLists['styles']});
+    tag.find('#manufacturer').autocomplete({source: autocompleteLists['manus']});
+    tag.find('#pavercolor').autocomplete({source: autocompleteLists['colors']});
+    tag.find('#paversize').autocomplete({source: autocompleteLists['sizes']});
+}
+
+function addStyleGroup()
+{
+    var slist = $(this).parents('.stylesgroups').find('.style-sheets');
+    var tag = $('#templates').find('.style-sheet').first().clone();
+    tag.find('.group-count').text(slist.find('.group-count').length + 1 + '*');
+
+    //tag.attr('id', 0);
+    //tag.find('input').val('');
+    //tag.find('#tumbled ').prop('checked', false);
+    slist.append(tag);
+    //add autocomplete to new ones
+    //todo
+    //add listener to add style button
+    tag.find('#paverstyle').autocomplete({source: autocompleteLists['styles']});
+    tag.find('#manu').autocomplete({source: autocompleteLists['manus']});
+    tag.find('#pavercolor').autocomplete({source: autocompleteLists['colors']});
+    tag.find('#paversize').autocomplete({source: autocompleteLists['sizes']});
+}
+
+function addmaterial()
+{
+    //var list = $(this).parent('#materials');
+    var tag = $('#templates').children('#material').clone();
+    $(this).before(tag);
+}
+
+function addremovals()
+{
+    var tag = '<input type="text" class="form-control inline-control" name="removal" data-removalid="0" value="" placeholder="removal...">';
+    $(this).before(tag);
+
+    $('input[name=removal]').each(function(){
+        if ($(this).autocomplete( "instance" ) == undefined) //add only if it doesn't have one already
+            $(this).autocomplete({source: autocompleteLists['removals']});
     });
-	//$("#createbt").on("click", function() {
-	//	event.preventDefault();
-	//	window.location.href = "/create";
-	//});
-
-	$('#anotherstyle, .anotherstyle').click(function () {
-	    var slist = $(this).parents('form').find('#jobstyles');
-	    var tag = $('.stylegroup').first().clone();
-        tag.data('styleid', 0);
-        tag.find('input').val('');
-        tag.find('#tumbled ').prop('checked', false);
-
-        console.log(tag);
-	    slist.append(tag);
-
-        //add autocomplete to new ones
-        tag.find('#paverstyle').autocomplete({source: autocompleteLists['styles']});
-        tag.find('#manufacturer').autocomplete({source: autocompleteLists['manus']});
-        tag.find('#pavercolor').autocomplete({source: autocompleteLists['colors']});
-        tag.find('#paversize').autocomplete({source: autocompleteLists['sizes']});
-	});
-
-
-	$("#savebt").on("click", function() {
-		event.preventDefault();
-
-		var formdata = {
-		customer: $('#customer').val(),
-		contact: $('#contact').val(),
-		street: $('#street').val(),
-		city: $('#city').val(),
-		zip: $('#zip').val(),
-		phone: $('#phone').val(),
-		email: $('#email').val(),
-		appointment: $('#appointment').val(),
-		note: $('#note').val(),
-		takenby: $('#takenby').val(),
-		source: $('#source').val(),
-		salesrep: $('#salesrep').val(),
-		status: $('#status').val()
-
-		};
-
-		console.log(formdata);
-		$.ajax({
-                url: "/store",
-			    data: formdata,
-                type: 'POST'
-            })
-			.done(function(data){
-         		showResult('New lead created successfully!')
-			})
-            .fail(function(){
-                showResult('Error trying to create a new lead!', true);
-            });
-	});
-
-	$("#createjob").on('click', function () {
-
-	    var styles = [];
-	    $('#jobstyles').find('.stylegroup').each(function () {
-	        styles.push({
-	            style: $(this).find('#paverstyle').val(),
-	            manu: $(this).find('#manufacturer').val(),
-	            color: $(this).find('#pavercolor').val(),
-	            size: $(this).find('#paversize').val(),
-                sqft: $(this).find('#sqft').val(),
-                weight: $(this).find('#weight').val(),
-                price: $(this).find('#price').val(),
-                palets: $(this).find('#palets').val(),
-                tumbled: $(this).find('#tumbled:checked').length
-	        });
-
-	    });
-	    var features = {};
-	    $('input[name=featurescb]').each(function () {
-	        features[$(this).val()] = $(this).prop('checked');
-	    });
-
-        var removals = [];
-        $('#removals').find('input').each(function () {
-            var value = $(this).val();
-            if(value != '')
-            {
-                removals.push({
-                   id: $(this).data('removalid'),
-                    name: value
-                });
-            }
-        });
-
-	    var leadId = $('#leadid').val();
-	    var formdata = {
-	        leadid: leadId,
-	        size: $('#size').val(),
-	        customertype: $('#customertype').val(),
-	        contractor: $('#contractor').val(),
-	        datesold: $('#datesold').val(),
-	        jobtype: $('#jobtype').val(),
-	        sqftprice: $('#sqftprice').val(),
-	        proposalamount: $('#proposalamount').val(),
-	        invoicedamount: $('#invoicedamount').val(),
-	        paversordered: $('#paversordered').prop('checked'),
-	        prelien: $('#prelien').prop('checked'),
-	        bluestakes: $('#bluestakes').prop('checked'),
-	        propertytype: $('#propertytype').val(),
-	        note: $('#note').val(),
-	        styles: styles,
-	        features: features,
-            downpayment: $('#downpayment:checked').length,
-            orderedby: $('#orderedby').val(),
-            handledby: $('#handledby').val(),
-            delivered: $('#delivered').val(),
-            placementnote: $('#placementnote').val(),
-            portland: $('#portland').val(),
-            crew: $('#crew').val(),
-            removals: removals
-	    };
-
-	    console.log(formdata);
-	    $.ajax({
-            url: "/job/store",
-            data: formdata,
-            type: 'POST'
-			})
-			.done(function (data) {
-			    if (data.result == 'success')
-			    {
-			        window.location.href = "/lead/" + leadId;
-			    }
-			})
-            .fail(function(){
-                showResult('Erro trying to open page', true);
-            });
-	});
-    //update job
-    //id: $(this).data("styleid")
-
-
-    //update lead
-	$('#updatelead').click(function () {
-	    event.preventDefault();
-	    var id = $('#leadid').val();
-	    var fdata = {
-	        id: id,
-	        customer: $('#customer').val(),
-	        contact: $('#contact').val(),
-	        street: $('#street').val(),
-	        city: $('#city').val(),
-	        zip: $('#zip').val(),
-	        phone: $('#phone').val(),
-	        email: $('#email').val(),
-	        appointment: $('#appointment').val(),
-	        apptime: $('#apptime').val(),
-	        takenby: $('#takenby').val(),
-	        source: $('#source').val(),
-	        salesrep: $('#salesrep').val(),
-	        status: $('#status').val()
-	    };
-
-	    $.ajax({
-	        url: "/update",
-	        data: fdata,
-            type: 'POST'
-	    }).done(function (msg) {
-	        console.log(msg);
-	        if (msg.result == 200) {
-
-	            showResult("lead info updated");
-	        }
-
-	    }).fail(function(){
-            showResult('Error trying to update lead info');
-        });
-
-	});
-
-    //update job
-	$('.updatejob').click(function () {
-	    event.preventDefault();
-	    var form = $(this).parents('form');
-	    var id = form.find('#jobid').val();
-
-	    var features = {};
-	    form.find('input[name=feats]').each(function () {
-	        features[$(this).val()] = $(this).prop('checked');
-	    });
-
-	    var styles = [];
-	    form.find('#jobstyles').find('.stylegroup').each(function () {
-	        var row = {
-	            id: $(this).data('styleid'),
-	            style: $(this).find('#paverstyle').val(),
-	            manu: $(this).find('#manufacturer').val(),
-	            color: $(this).find('#pavercolor').val(),
-	            size: $(this).find('#paversize').val(),
-                sqft: $(this).find('#sqft').val(),
-                weight: $(this).find('#weight').val(),
-                price: $(this).find('#price').val(),
-                palets: $(this).find('#palets').val(),
-                tumbled: $(this).find('#tumbled:checked').length
-	        };
-            if (!empty(row)) styles.push(row);
-	    });
-
-        var removals = [];
-        form.find('#removals').find('input').each(function (){
-            var value = $(this).val();
-            if (value != '')
-            {
-                removals.push(
-                    {
-                        id: $(this).data('removalid'),
-                        name: value
-                    }
-                );
-            }
-        });
-
-	    var fdata = {
-	        id: id,
-	        size: form.find('#size').val(),
-	        customertype: form.find('#customertype').val(),
-	        contractor: form.find('#contractor').val(),
-	        datesold: form.find('#datesold').val(),
-	        jobtype: form.find('#jobtype').val(),
-	        sqftprice: form.find('#sqftprice').val(),
-	        proposalamount: form.find('#proposalamount').val(),
-	        invoicedamount: form.find('#invoicedamount').val(),
-	        propertytype: form.find('#propertytype').val(),
-	        paversordered: form.find('#paversordered').prop('checked'),
-	        prelien: form.find('#prelien').prop('checked'),
-	        bluestakes: form.find('#bluestakes').prop('checked'),
-	        features: features,
-	        styles: styles,
-            portland: form.find('#portland').val(),
-            crew: form.find('#crew').val(),
-            downpayment: form.find('#downpayment:checked').length,
-            orderedby: form.find('#orderedby').val(),
-            handledby: form.find('#handledby').val(),
-            delivered: form.find('#delivered').val(),
-            placementnote: form.find('#placementnote').val(),
-            removals: removals
-	    };
-	    console.log(fdata);
-	
-	    $.ajax({
-	        url: "/job/update",
-	        data: fdata,
-            type: 'POST'
-	    }).done(function (msg) {
-	        console.log(msg);
-	        if (msg.result == 'success') {
-
-	            showResult('Job info updated!');
-	        }
-	    }).fail(function (){
-            showResult('Error trying to update job info!', true);
-        });
-
-	});
-
-
-    $("#leadstb tbody").on("click", "tr", function () {
-        //alert($(this).data('id'));
-        window.location.href = "lead/" + $(this).data('id');
-    });
-
-    $('#addImageModal').on('show.bs.modal', function (event) {
-        var button = $(event.relatedTarget); // Button that triggered the modal
-        var leadid = $('#leadid').val();
-
-        var modal = $(this);
-
-        modal.find('#uploadImage').click(function(event) {
-            var files = modal.find('#inputfile').prop('files');
-            var title = modal.find('#title').val();
-
-            console.log('button clicked from job -- '+ leadid +' length '+ files.length);
-            if(files.length > 0) {
-                uploadFile(event, files[0], leadid, title);
-                modal.modal('hide');
-            }
-        });
-
-
-    });
-
-    $('.sketch-group').on('click', '.sketch-tbn', function(event){
-        event.preventDefault();
-        var url = $(this).prop('href');
-        $('#showImageModal').find('#img-holder').prop('src', url);
-
-        var modal = $('#showImageModal');
-        modal.modal('show');
-    });
-
-
-	$('#searchbt').on('click', function () {
-        searchLeads();
-	});
-
-    $('#searchtx').keypress(function (e) {
-        if (e.which == 13) {
-            e.preventDefault();
-            $('#searchtx').autocomplete('close');
-            searchLeads();
-        }
-    });
-
-	$('#searchtx').autocomplete({
-	    source: 'getdata',
-	    minLength: 1,
-	    select: function (event, ui) {
-	        console.log(ui.item.label);
-            $('#searchtx').val(ui.item.label); //set textfield value
-            searchLeads();
-	    }
-	});
-
-    $('[data-toggle="offcanvas"]').click(function () {
-        $('.row-offcanvas').toggleClass('active')
-    });
-
-
-    $('.tbfilter').on('change', function(event) {
-       // filterTable(event);
-        searchLeads();
-    });
-
-    $('.searchby').on('click', function (){
-        $('#searchbt > small').text($(this).text());
-    });
-
-    $('body').on('click', function(){
-        $contextMenu.hide();
-    });
-
-    var $contextMenu = $("#contextMenu");
-
-    $('#drawings').on("contextmenu", '.sketch-nail', function(e) {
-        $contextMenu.data('id', $(this).data('drawingid'));
-
-        $contextMenu.css({
-            display: "block",
-            left: e.pageX,
-            top: e.pageY
-        });
-        return false;
-    });
-
-    $contextMenu.on("click", "a", function() {
-        var select = $(this).text();
-        if(select == 'Delete')
-        {
-            var drawingid = $contextMenu.data('id');
-            console.log('Delete '+ drawingid);
-            deleteDrawing($(this), drawingid);
-        }
-        if(select == 'Select')
-        {
-            //console.log('Select '+ $contextMenu.data('id'));
-            selectOneDrawing($contextMenu.data('id'));
-        }
-        $contextMenu.hide();
-    });
-
-    $('ul.j-pager li').on('click', 'a', function(event){
-        event.preventDefault();
-        event.stopPropagation();
-        var page = $(this).prop('href').match(/\d+/g)[0];
-        console.log(page);
-
-        $.ajax({
-            url: "/getpagi",
-            data: { page: page },
-            type: 'POST'
-        }).done(function (msg) {
-            $('#leadstb > tbody').html(msg.leads);
-            var pager = $(this).parents('ul');
-            pager.find('a:nth-child(1)').prop('href', msg.prev);
-            pager.find('a:nth-child(2)').prop('href', msg.next);
-        });
-
-    });
-
-    getcities();
-});
+}
 
 function selectOneDrawing(id)
 {
@@ -531,13 +233,382 @@ function selectOneDrawing(id)
         });
 }
 
+function changeSearchBy()
+{
+    $('#searchbt > small').text($(this).text());
+}
+
+function saveLead() {
+    event.preventDefault();
+
+    var formdata = {
+        customer: $('#customer').val(),
+        contact: $('#contact').val(),
+        street: $('#street').val(),
+        city: $('#city').val(),
+        zip: $('#zip').val(),
+        phone: $('#phone').val(),
+        email: $('#email').val(),
+        appointment: $('#appointment').val(),
+        note: $('#note').val(),
+        takenby: $('#takenby').val(),
+        source: $('#source').val(),
+        salesrep: $('#salesrep').val(),
+        status: $('#status').val()
+
+    };
+
+    console.log(formdata);
+    $.ajax({
+            url: "/store",
+            data: formdata,
+            type: 'POST'
+        })
+        .done(function(data){
+            showResult('New lead created successfully!')
+        })
+        .fail(function(){
+            showResult('Error trying to create a new lead!', true);
+        });
+}
+
+function setAutoComplete () {
+    $.ajax({
+            url: "/getcities",
+            type: 'POST'
+        })
+        .done(function (data)
+        {
+            console.log(data);
+            // auto complete for cities
+            $('#city').autocomplete({
+                source: data['cities'],
+                minLength: 1
+            });
+
+            $('input[name=paverstyle]').autocomplete({
+                source: data['styles'],
+                minLength: 1
+            });
+
+            $('input[name=manu]').autocomplete({
+                source: data['manus'],
+                minLength: 1
+            });
+
+            $('input[name=pavercolor]').autocomplete({
+                source: data['colors'],
+                minLength: 1
+            });
+
+            $('input[name=paversize]').autocomplete({
+                source: data['sizes'],
+                minLength: 1
+            });
+
+            $('input[name=removal]').autocomplete({
+                source: data['removals'],
+                minLength: 1
+            });
+            autocompleteLists = data;
+        });
+}
+
 function empty (arow) {
+    //console.log('empty');
+    //console.log(arow);
     for (var i in arow)
     {
-        if(arow[i].length > 0)
+        if(arow[i].length > 0 && arow[i] != 0)
             return false;
     }
     return true;
+}
+
+function createJob () //todo change to direct post instead of ajax
+{
+    var form = $('form');
+    var leadId = $('#leadid').val();
+    var formdata = jobFormData(form);
+
+    formdata['leadid'] = leadId;
+
+    console.log(formdata);
+
+    $.ajax({
+            url: "/job/store",
+            data: formdata,
+            type: 'POST'
+        })
+        .done(function (data) {
+            if (data.result == 'success')
+            {
+                window.location.href = "/lead/" + leadId;
+            }
+        })
+        .fail(function(){
+            showResult('Error trying to open page', true);
+        });
+}
+
+function jobFormData(form)
+{
+    return {
+        size: form.find('#size').val(),
+        customertype: form.find('#customertype').val(),
+        contractor: form.find('#contractor').val(),
+        datesold: form.find('#datesold').val(),
+        jobtype: form.find('#jobtype').val(),
+        sqftprice: form.find('#sqftprice').val(),
+        proposalamount: form.find('#proposalamount').val(),
+        invoicedamount: form.find('#invoicedamount').val(),
+        propertytype: form.find('#propertytype').val(),
+        paversordered: form.find('#paversordered').prop('checked'),
+        prelien: form.find('#prelien').prop('checked'),
+        bluestakes: form.find('#bluestakes').prop('checked'),
+        crew: form.find('#crew').val(),
+        downpayment: form.find('#downpayment:checked').length,
+        materials: getMaterials(form),
+        stylegroups: getStyleGroups(form),
+        removals: getRemovals(form),
+        features: getFeats(form)
+    };
+}
+
+function getRemovals(form)
+{
+    var removals = [];
+    form.find('#removals').find('input').each(function (){
+        var value = $(this).val();
+        if (value != '')
+        {
+            removals.push(
+                {
+                    id: $(this).data('removalid'),
+                    name: value
+                }
+            );
+        }
+    });
+
+    return removals;
+}
+
+function showContextMenu ()
+{
+    var $contextMenu = $("#contextMenu");
+    $('#drawings').on("contextmenu", '.sketch-nail', function(e) {
+        $contextMenu.data('id', $(this).data('drawingid'));
+
+        $contextMenu.css({
+            display: "block",
+            left: e.pageX,
+            top: e.pageY
+        });
+        return false;
+    });
+}
+
+function runContextMenuAction() {
+    var $contextMenu = $("#contextMenu");
+    var select = $(this).text();
+    if(select == 'Delete')
+    {
+        var drawingid = $contextMenu.data('id');
+        console.log('Delete '+ drawingid);
+        deleteDrawing($(this), drawingid);
+    }
+    if(select == 'Select')
+    {
+        //console.log('Select '+ $contextMenu.data('id'));
+        selectOneDrawing($contextMenu.data('id'));
+    }
+    $contextMenu.hide();
+}
+
+function addImage(event) {
+    var button = $(event.relatedTarget); // Button that triggered the modal
+    var leadid = $('#leadid').val();
+
+    var modal = $(this);
+
+    modal.find('#uploadImage').click(function(event) {
+        var files = modal.find('#inputfile').prop('files');
+        var title = modal.find('#title').val();
+
+        console.log('button clicked from job -- '+ leadid +' length '+ files.length);
+        if(files.length > 0) {
+            uploadFile(event, files[0], leadid, title);
+            modal.modal('hide');
+        }
+    });
+}
+
+function addSearchAutoComplete()
+{
+    $('#searchtx').autocomplete({
+        source: 'getdata',
+        minLength: 1,
+        select: function (event, ui) {
+            console.log(ui.item.label);
+            $('#searchtx').val(ui.item.label); //set textfield value
+            searchLeads();
+        }
+    });
+}
+
+function seachLeadsEnter (e) {
+    if (e.which == 13) {
+        e.preventDefault();
+        $('#searchtx').autocomplete('close');
+        searchLeads();
+    }
+}
+
+function viewImage(event){
+    event.preventDefault();
+    var url = $(this).prop('href');
+    $('#showImageModal').find('#img-holder').prop('src', url);
+
+    var modal = $('#showImageModal');
+    modal.modal('show');
+}
+
+function tableRowGoto () {
+    window.location.href = "lead/" + $(this).data('id');
+}
+
+function updateJob () {
+    event.preventDefault();
+
+    var form = $(this).parents('form');
+    var id = form.find('#jobid').val();
+    var fdata = jobFormData(form);
+
+    fdata['id'] = id;
+
+    console.log(fdata);
+
+    $.ajax({
+        url: "/job/update",
+        data: fdata,
+        type: 'POST'
+    }).done(function (msg) {
+        console.log(msg);
+        if (msg.result == 'success') {
+            form.find('.group-count').each(function(){
+                //remove *
+                var txt = $(this).text().replace('*', '');
+                $(this).text(txt);
+            })
+            showResult('Job info updated!');
+        }
+    }).fail(function (){
+        showResult('Error trying to update job info!', true);
+    });
+}
+
+function getFeats(form)
+{
+    var features = {};
+    form.find('input[name=feats]').each(function () {
+        features[$(this).val()] = $(this).prop('checked');
+    });
+
+    return features;
+}
+
+function getMaterials(form)
+{
+    var list = [];
+    form.find('.material').each(function()
+    {
+        var material = $(this);
+        var item = {
+            id: material.attr('id'),
+            name: material.find('#name').val(),
+            qty: material.find('#qty').val()
+        }
+        if(!empty(item)) list.push(item);
+    });
+    return list;
+}
+
+function getStyleGroups(form)
+{
+    //groups
+    var stylegroups = [];
+    form.find('.style-sheet').each(function() {
+        var styles = [];
+        var gr = {
+            id: $(this).attr('id'),
+            manu: $(this).find('#manu').val(),
+            portland: $(this).find('#portland').val(),
+            orderedby: $(this).find('#orderedby').val(),
+            handledby: $(this).find('#handledby').val(),
+            delivery: $(this).find('#delivery').val(),
+            note: $(this).find('#note').val()
+        };
+
+        $(this).find('.style-row').each(function () {
+            var row = {
+                id: $(this).attr('id'),
+                style: $(this).find('#paverstyle').val(),
+                //manu: $(this).find('#manufacturer').val(),
+                color: $(this).find('#pavercolor').val(),
+                size: $(this).find('#paversize').val(),
+                sqft: $(this).find('#sqft').val(),
+                weight: $(this).find('#weight').val(),
+                price: $(this).find('#price').val(),
+                palets: $(this).find('#palets').val(),
+                tumbled: $(this).find('#tumbled:checked').length
+            };
+            if (!empty(row)) styles.push(row);
+        });
+        if (!empty(gr) || !empty(styles))
+        {
+            gr['styles'] = styles;
+            stylegroups.push(gr);
+        }
+    });
+    return stylegroups;
+}
+
+function updateLead () {
+    event.preventDefault();
+    var id = $('#leadid').val();
+    var fdata = {
+        id: id,
+        customer: $('#customer').val(),
+        contact: $('#contact').val(),
+        street: $('#street').val(),
+        city: $('#city').val(),
+        zip: $('#zip').val(),
+        phone: $('#phone').val(),
+        email: $('#email').val(),
+        appointment: $('#appointment').val(),
+        apptime: $('#apptime').val(),
+        takenby: $('#takenby').val(),
+        source: $('#source').val(),
+        salesrep: $('#salesrep').val(),
+        status: $('#status').val()
+    };
+
+    $.ajax({
+        url: "/update",
+        data: fdata,
+        type: 'POST'
+    }).done(function (msg) {
+        console.log(msg);
+        if (msg.result == 200) {
+
+            showResult("lead info updated");
+        }
+
+    }).fail(function(){
+        showResult('Error trying to update lead info');
+    });
+
 }
 
 function deleteDrawing(target, drawingid)
@@ -735,6 +806,7 @@ function searchLeads() {
             processingSearch = false;
         })
         .fail(function () {
+            processingSearch = false;
             showResult('Error trying to get leads', true);
         });
 }
@@ -930,7 +1002,6 @@ function addnote() {
                 '<span aria-hidden="true">&times;</span></button>'+
                 '<h4 class="list-group-item-heading">'+ data.note +'</h4>' +
                 '<p class="list-group-item-text">Created on: ' + data.created + '</p></a>';
-
 
             var list = target.parents('form').find('#notes');
             target.val("");//clear the input text field
