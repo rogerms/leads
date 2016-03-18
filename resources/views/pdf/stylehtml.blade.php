@@ -34,6 +34,7 @@
             width: 1000px;
             margin-bottom: -5px;
             padding: 0;
+            margin: auto;
         }
         .to-div{
             width: 100%;
