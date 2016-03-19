@@ -155,8 +155,8 @@
                     <td>{{ $style->palets }}</td>
                     <td>{{ $style->sqft }}</td>
                     <td>{{ $style->style }}</td>
-                    <td>{{ $style->color }}</td>
                     <td>{{ $style->size }}</td>
+                    <td>{{ $style->color }}</td>
                     <td>{{ ($style->tumbled == true)? 'YES': 'NO' }}</td>
                     <td>{{ $style->weight }}</td>
                     <td>{{ $style->price }}</td>
