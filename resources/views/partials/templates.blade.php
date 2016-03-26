@@ -74,21 +74,35 @@
         </div>
     </div>
     <div class="row">
-        <div class="form-group col-md-6">
+        <div class="form-group col-md-4">
             <label for="placementnote">Notes for placing pavers</label>
             <input type="text" class="form-control" id="note" value="" >
+        </div>
+        <div class="form-group col-md-4">
+            <label for="deliveryaddr">Delivery Address</label>
+            <input type="text" class="form-control" id="deliveryaddr" value="" >
+        </div>
+        <div class="form-group col-md-2">
+            <label for="orderdate">Order Date</label>
+            <input type="date" class="form-control" id="orderdate" value="" >
         </div>
     </div>
 </div>
 
-<div class="col-lg-3" id="material">
-    <div class="input-group material" id="0">
-        <span class="input-group-addon material-name">
-            <input type="text" class="form-control" id="name" placeholder="name" value="" >
-        </span>
-        <span class="input-group-addon material-value">
-            <input type="text" class="form-control" id="qty" placeholder="qty" value="">
-        </span>
-    </div><!-- /input-group -->
+<div id="material" class="col-sm-5">
+        <div class="input-group material" id="0">
+            <span class="input-group-addon material-name">
+                <input type="text" class="form-control" id="name" placeholder="name" >
+            </span>
+            <span class="input-group-addon material-value-sm">
+                <input type="text" class="form-control" id="qty" placeholder="qty" >
+            </span>
+            <span class="input-group-addon material-value-sm">
+                <input type="text" class="form-control" id="unit" placeholder="unit">
+            </span>
+            <span class="input-group-addon material-value">
+                <input type="text" class="form-control" id="vendor" placeholder="from">
+            </span>
+        </div>
 </div><!-- /.col-lg-6 -->
 </div>

@@ -48,6 +48,10 @@
                   @can('edit-user')
                   <li role="separator" class="divider"></li>
                   <li><a href="{{ url('/register') }}">Add New User</a></li>
+                  <li><a href="{{ url('/reps') }}">Update Reps</a></li>
+                  @if(isset($lead))
+                    <li><a href="{{ url('/download/'.$lead->id) }}">Download</a></li>
+                  @endif
                   @endcan
 
                   <!--  add more actions

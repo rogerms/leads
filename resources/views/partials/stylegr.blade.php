@@ -79,12 +79,21 @@
         </div>
     </div>
     <div class="row">
-        <div class="form-group col-md-6">
+        <div class="form-group col-md-4">
             <label for="placementnote">Notes for placing pavers</label>
             <input type="text" class="form-control" id="note" value="{{ $stylegroup->note }}" >
         </div>
-
+        <div class="form-group col-md-4">
+            <label for="deliveryaddr">Delivery Address</label>
+            <input type="text" class="form-control" id="deliveryaddr" value="{{ $stylegroup->delivery_addr }}" >
+        </div>
+        <div class="form-group col-md-2">
+            <label for="orderdate">Order Date</label>
+            <input type="date" class="form-control" id="orderdate" value="{{ $stylegroup->order_date }}" >
+        </div>
+    </div>
+    <div class="print-btns">
+        <a href="" class="btn btn-primary update-group">Update Group</a>
         <a href="/style/html/{{ $stylegroup->id  }}" class="btn btn-default">View Print</a>
-        <a href="/style/pdf/{{ $stylegroup->id  }}" class="btn btn-default">View PDF</a>
     </div>
 </div>

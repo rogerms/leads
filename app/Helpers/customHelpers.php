@@ -69,6 +69,35 @@
         function format_date($time)
         {
             $zero = new DateTime('0000-00-00 00:00:00');
+            if($time == null)
+            {
+                return '';
+            }
+            if(! $time instanceof Datetime)
+            {
+                if(is_int($time ))
+                {
+                    $tmp = new DateTime();
+                    $tmp->setTimestamp($time);
+                    $time = $tmp;
+                }
+                else{
+                    $time = new Datetime($time);
+                }
+            }
+            if($time->format('d') == 0)
+            {
+                return '';
+            }
+            return $time->format('m/d/Y');
+        }
+    }
+
+    if(!function_exists('format_datetime'))
+    {
+        function format_datetime($time)
+        {
+            $zero = new DateTime('0000-00-00 00:00:00');
             if(! $time instanceof Datetime)
             {
                 if(is_int($time ))
@@ -85,20 +114,38 @@
             {
                 return '';
             }
-            return $time->format('m/d/Y');
+            return $time->format('m/d/Y h:i A');
         }
     }
 
+    if(!function_exists('get_selected_drawing'))
+    {
+        function get_selected_drawing($drawings)
+        {
+            foreach($drawings as $drawing){
+                if($drawing->selected) return $drawing->path;
+            }
+            return "";
+        }
+    }
 
     //convert date from database to show in form input type date 2015-01-02
     if(!function_exists('toInputDate'))
 	{
         function toInputDate($time)
         {
+            if($time == null)
+            {
+                return '';
+            }
         	if(! $time instanceof Datetime)
         	{
         		$time = new Datetime($time);
         	}
+            if($time->format('d') == '00')
+            {
+                return '';
+            }
             return $time->format('Y-m-d');
         } 
 
@@ -182,6 +229,33 @@
                 $result .= $job->id." ";
             }
             return $result;
+        }
+    }
+
+    if(!function_exists('number_or_blank'))
+    {
+        function number_or_blank($value)
+        {
+            if($value <= 0)
+            {
+                return '';
+            }
+            return $value;
+        }
+    }
+
+    if(!function_exists('number_fmt'))
+    {
+        function number_fmt($number)
+        {
+            if($number == null) return '';
+            list($whole, $decimal) = explode('.', $number);
+            if($decimal == 0) // 4.00 shows as 4, 4.50 = 4.5
+            {
+                return $whole;
+            }
+            $decimals = ($decimal % 10 == 0)? 1: 2;
+            return number_format($number, $decimals);
         }
     }
 

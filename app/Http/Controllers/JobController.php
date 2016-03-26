@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Drawing;
 use App\Feature;
 use App\Material;
 use App\StyleGroup;
@@ -291,7 +292,8 @@ class JobController extends Controller
         }
 
         $result = ($result == true)? 'success': 'failed';
-        return response()->json(['result' => $result ]);
+        $updated = $job->updated_at->format('m/d/Y h:i A');
+        return response()->json(['result' => $result, 'updated' => $updated ]);
     }
 
     private function update_styles($stylegroups, $job_id)
@@ -370,6 +372,9 @@ class JobController extends Controller
             $mat->job_id = $job_id;
             $mat->name = $material['name'];
             $mat->qty = $material['qty'];
+            $mat->qty_unit= $material['unit'];
+            $mat->vendor = $material['vendor'];
+
             $result &= $mat->save();
         }
         return $result;
@@ -377,10 +382,19 @@ class JobController extends Controller
 
     private function update_job(Job $job, Request $request)
     {
+        $sold = $this->dbDate($request->datesold);
+
+//        dd($job->date_sold);
+
+        if(empty($job->date_sold) && $sold != null)
+        {
+            $job->code = $this->create_job_code();
+        }
+
         $job->size = $request->size;
         $job->customer_type = $request->customertype;
         $job->contractor = $request->contractor;
-        $job->date_sold = $this->dbDate($request->datesold);
+        $job->date_sold = $sold;
         $job->job_type = $request->jobtype;
         $job->sqft_price = $request->sqftprice;
         $job->proposal_amount = $request->proposalamount;
@@ -390,7 +404,9 @@ class JobController extends Controller
         $job->bluestakes = ($request->bluestakes == 'true');
         $job->property_type = $request->propertytype;
         $job->crew = $request->crew;
-        $job->downpayment_done = $request->downpayment;
+        $job->downpayment = $request->downpayment;
+        $job->start_date = $request->startdate;
+        $job->signed_at = $request->signedat;
 
         $job->save();
         return $job;
@@ -398,11 +414,12 @@ class JobController extends Controller
 
     private function dbDate($datestr)
     {
+        if(empty($datestr)) return null;
         $date = strtotime($datestr);
         return date('Y-m-d H:i:s', $date);
     }
 
-    public  function style_print($id)
+    public  function style_pdf($id)
     {
         $stylegroup = StyleGroup::find($id);
 
@@ -414,12 +431,49 @@ class JobController extends Controller
 //      return view('pdf.style', compact('stylegroup', 'jobname'));
     }
 
-    public  function style_view($id)
+    public  function style_html($id)
     {
         $stylegroup = StyleGroup::find($id);
         $jobname = $this->job_name($stylegroup);
+        $stylegroup->addr = $stylegroup->delivery_addr;
+        if ($stylegroup->delivery_addr == "")
+        {
+            $info = $stylegroup->job->lead;
+            $stylegroup->addr = "$info->street\n$info->city, UT $info->zip";
+        }
 
         return view('pdf.stylehtml', compact('stylegroup', 'jobname'));
+    }
+    
+    public function print_preview($id)
+    {
+        $job = Job::find($id);
+        $draw = Drawing::where('lead_id',  $job->lead_id)->where('selected', true)->get();
+
+        $path = count($draw) > 0? $draw[0]->path: '';
+        $job->name = $this->get_job_name($job);
+        $job->style_summary = $this->get_style_summary($job);
+
+        return view('pdf.job', compact('job', 'path'));
+    }
+
+    private function get_style_summary($job)
+    {
+        $notes = $job->notes->filter(function ($value, $key) {
+            return (0 === strpos($value->note, '#style '));
+        });
+
+       if($notes->first() != null)
+           return str_replace("#style ", "", $notes->first()->note);
+
+        return '';
+    }
+
+    private function get_job_name($job)
+    {
+        if($job->customer_type == 'Contractor')
+            return $job->contractor;
+        return $job->lead->customer_name;
     }
 
     private function job_name($sgroup)
@@ -433,6 +487,14 @@ class JobController extends Controller
             return $sgroup->job->lead['customer_name'];
         }
     }
+
+    private function create_job_code()
+    {
+        $result = DB::select("SELECT CONCAT('U', DATE_FORMAT(now(), '%y'),'-', RIGHT(CONCAT('000',COUNT(id)+1), 3)) `code` FROM jobs WHERE date_sold IS NOT NULL AND YEAR(date_sold)=YEAR(NOW())");
+        $result[0]->code;
+        return $result[0]->code;
+    }
+    
 
 
 //    public function upload($lead_id)

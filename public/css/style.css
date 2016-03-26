@@ -438,6 +438,7 @@ small{
     padding-top: 8px;
     background-color: #d1d1d1;
     border-top: thin solid darkgrey;
+
 }
 
 .style-group-title h5{
@@ -463,13 +464,20 @@ small{
     border: 0;
 }
 .material-name {
-    width: 66%;
+    width: 34%;
     padding: 1px 0px;
 }
 
 .material-value{
-    width: 33%;
+    width: 26%;
     padding: 1px 3px 1px 0;
+}
+.material-value-sm {
+    width: 20%;
+    padding: 1px 3px 1px 0;
+}
+.materials {
+    padding-bottom: 20px;
 }
 
 /* Custom page CSS
@@ -623,4 +631,21 @@ body {
 
 .toggle-box {
     cursor: pointer;
+}
+
+.last-update {
+    text-align: right;
+    /*display: inline;*/
+    padding-right: 20px;
+}
+
+.reps-active
+{
+    background-color: transparent;
+    box-shadow: none;
+}
+
+.print-btns {
+    padding-bottom: 12px;
+    margin-left: 10px;
 }

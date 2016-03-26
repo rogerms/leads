@@ -42,7 +42,12 @@
         <div class="col-md-6">
             <div class="form-group">
                 <label for="street">Street Address</label>
-                <input type="text" class="form-control" id="street" value="{{$lead->street}}" placeholder="Address">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="street" value="{{$lead->street}}" placeholder="Address">
+                    <span class="input-group-btn">
+                        <a class="btn btn-default" role="button" href="{{ $lead->address }}"><span class="glyphicon glyphicon-globe"></span></a>
+                    </span>
+                </div>
             </div>
         </div>
         <div class="col-md-3">

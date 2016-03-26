@@ -85,6 +85,12 @@ Route::group(['middleware' => 'web'], function () {
 
     Route::post('getcities', 'LeadController@getcities');
 
+    Route::get('reps', 'HomeController@reps');
+
+    Route::post('rep/update/{id}', 'HomeController@update_rep');
+
+    Route::get('download/{id}', 'HomeController@get_xls');
+
 
 //----------------------------------------------------
 // drawings
@@ -113,9 +119,16 @@ Route::group(['middleware' => 'web'], function () {
 
     Route::post('job/update', 'JobController@update');
 
+    Route::get('job/{id}/style', 'StyleController@show');
+
     Route::any('jobs', 'JobController@index');
 
-    Route::any('style/pdf/{id}', 'JobController@style_print');
+    Route::any('style/pdf/{id}', 'JobController@style_pdf');
 
-    Route::any('style/html/{id}', 'JobController@style_view');
+    Route::any('style/html/{id}', 'JobController@style_html');
+
+    Route::any('print/job/{id}', 'JobController@print_preview');
+
+    Route::post('style/update', 'StyleController@update');
+
 });

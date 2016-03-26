@@ -1,7 +1,10 @@
 <div class="panel-group">
     <form id="{{$job->id}}">
         <div class="row row-extra-pad">
-            <h2>Job: {{$job->id}}</h2>
+            <h2>Job: {{$job->id}} @if($job->code)({{ $job->code }})@endif</h2>
+            <div class="last-update" id="{{ $job->id }}">
+                <span>Last Updated: </span><span>{{ format_datetime($job->updated_at) }}</span>
+            </div>
         </div>
         <div class="row">
             <div class="form-grrup col-md-2">
@@ -63,6 +66,10 @@
                     <input type="text" class="form-control"  id="invoicedamount" value="{{$job->invoiced_amount}}" aria-label="Amount">
                 </div>
             </div>
+            <div class="form-group col-md-2">
+                <label for="startdate">Start Date</label>
+                <input type="date" class="form-control" id="startdate" value="{{  toInputDate($job->start_date) }}">
+            </div>
         </div>
         @endcan
 
@@ -82,29 +89,22 @@
             </div>
             @endforeach
         </div> <!-- END FEATURES 2-->
-
-        <div class="stylesgroups">
-            @if($count = 1) @endif
-            <div class="style-sheets">
-            @foreach($job->stylegroups as $stylegroup)
-                    @include('partials.stylegr', compact('stylegroup', 'count'))
-                @if($count++) @endif
-            @endforeach
-            </div>
-            <div class="row row-extra-pad">
-                <button type="button" class="btn btn-primary btn-xs add-style-group" id="add-style-group">New Style Group</button>
-            </div>
+        @can('edit-job')
+        <div class="row row-extra-pad">
+            <a role="button" class="btn btn-primary" href="/job/{{$job->id}}/style">Parver Styles</a>
         </div>
-
+        @endcan
         <div class="row">
             <div class="form-group col-md-3">
                 <label for="crew">Crew</label>
                 <input type="text" class="form-control" name="crew"  id="crew" value="{{ $job->crew }}" placeholder="Name">
             </div>
-            <div class="form-group col-md-2 center-box">
-                <label class="checkbox-inline">
-                    <input type="checkbox" id="downpayment" name="downpayment" {{ isChecked($job->downpayment_done) }}>Down payment
-                </label>
+            <div class="form-group col-md-2">
+                <label for="downpayment">Down payment</label>
+                <div class="input-group">
+                    <input type="number" class="form-control" name="downpayment" id="downpayment" value="{{ number_fmt($job->downpayment) }}"  placeholder="amount" aria-describedby="basic-addon2">
+                    <span class="input-group-addon" id="basic-addon2">%</span>
+                </div>
             </div>
 
         </div> <!--  -->
@@ -118,31 +118,36 @@
                                value="{{ $removal->name }}" placeholder="removal..."
                         >
                     @endforeach
-                    @can('edit-job')<button type="button" class="btn btn-primary " id="addremoval">Add Removal</button>@endcan
+                    @can('edit-job')<button type="button" class="btn btn-primary addremoval" name="addremoval">Add Removal</button>@endcan
                 </div>
 
             </div>
         </div>
-        <div class="row">
-            <div class="form-group col-md-12 note-form">
+        <div class="row materials">
                 <label>Materials </label>
                 <div class="list-group" id="materials" name="materials">
                     @foreach($job->materials as $material)
-                        <div class="col-lg-3">
+                        <div class="col-sm-5">
                             <div class="input-group material" id="{{ $material->id}}">
-                            <span class="input-group-addon material-name">
-                                <input type="text" class="form-control" id="name" placeholder="name" value="{{ $material->name }}" >
-                            </span>
-                            <span class="input-group-addon material-value">
-                                <input type="text" class="form-control" id="qty" placeholder="qty" value="{{ $material->qty }}">
-                            </span>
+                                <span class="input-group-addon material-name">
+                                    <input type="text" class="form-control" id="name" placeholder="name" value="{{ $material->name }}" >
+                                </span>
+                                <span class="input-group-addon material-value-sm">
+                                    <input type="text" class="form-control" id="qty" placeholder="qty" value="{{ $material->qty }}">
+                                </span>
+                                <span class="input-group-addon material-value-sm">
+                                    <input type="text" class="form-control" id="unit" placeholder="unit" value="{{ $material->qty_unit }}">
+                                </span>
+                                <span class="input-group-addon material-value">
+                                    <input type="text" class="form-control" id="vendor" placeholder="from" value="{{ $material->vendor }}">
+                                </span>
                             </div><!-- /input-group -->
                         </div><!-- /.col-lg-6 -->
                     @endforeach
-                    @can('edit-job')<button type="button" class="btn btn-primary " id="add-material">Add Material</button>@endcan
+                        @can('edit-job')
+                        <button type="button" class="btn btn-primary add-material" name="add-material">Add Material</button>
+                        @endcan
                 </div>
-
-            </div>
         </div>
 
         <div class="row">
@@ -197,6 +202,12 @@
                 </div><!-- /.row -->
                 @endif
             </div>
+            <div class="col-md-6">
+                <div class="form-group col-md-3">
+                    <label for="signedat">Signature Date</label>
+                    <input type="date" class="form-control" id="signedat" value="{{  toInputDate( $job->signed_at) }}">
+                </div>
+            </div>
         </div>
         <div class="row row-extra-pad">
             <input type="hidden" id="jobid" value="{{$job->id}}" />
@@ -207,6 +218,7 @@
                 @else
                     <button type="button" class="btn btn-primary createjob" id="createjob">Create</button>
                 @endif
+                <a role="button" href="/print/job/{{$job->id}}" class="btn btn-default" id="print-job">View Print</a>
             @endcan
         </div>
 

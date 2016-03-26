@@ -11,7 +11,7 @@ $(function () {
     //needs to add listener after a new job is added if using modal form
 	$('#leadnote,.jobnote').keypress(addnote);
 
-    $('#addremoval').on('click', addremovals);
+    $('.addremoval').on('click', addremovals);
 
     $('div[name=notes]').on('click', '.delete-note', deletenote);
 
@@ -55,9 +55,15 @@ $(function () {
 
     $('ul.j-pager li').on('click', 'a', updatePagination);
 
-    $('#add-material').on('click', addmaterial);
+    $('.add-material').on('click', addmaterial);
 
     $('.toggle-box').on('click', toggleStyles);
+
+    $('.add-rep').on('click', addReps);
+
+    $('.update-rep').on('click', updateReps);
+
+    $('.update-group,#update-all-groups').on('click', updateGroup);
 
 });
 
@@ -163,7 +169,6 @@ function addStyle()
 {
     var slist = $(this).parents('.style-sheet').find('.style-rows');
     var tag = $('#templates').find('.style-row').first().clone();
-
     slist.append(tag);
     //add autocomplete to new ones
     tag.find('#paverstyle').autocomplete({source: autocompleteLists['styles']});
@@ -193,9 +198,9 @@ function addStyleGroup()
 
 function addmaterial()
 {
-    //var list = $(this).parent('#materials');
+    var list = $(this).parents('form').find('#materials');
     var tag = $('#templates').children('#material').clone();
-    $(this).before(tag);
+    list.append(tag);
 }
 
 function addremovals()
@@ -367,9 +372,10 @@ function jobFormData(form)
         prelien: form.find('#prelien').prop('checked'),
         bluestakes: form.find('#bluestakes').prop('checked'),
         crew: form.find('#crew').val(),
-        downpayment: form.find('#downpayment:checked').length,
+        downpayment: form.find('#downpayment').val(),
         materials: getMaterials(form),
-        stylegroups: getStyleGroups(form),
+        startdate: form.find('#startdate').val(),
+        signedat: form.find('#signedat').val(),
         removals: getRemovals(form),
         features: getFeats(form)
     };
@@ -500,11 +506,56 @@ function updateJob () {
                 //remove *
                 var txt = $(this).text().replace('*', '');
                 $(this).text(txt);
-            })
+            });
+
+            form.find('.last-update>span:last-child').text(msg.updated);
             showResult('Job info updated!');
         }
     }).fail(function (){
         showResult('Error trying to update job info!', true);
+    });
+}
+
+function updateGroup () {
+    event.preventDefault();
+    var form  = $('form');
+    var group = false;
+    var _stylegroups = null;
+    if ($(this).hasClass('update-group'))
+    {
+        var group = true;
+        _stylegroups = getStyleGroup($(this).parents('.style-sheet'));
+    }
+    else{
+        _stylegroups = getStyleGroups(form);
+    }
+
+    var id = $('#jobid').val();
+    var fdata = {
+            stylegroups: _stylegroups,
+            jobid: id
+        };
+
+    console.log($(this).parents('.style-sheet2').length);
+
+    $.ajax({
+        url: "/style/update",
+        data: fdata,
+        type: 'POST'
+    }).done(function (msg) {
+        console.log(msg);
+        if (msg.result == 'success') {
+            form.find('.group-count').each(function(){
+                //remove *
+                var txt = $(this).text().replace('*', '');
+                $(this).text(txt);
+            });
+            showResult('Pavers info updated!');
+
+            if(group == false) location.reload();
+        }
+    }).fail(function (){
+        showResult('Error trying to update pavers info!', true);
     });
 }
 
@@ -527,50 +578,94 @@ function getMaterials(form)
         var item = {
             id: material.attr('id'),
             name: material.find('#name').val(),
-            qty: material.find('#qty').val()
-        }
+            qty: material.find('#qty').val(),
+            unit: material.find('#unit').val(),
+            vendor: material.find('#vendor').val()
+        };
         if(!empty(item)) list.push(item);
     });
     return list;
 }
 
-function getStyleGroups(form)
+function getStyleGroups(form, selected)
 {
     //groups
     var stylegroups = [];
-    form.find('.style-sheet').each(function() {
-        var styles = [];
-        var gr = {
-            id: $(this).attr('id'),
-            manu: $(this).find('#manu').val(),
-            portland: $(this).find('#portland').val(),
-            orderedby: $(this).find('#orderedby').val(),
-            handledby: $(this).find('#handledby').val(),
-            delivery: $(this).find('#delivery').val(),
-            note: $(this).find('#note').val()
-        };
 
-        $(this).find('.style-row').each(function () {
-            var row = {
+    form.find('.style-sheet').each(function() {
+            var styles = [];
+            var gr = {
                 id: $(this).attr('id'),
-                style: $(this).find('#paverstyle').val(),
-                //manu: $(this).find('#manufacturer').val(),
-                color: $(this).find('#pavercolor').val(),
-                size: $(this).find('#paversize').val(),
-                sqft: $(this).find('#sqft').val(),
-                weight: $(this).find('#weight').val(),
-                price: $(this).find('#price').val(),
-                palets: $(this).find('#palets').val(),
-                tumbled: $(this).find('#tumbled:checked').length
+                manu: $(this).find('#manu').val(),
+                portland: $(this).find('#portland').val(),
+                orderedby: $(this).find('#orderedby').val(),
+                handledby: $(this).find('#handledby').val(),
+                delivery: $(this).find('#delivery').val(),
+                note: $(this).find('#note').val(),
+                orderdate: $(this).find('#orderdate').val(),
+                addr: $(this).find('#deliveryaddr').val()
             };
-            if (!empty(row)) styles.push(row);
-        });
-        if (!empty(gr) || !empty(styles))
-        {
-            gr['styles'] = styles;
-            stylegroups.push(gr);
-        }
+
+            $(this).find('.style-row').each(function () {
+                var row = {
+                    id: $(this).attr('id'),
+                    style: $(this).find('#paverstyle').val(),
+                    //manu: $(this).find('#manufacturer').val(),
+                    color: $(this).find('#pavercolor').val(),
+                    size: $(this).find('#paversize').val(),
+                    sqft: $(this).find('#sqft').val(),
+                    weight: $(this).find('#weight').val(),
+                    price: $(this).find('#price').val(),
+                    palets: $(this).find('#palets').val(),
+                    tumbled: $(this).find('#tumbled:checked').length
+                };
+                if (!empty(row)) styles.push(row);
+            });
+            if (!empty(gr) || !empty(styles)) {
+                gr['styles'] = styles;
+                stylegroups.push(gr);
+            }
     });
+    return stylegroups;
+}
+
+function getStyleGroup(group)
+{
+    //groups
+    var stylegroups = [];
+    var styles = [];
+    var gr = {
+        id: group.attr('id'),
+        manu: group.find('#manu').val(),
+        portland: group.find('#portland').val(),
+        orderedby: group.find('#orderedby').val(),
+        handledby: group.find('#handledby').val(),
+        delivery: group.find('#delivery').val(),
+        note: group.find('#note').val(),
+        orderdate: group.find('#orderdate').val(),
+        addr: group.find('#deliveryaddr').val(),
+    };
+
+    group.find('.style-row').each(function () {
+        var row = {
+            id: $(this).attr('id'),
+            style: $(this).find('#paverstyle').val(),
+            //manu: $(this).find('#manufacturer').val(),
+            color: $(this).find('#pavercolor').val(),
+            size: $(this).find('#paversize').val(),
+            sqft: $(this).find('#sqft').val(),
+            weight: $(this).find('#weight').val(),
+            price: $(this).find('#price').val(),
+            palets: $(this).find('#palets').val(),
+            tumbled: $(this).find('#tumbled:checked').length
+        };
+        if (!empty(row)) styles.push(row);
+    });
+    if (!empty(gr) || !empty(styles))
+    {
+        gr['styles'] = styles;
+        stylegroups.push(gr);
+    }
     return stylegroups;
 }
 
@@ -736,6 +831,28 @@ function parseQueryString() {
     return objURL;
 }
 
+function addReps(event)
+{
+    alert('add rep '+$(this).attr('id'));
+}
+function updateReps()
+{
+    var row = $(this).parent('.row');
+    var id = $(this).attr('id');
+
+    $.ajax({
+        url: '/rep/update/'+id,
+        type: 'POST',
+        data: {
+            name: row.find('#name').val(),
+            phone: row.find('#phone').val(),
+            active: row.find('#active:checked').length
+        }
+    }).done(function(msg){
+        console.log(msg);
+        location.reload();
+    });
+}
 
 function searchLeads() {
     if (processingSearch == true) return;

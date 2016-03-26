@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Style;
+use ClassesWithParents\D;
 use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
@@ -42,9 +43,16 @@ class LeadController extends Controller
 
         $this->authorize('read', $lead);
 
-//        if (\Gate::denies('read-job', $lead)) {
-//            $lead->job = null;
-//        }
+        if (\Gate::denies('edit-job', $lead)) {
+            $draw = [];
+            foreach($lead->drawings as $d)
+            {
+               if($d->selected == 1)
+               $draw[] =  $d;
+            }
+            $lead->drawings = $draw;
+        }
+        $lead->address = $this->get_address($lead);
         return view('lead.lead',
         	[
         	'lead' => $lead,
@@ -57,6 +65,13 @@ class LeadController extends Controller
             'job_types' => DB::table('job_types')->Orderby('name', 'asc')->get(),
             'features' => DB::table('features')->Orderby('name', 'asc')->get()
         	]); 
+    }
+
+    private function get_address($lead)
+    {
+        $tmp = "$lead->street+$lead->city+UT+$lead->zip";
+        $tmp = preg_replace('/\s+/', '+',$tmp);
+        return "https://www.google.com/maps/place/$tmp";
     }
 
     /**

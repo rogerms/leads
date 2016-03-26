@@ -81,7 +81,7 @@
 
     </div>
     {!! $jobs->render() !!}
-    @endsection
+@endsection
             <!-- #7D1935
 #4A96AD
 #F5F3EE
