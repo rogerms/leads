@@ -422,12 +422,17 @@ class JobController extends Controller
     public  function style_pdf($id)
     {
         $stylegroup = StyleGroup::find($id);
-
         $jobname = $this->job_name($stylegroup);
-        $pdf = PDF::loadView('pdf.style', compact('stylegroup', 'jobname'));
-        $pdf->setPaper('letter', 'portrait');
-        return $pdf->inline();
+        $stylegroup->addr = $stylegroup->delivery_addr;
+        if ($stylegroup->delivery_addr == "")
+        {
+            $info = $stylegroup->job->lead;
+            $stylegroup->addr = "$info->street\n$info->city, UT $info->zip";
+        }
 
+        $pdf = \PDF::loadView('pdf.style', compact('stylegroup', 'jobname'));
+        $pdf->setPaper('letter', 'portrait');
+        return $pdf->stream();
 //      return view('pdf.style', compact('stylegroup', 'jobname'));
     }
 

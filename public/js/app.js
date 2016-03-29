@@ -190,6 +190,7 @@ function addStyleGroup()
     //add autocomplete to new ones
     //todo
     //add listener to add style button
+    $('.update-group').on('click', updateGroup);
     tag.find('#paverstyle').autocomplete({source: autocompleteLists['styles']});
     tag.find('#manu').autocomplete({source: autocompleteLists['manus']});
     tag.find('#pavercolor').autocomplete({source: autocompleteLists['colors']});
@@ -518,9 +519,11 @@ function updateJob () {
 
 function updateGroup () {
     event.preventDefault();
+
     var form  = $('form');
     var group = false;
     var _stylegroups = null;
+
     if ($(this).hasClass('update-group'))
     {
         var group = true;

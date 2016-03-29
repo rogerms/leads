@@ -86,6 +86,9 @@
             <label for="orderdate">Order Date</label>
             <input type="date" class="form-control" id="orderdate" value="" >
         </div>
+        <div >
+            <a href="" class="btn btn-primary update-group">Update Group</a>
+        </div>
     </div>
 </div>
 

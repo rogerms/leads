@@ -2,11 +2,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Style Print</title>
-    <link href='https://fonts.googleapis.com/css?family=Nunito:700,300,400' rel='stylesheet' type='text/css'>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>Style Print Html</title>
+    {{--<link href='https://fonts.googleapis.com/css?family=Nunito:700,300,400' rel='stylesheet' type='text/css'>--}}
     {{--<link href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css' rel="stylesheet">--}}
     <style>
         /*@import url('http://fonts.googleapis.com/css?family=Open+Sans'); fdfdfc */
@@ -80,6 +78,8 @@
             width: 100%;
             text-align: center;
             /*background-color: beige;*/
+            margin: auto;
+            padding: 0;
         }
         .top-section {
             font-size: 11pt;
@@ -107,12 +107,15 @@
         .ship-to-title {
             border-bottom: darkgrey thin solid;
             font-weight: bold;
+            padding: .2cm;
         }
 
         .ship-to-title h5{
             text-align: center;
             font-weight: bold;
+            margin: auto;
         }
+
 
         .ship-to-body{
             padding: .5cm .5cm;

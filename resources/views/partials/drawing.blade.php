@@ -6,6 +6,7 @@
                 <div class="caption ">
                     <p>{{ $drawing->title }}</p>
                     <a href="/drawings/{{$drawing->path}}" class="sketch-tbn"><i class="glyphicon glyphicon-picture"></i></a>
+                    <a href="/drawings/{{$drawing->path}}"><i class="glyphicon glyphicon-resize-full"></i></a>
                 </div>
             </div>
         </div>

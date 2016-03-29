@@ -94,6 +94,6 @@
     </div>
     <div class="print-btns">
         <a href="" class="btn btn-primary update-group">Update Group</a>
-        <a href="/style/html/{{ $stylegroup->id  }}" class="btn btn-default">View Print</a>
+        <a href="/style/pdf/{{ $stylegroup->id  }}" class="btn btn-default">View PDF</a>
     </div>
 </div>

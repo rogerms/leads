@@ -1,129 +1,136 @@
-<!-- Stored in resources/views/layouts/master.blade.php -->
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Style Print</title>
-    <link href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css' rel="stylesheet">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    {{--<link href="/css/bootstrap.min.css" rel="stylesheet">--}}
+    <title>Style Print PDF</title>
     <style>
-        /*@import url('http://fonts.googleapis.com/css?family=Open+Sans');*/
+        /*@import url('https://fonts.googleapis.com/css?family=Averia+Gruesa+Libre');*/
         body{
-            padding-top: 0;
-            background-color: #fdfdfc;
-            font-size: 12pt;
-            color: #880000;
+            font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+            font-size: 11pt;
         }
+        #page{
+            /*border: thin #eee dashed;*/
+            /*background-color: white;*/
+            width: 100%;
+            padding: 0;
+        }
+
         .ship-to{
-            width: 300px;
+            width: 5.8cm;
             border: thin solid darkgrey;
-            font-size: 14pt;
+            font-size: 12pt;
         }
         .order-info {
             position: absolute;
-            top: 0px;
-            left: 500px;
+            top: 0;
+            left: 10cm;
             font-size: 14pt;
         }
         .table-div{
-            height: 696px;
+            height: 13.8cm;
+            /*background-color: #3B3738;*/
         }
-        #page{
-            /*padding: 50px;*/
-            background-color: white;
-            width: 1000px;
-            margin-bottom: -5px;
-            padding: 40px;
+
+        td, th {
+            border-width: 1px;
+            border-style: solid;
+            border-color: gray;
+            padding: .2cm;
         }
+
+        tr{
+            height: .8cm;
+        }
+        .table {
+            width:100%;
+        }
+
+        .table-bordered {
+            border-width: 0px;
+            border-spacing: 0px;
+            border-color: gray;
+            border-collapse: collapse;
+        }
+
         .to-div{
             width: 100%;
-            background-color: #eee;
+            /*background-color: #eee;*/
             /*display: inline-flex;*/
         }
 
         .head-div{
             width: 100%;
             text-align: center;
-            background-color: beige;
+            margin: auto;
+            padding: 0;
+            /*background-color: beige;*/
+        }
+        .head-div > h3{
+            margin-top: 0;
         }
         .top-section {
             font-size: 11pt;
-            font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
-            background-color: #eee;
+            /*background-color: #eee;*/
             width: 100%;
-            height: 200px;
+            height: 4cm;
             position: relative;
             top: 0;
             left: 0;
             /*display: flex;*/
-            margin: 30px 0;
-        }
-        .table-no-line {
-            border-top: none;
+            margin: .2cm 0;
         }
 
         .footer-text {
             width: 100%;
             text-align: center;
             border-top: solid thin darkgray;
-            padding-top: 10px;
+            padding-top: .5cm;
+            /*background-color: #2ca02c;*/
         }
 
         .ship-to-title {
             border-bottom: darkgrey thin solid;
             font-weight: bold;
+            padding: .2cm;
         }
 
         .ship-to-title h5{
             text-align: center;
             font-weight: bold;
+            margin: auto;
         }
 
         .ship-to-body{
-            padding: 10px 10px;
+            padding: .25cm .5cm;
         }
 
-        .bottom-table {
+        .bottom-div {
             font-size: 14pt;
-            margin-bottom: 25px;
+            margin-bottom: 1cm;
+            /*background-color: #1c94c4;*/
         }
 
-
-
-        .mtable {
-            border: 2px #000 solid;
+        .sum-row{
+            background-color: #eee;
+            color: #5e5e5e;
         }
-
-        .mtable tr {
-            border: 2px #000 solid;
+        .fill-row > td{
+            height: 3cm;
         }
-        .mtable td {
-            border-left: 1px #000 solid;
-            border-bottom: 1px #000 solid;
-        }
-
-
-        /*@media print {*/
-            /*#page {*/
-                /*background-color: transparent;*/
-                /*width: 100%;*/
-                /*margin: 0;*/
-            /*}*/
-        /*}*/
     </style>
 </head>
 <body id="print">
-    <?php
-        $sg = $stylegroup;
-        $info = $stylegroup->job->lead;
+<?php
+$sg = $stylegroup;
+$info = $stylegroup->job->lead;
+$footage_sum = 0;
+$weight_sum = 0;
+$price_sum = 0;
+$palets_sum = 0;
 
-        $footage_total = 0;
-        foreach($stylegroup->styles as $style)
-        {
-            $footage_total += $style->sqft;
-        }
-    ?>
+?>
     <div id="page">
         <div class="to-div">
             <h4>TO: <b>{{ $sg->manufacturer }}</b> </h4>
@@ -135,60 +142,88 @@
             <div class="ship-to">
                 <div class="ship-to-title"><h5>DELIVERY ADDRESS</h5></div>
                 <div class="ship-to-body">
-                    {{ $info->customer_name }} <br>
-                    {{ $info->street }} <br>
-                    {{ $info->city }}, UT {{$info->zip}}<br>
+                    {{ $stylegroup->addr }}
                 </div>
             </div>
 
             <div class="order-info">
-                <b>Date:</b> {{ format_date(time()) }} <br>
+                <b>Date:</b> {{ format_date( $stylegroup->order_date ) }} <br>
                 <b>Job Name:</b> {{ $jobname }} <br>
                 <b>Delivery Date:</b> {{ format_date($stylegroup->delivery_at) }} <br>
-                <b>Square Footage:</b> {{ $footage_total }} <!-- the sum of all sqft in this order -->
+                <b>Portlands:</b> {{ $sg->portlands }} <br>
             </div>
         </div>
 
         <div class="table-div">
             <table  class="table table-bordered" id="leadstb">
-            <thead>
-            <tr>
-                <th>Palets</th>
-                <th>SQ/FT</th>
-                <th>Name</th>
-                <th>Size</th>
-                <th>Color</th>
-                <th>Tumbled</th>
-                <th>Weight</th>
-                <th>Price</th>
-            </tr>
-            </thead>
-            <tbody>
-            @foreach($stylegroup->styles as $style)
+                <thead>
                 <tr>
-                    <td>{{ $style->palets }}</td>
-                    <td>{{ $style->sqft }}</td>
-                    <td>{{ $style->style }}</td>
-                    <td>{{ $style->size }}</td>
-                    <td>{{ $style->color }}</td>
-                    <td>{{ ($style->tumbled == true)? 'YES': 'NO' }}</td>
-                    <td>{{ $style->weight }}</td>
-                    <td>{{ $style->price }}</td>
+                    <th>Palets</th>
+                    <th>SQ/FT</th>
+                    <th>Name</th>
+                    <th>Size</th>
+                    <th>Color</th>
+                    <th>Tumbled</th>
+                    <th>Weight</th>
+                    <th>Price</th>
                 </tr>
-            @endforeach
-            </tbody>
+                </thead>
+                <tbody>
+                @foreach($stylegroup->styles as $style)
+                    <tr>
+                        <td>{{ $style->palets }}</td>
+                        <td>{{ $style->sqft }}</td>
+                        <td>{{ $style->style }}</td>
+                        <td>{{ $style->size }}</td>
+                        <td>{{ $style->color }}</td>
+                        <td>{{ ($style->tumbled == true)? 'YES': 'NO' }}</td>
+                        <td>{{ number_or_blank($style->weight) }}</td>
+                        <td>{{ $style->price }}</td>
+                    </tr>
+                    <?php
+                    $footage_sum += $style->sqft;
+                    $weight_sum += $style->weight;
+                    $price_sum += $style->price;
+                    $palets_sum += $style->palets;
+                    ?>
+                @endforeach
+
+                @for($i =0; $i < 1; $i++)
+                    <tr class="fill-row">
+                        <td>&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                @endfor
+                <tr class="sum-row">
+                    <td>{{ $palets_sum }}</td>
+                    <td>{{ $footage_sum }}</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>{{ number_or_blank($weight_sum) }}</td>
+                    <td>{{ $price_sum }}</td>
+                </tr>
+
+                </tbody>
             </table>
         </div>
 
-        <div  class="bottom-table">
+        <div  class="bottom-div">
             <b>Order placed by:</b> {{ $sg->orderedby }}<br>
             <b>Delivery handled by:</b> {{ $sg->handledby }}<br>
             <b>Notes for placement pavers:</b> {{ $sg->note }}<br>
-            <b>Portlands:</b> {{ $sg->portlands }} <br>
         </div>
         <div class="footer-text">
             Contact office for questions or confirmation at <b>(801) 815-5704</b><br>
             <b>office&#64;strongrockpavers.com</b>
         </div>
+    </div>
 </body>
 </html>

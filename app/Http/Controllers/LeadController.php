@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Style;
+use App\StyleGroup;
 use ClassesWithParents\D;
 use Illuminate\Http\Request;
 use App\Http\Requests;
@@ -100,6 +101,7 @@ class LeadController extends Controller
             FROM leads
             LEFT JOIN notes ON notes.lead_id = leads.id
             LEFT JOIN jobs ON jobs.lead_id=leads.id
+            LEFT JOIN notes j_notes ON j_notes.job_id = jobs.id
             JOIN status ON status.id = leads.status_id
             JOIN sales_reps ON sales_reps.id = leads.sales_rep_id
             JOIN taken_by ON taken_by.id = leads.taken_by_id
@@ -110,7 +112,7 @@ class LeadController extends Controller
             {
                 if(strpos($search, '#') === false || strpos($search, '#') != 0) $search = '#'.$search;
 //                $query .= sprintf(" AND notes.note LIKE '%s%%' ", $search);
-                $query .= " AND notes.note LIKE '$search%'";
+                $query .= " AND (notes.note LIKE '$search%'  OR  j_notes.note LIKE '$search%')";
             }
             elseif($request->searchby == 'Addr')
             {
@@ -457,8 +459,29 @@ class LeadController extends Controller
 
     public function services()
     {
-        echo "Page";
-        echo hello('james'); //testing  function inside customHelper
+//        $pdf = \App::make('dompdf.wrapper');
+//        $pdf->loadHTML('<h1 style="color: #c0a16b;">Test</h1>');
+//        return $pdf->stream();
+        
+//        $today = strtotime('1/1/2014');
+//        $years = strtotime('1/1/2031');
+//
+//        while($today < $years)
+//        {
+//            $date =  date('Y-m-d', $today) ."\n";
+//            DB::table('dates')->insert(
+//                ['date_value' => $date]
+//            );
+//            $today += (60*60*24);
+//        }
+//        echo "done";
+
+
+// Add 1 day - expect time to remain at 08:00
+//        while(d1 < '2031-01-01') {
+
+        //echo "Page";
+        //echo hello('james'); //testing  function inside customHelper
         //echo Hello::show('Joe');
 //        Cache::forever('leads_pages',
 //      //      ['name' => 'Mary', 'age' => 25]);
@@ -603,6 +626,18 @@ class LeadController extends Controller
     public function destroy($id)
     {
         //
+    }
+    //todo delete after test
+    private function job_name($sgroup)
+    {
+        if($sgroup->job['customer_type'] == 'Contractor')
+        {
+            return $sgroup->job['contractor'];
+        }
+        else
+        {
+            return $sgroup->job->lead['customer_name'];
+        }
     }
 }
 
