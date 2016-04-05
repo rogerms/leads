@@ -28,7 +28,12 @@
         <div class="col-md-6">
         <div class="form-group">
             <label for="phone">Phone</label>
-            <input type="tel" class="form-control" id="phone" value="{{$lead->phone}}" placeholder="Phone #">
+            <div class="input-group">
+                <input type="tel" class="form-control" id="phone" value="{{$lead->phone}}" placeholder="Phone #">
+                    <span class="input-group-btn">
+                        <a class="btn btn-default" role="button" href="tel:{{ $lead->phone }}"><span class="glyphicon glyphicon-earphone"></span></a>
+                    </span>
+            </div>
         </div>
         </div>
         <div class="col-md-6">

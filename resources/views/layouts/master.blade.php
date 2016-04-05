@@ -49,9 +49,6 @@
                   <li role="separator" class="divider"></li>
                   <li><a href="{{ url('/register') }}">Add New User</a></li>
                   <li><a href="{{ url('/reps') }}">Update Reps</a></li>
-                  @if(isset($lead))
-                    <li><a href="{{ url('/download/'.$lead->id) }}">Download</a></li>
-                  @endif
                   @endcan
 
                   <!--  add more actions
@@ -63,6 +60,20 @@
                  -->
               </ul>
             </li>
+              <li class="dropdown">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Reports <span class="caret"></span></a>
+                  <ul class="dropdown-menu">
+                      @can('edit-user')
+                      <li role="separator" class="divider"></li>
+                      <li><a href="{{ url('/report/upload') }}">Upload Job</a></li>
+                      <li><a href="{{ url('/report/jobs') }}">Export Jobs</a></li>
+                      <li><a href="{{ url('/report/leads') }}">Export Leads</a></li>
+                      @if(isset($lead))
+                          <li><a href="{{ url('/report/lead/'.$lead->id) }}">Export Lead</a></li>
+                          @endif
+                      @endcan
+                  </ul>
+              </li>
 
           </ul>
 

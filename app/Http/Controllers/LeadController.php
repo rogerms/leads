@@ -459,10 +459,9 @@ class LeadController extends Controller
 
     public function services()
     {
-//        $pdf = \App::make('dompdf.wrapper');
-//        $pdf->loadHTML('<h1 style="color: #c0a16b;">Test</h1>');
-//        return $pdf->stream();
         
+//        return $pdf->stream();
+
 //        $today = strtotime('1/1/2014');
 //        $years = strtotime('1/1/2031');
 //
@@ -626,18 +625,6 @@ class LeadController extends Controller
     public function destroy($id)
     {
         //
-    }
-    //todo delete after test
-    private function job_name($sgroup)
-    {
-        if($sgroup->job['customer_type'] == 'Contractor')
-        {
-            return $sgroup->job['contractor'];
-        }
-        else
-        {
-            return $sgroup->job->lead['customer_name'];
-        }
     }
 }
 

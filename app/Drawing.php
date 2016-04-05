@@ -12,4 +12,9 @@ class Drawing extends Model
     {
         return $this->belongsTo('App\Lead');
     }
+
+    public function scopeSelected($query)
+    {
+        return $query->where('selected', '=', true);
+    }
 }

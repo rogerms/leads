@@ -480,6 +480,15 @@ small{
     padding-bottom: 20px;
 }
 
+.qty-value{
+    width: 50%;
+    padding: 1px 3px 1px 0;
+}
+.qty-unit {
+    width: 50%;
+    padding: 1px 3px 1px 0;
+}
+
 /* Custom page CSS
 -------------------------------------------------- */
 /* Not required for template or sticky footer method. */

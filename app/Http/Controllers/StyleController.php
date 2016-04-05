@@ -24,6 +24,7 @@ class StyleController extends Controller
     public function show($job_id)
     {
         $job = Job::find($job_id);
+
         return view('job.style', compact('job'));
     }
 
@@ -79,7 +80,8 @@ class StyleController extends Controller
                 $style->sqft = $s['sqft'];
                 $style->weight = $s['weight'];
                 $style->price = $s['price'];
-                $style->palets = $s['palets'];
+                $style->qty = $s['qty'];
+                $style->qty_unit = $s['qty_unit'];
                 $style->tumbled = $s['tumbled'];
                 $result &= $style->save();
             }

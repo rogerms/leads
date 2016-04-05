@@ -85,7 +85,7 @@
                     $time = new Datetime($time);
                 }
             }
-            if($time->format('d') == 0)
+            if($time->format('Y') < 2000)
             {
                 return '';
             }
@@ -246,9 +246,9 @@
 
     if(!function_exists('number_fmt'))
     {
-        function number_fmt($number)
+        function number_fmt($number, $showzero=false)
         {
-            if($number == null) return '';
+            if($number == null) return ($showzero == false)? '': '0';
             list($whole, $decimal) = explode('.', $number);
             if($decimal == 0) // 4.00 shows as 4, 4.50 = 4.5
             {
@@ -259,5 +259,24 @@
         }
     }
 
+    if(!function_exists('job_name')) {
+        function job_name($job)
+        {
+            if ($job['customer_type'] == 'Contractor') {
+                return $job['contractor'];
+            }
+            return $job->lead['customer_name'];
+        }
+    }
+
+    if(!function_exists('job_number')) {
+        function job_number($job)
+        {
+            if (empty($job->code)) {
+                return $job->id;
+            }
+            return $job->code;
+        }
+    }
 
 

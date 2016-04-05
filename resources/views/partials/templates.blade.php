@@ -33,9 +33,16 @@
                         <label for="price">Price</label>
                         <input type="text" class="form-control" name="price"  id="price" value="" placeholder="0.00">
                     </div>
-                    <div class="form-group col-md-1">
-                        <label for="palets">Palets</label>
-                        <input type="text" class="form-control" name="palets"  id="palets" value="" placeholder="0">
+                    <div class="form-group col-sm-2">
+                        <label for="palets">Quantity</label>
+                        <div class="input-group" id="">
+                        <span class="input-group-addon qty-value">
+                            <input type="text" class="form-control" id="qty" placeholder="how many" value="">
+                        </span>
+                        <span class="input-group-addon qty-unit">
+                            <input type="text" class="form-control" id="qty_unit" placeholder="unit" value="">
+                        </span>
+                        </div>
                     </div>
                     <div class="form-group col-md-2 center-box">
                         <label class="checkbox-inline">

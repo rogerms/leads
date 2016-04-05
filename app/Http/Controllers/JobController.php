@@ -6,22 +6,19 @@ use App\Drawing;
 use App\Feature;
 use App\Material;
 use App\StyleGroup;
-use Barryvdh\Snappy\Facades\SnappyPdf;
 use Illuminate\Http\Request;
 use App\Http\Requests;
-use App\Http\Controllers\Controller;
 use App\Lead;
 use App\Job;
-use App\Note;
 use App\Style;
 use App\Removal;
 use DB;
-use Illuminate\Support\Facades\Input;
 use PDF;
 
 
 class JobController extends Controller
 {
+    var $destinationPath = 'tmp/';
 
     public function __construct()
     {
@@ -433,7 +430,6 @@ class JobController extends Controller
         $pdf = \PDF::loadView('pdf.style', compact('stylegroup', 'jobname'));
         $pdf->setPaper('letter', 'portrait');
         return $pdf->stream();
-//      return view('pdf.style', compact('stylegroup', 'jobname'));
     }
 
     public  function style_html($id)
@@ -450,7 +446,7 @@ class JobController extends Controller
         return view('pdf.stylehtml', compact('stylegroup', 'jobname'));
     }
     
-    public function print_preview($id)
+    public function print_preview_html($id)
     {
         $job = Job::find($id);
         $draw = Drawing::where('lead_id',  $job->lead_id)->where('selected', true)->get();
@@ -460,6 +456,48 @@ class JobController extends Controller
         $job->style_summary = $this->get_style_summary($job);
 
         return view('pdf.job', compact('job', 'path'));
+    }
+
+    public function print_preview($id)
+    {
+        $job = Job::find($id);
+        return $this->get_job_pdf($job);
+    }
+
+    private function get_job_pdf(Job $job)
+    {
+        $draw = Drawing::where('lead_id',  $job->lead_id)->selected()->first();
+//        $draw = $job->lead->drawings->first(function ($key, $value) {
+//            return $value->selected == true;
+//        });
+        $path = isset($draw->path)? $draw->path: '';
+        $job->name = $this->get_job_name($job);
+        $job->style_summary = $this->get_style_summary($job);
+
+        $pdf = \PDF::loadView('pdf.job', compact('job', 'path'));
+        $pdf->setPaper('letter', 'portrait');
+        return $pdf->stream();
+    }
+
+    public function email_pdf($id)
+    {
+        $job = Job::find($id);
+        $data = $this->get_job_pdf($job);
+        $email_body = "Check attachment for a copy of the proposal\n\nThank you\n".$job->lead->salesrep['name'];
+
+        \Mail::raw($email_body, function ($message) use($job, $data) {
+            $message->from('sales@strongrockpavers.com', 'Strong Rock Pavers');
+            $message->to($job->lead->email);
+            $message->subject("Service Proposal");
+            $message->attachData($data, 'document.pdf');
+        });
+
+        $message['text'] = 'Email sent successufully';
+        $message['class'] = 'alert-success';
+        $message['title'] = 'Info!';
+        \Session::flash('message', $message);
+
+        return back();
     }
 
     private function get_style_summary($job)
@@ -499,6 +537,7 @@ class JobController extends Controller
         $result[0]->code;
         return $result[0]->code;
     }
+
     
 
 

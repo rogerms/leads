@@ -37,10 +37,18 @@
                     <label for="price">Price</label>
                     <input type="text" class="form-control" name="price"  id="price" value="{{ $style->price }}" placeholder="0.00">
                 </div>
-                <div class="form-group col-md-1">
-                    <label for="palets">Palets</label>
-                    <input type="text" class="form-control" name="palets"  id="palets" value="{{ $style->palets }}" placeholder="0">
+                <div class="form-group col-sm-2">
+                    <label for="palets">Quantity</label>
+                    <div class="input-group" id="">
+                        <span class="input-group-addon qty-value">
+                            <input type="text" class="form-control" id="qty" placeholder="qty" value="{{ $style->qty }}">
+                        </span>
+                        <span class="input-group-addon qty-unit">
+                            <input type="text" class="form-control" id="qty_unit" placeholder="unit" value="{{ $style->qty_unit }}">
+                        </span>
+                    </div>
                 </div>
+
                 <div class="form-group col-md-2 center-box">
                     <label class="checkbox-inline">
                         <input type="checkbox" id="tumbled" name="tumbled" {{ isChecked($style->tumbled) }}>Tumbled

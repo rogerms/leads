@@ -218,7 +218,21 @@
                 @else
                     <button type="button" class="btn btn-primary createjob" id="createjob">Create</button>
                 @endif
-                <a role="button" href="/print/job/{{$job->id}}" class="btn btn-default" id="print-job">View Print</a>
+
+
+
+            <!-- Split button -->
+            <div class="btn-group">
+                <a role="button" href="/print/job/{{$job->id}}" class="btn btn-default" id="print-job">View PDF</a>
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="caret"></span>
+                    <span class="sr-only">Toggle Button</span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a href="/email/job/{{$job->id}}">Email PDF</a></li>
+                    <li><a href="/report/job/{{$job->id}}">Export Excel</a></li>
+                </ul>
+            </div>
             @endcan
         </div>
 

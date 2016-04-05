@@ -12,38 +12,30 @@
         /*@import url('http://fonts.googleapis.com/css?family=Open+Sans');*/
         body{
             padding-top: 0;
-            background-color: #eee;
+            /*background-color: #eee;*/
             font-family: sans-serif;
             font-size: 10pt;
         }
 
         #page{
-            /*padding: 50px;*/
-            border: thin black dashed;
-            background-color: white;
-            width: 20.59cm; 
-            height: 25.94cm;
             padding: 0;
-/*            margin: auto;*/
         }
         .head-div{
             width: 100%;
-            height: 2.5cm;
-            /*border: dashed thin sienna;*/
+            height: 2cm;
             /*background-color: beige;*/
         }
         .top-section {
             font-size: 12pt;
             font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
-/*            background-color: #eee;*/
+            /*background-color: red;*/
 /*            position:absolute;*/
-            top: 3.5cm;
-            width: 20.59cm;
+            /*top: 3.5cm;*/
             margin: 0;
         }
 
         .bottom-table {
-            font-size: 10pt;
+            font-size: 9.75pt;
             margin-bottom: .3cm;
         }
         .botom-exclusion
@@ -56,12 +48,12 @@
             height: 1.9cm;
             text-align: center;
             margin-top: .5cm;
-            /*border: dotted thin black;*/
+            /*background-color: #0000cc;*/
         }
         .srce {
             display: inline;
-            position: relative;
-            top: -1.5cm;
+            position: absolute;
+            top: 0cm;
             width: 3.3cm;
             height: 2.4cm;
         }
@@ -81,17 +73,16 @@
         .field-value{
            font-size: 11pt;
             margin: .05cm 0 0 .05cm;
-
             height: .5cm;
         }
         .second {
-            height: 3cm;
-            padding: 0.2cm;
+            height: 2.5cm;
+            /*padding: 0.2cm;*/
         }
         .drawing{
            
             height: 8.1cm;
-            background-color: #fbfbfb;
+            /*background-color: !*#fbfbfb;*!*/
             border: thin grey solid;
             margin: .2cm 0;
             position: relative;
@@ -101,8 +92,8 @@
         .total-box{
             position: absolute;
             font-size: 11pt;
-            bottom:0;
-            right:0;
+            top: 6.8cm;
+            left:10.35cm;
             border: thin black solid;
             height: 1.1cm;
             width: 8.5cm;
@@ -119,14 +110,6 @@
             position: absolute;
             top: -.55cm;
             left: 0;
-        }
-        .page-margin {
-            background-color: white;
-            padding: 1cm;
-            width: 20.59cm;
-            height: 27.94cm;
-            border: thin solid darkgrey;
-            margin: auto;
         }
         
         .table-bordered {
@@ -147,11 +130,11 @@
             height: 1.1cm;
         }
         .table {
-            width:20.6cm;
+            width:100%;
         }
         
         .bottom-group{
-            width: 20.59cm;
+
 /*            position: relative;*/
             top: 1cm;
         }
@@ -182,20 +165,10 @@
                 border: none;
                 margin: 0;
             }
-            .page-margin
-            {
-                padding: 0;
-                border: none;
-                margin: 0;
-                height: 0;
-                width: 0;
-            }
         }
     </style>
 </head>
 <body id="print">
-
-    <div class="page-margin">
        <div id="page">
         <div class="head-div">
             <div class="logo">
@@ -238,19 +211,15 @@
                     </td>
                     <td colspan="2">
                        <div class="field-name">Est. Start Date</div>
-                       <div class='field-value'>{{ format_date($job->start_date)  }}</div>
+                       <div class='field-value'>{{  format_date($job->start_date)  }}</div>
                     </td>
                 </tr>
                 <tr>
-                    <td colspan="5">
+                    <td colspan="7">
                         <div class="field-name">Billing Address</div>
                        <div class='field-value'>{{ ''  }}</div>
                     </td>
-                    <td colspan="3">
-                        <div class="field-name">Office/Home</div>
-                       <div class='field-value'></div>
-                    </td>
-                    <td colspan="4">
+                    <td colspan="5">
                        <div class="field-name">Email</div>
                        <div class='field-value'>{{ $job->lead->email }}</div>
                     </td>
@@ -342,7 +311,7 @@
             <u>Payments to be made as follows</u>:  50% down payment/deposit 5 days prior to projected project start date and final payment due upon project completion. Invoice past due 30 day or more are subject to a 5% per month service charge and 1.5% per month payment for services performed. Due to high demand of job materials and market conditions, projects started 20 day or ore after the date of this proposal may be subject to price increases INITIALS _________.
         </div>
         <div class="bottom-table">
-            <u>Exclusion</u>u>: SPRINKLERS, Underground unknown, rough grading/excavation, state and city sales tax.
+            <u>Exclusion</u>: SPRINKLERS, Underground unknown, rough grading/excavation, state and city sales tax.
         </div>
         <div class="bottom-table">
             <u>Additional fees</u>: $600.00 dumpster fee if one is not provided on jobsite. Any alteration or deviation to the Scope of the Work or Material Specification listed above will require a bid revision or change order which could result in extra costs over and above the original contract value. Pavers, steps, retaining walls, different types of sands, sealers and concrete removal including landfill costs are priced differently and separately.
@@ -354,7 +323,6 @@
             Authorized Signature _______________________________________   Date________________
         </div>
         </div>
-    </div>
     </div>
 </body>
 </html>

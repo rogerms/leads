@@ -188,7 +188,8 @@
             <table  class="table table-bordered" id="leadstb">
             <thead>
             <tr>
-                <th>Palets</th>
+                <th>Qty</th>
+                <th>Unit</th>
                 <th>SQ/FT</th>
                 <th>Name</th>
                 <th>Size</th>
@@ -201,7 +202,8 @@
             <tbody>
             @foreach($stylegroup->styles as $style)
                 <tr>
-                    <td>{{ $style->palets }}</td>
+                    <td>{{ $style->qty }}</td>
+                    <td>{{ $style->qty_unit }}</td>
                     <td>{{ $style->sqft }}</td>
                     <td>{{ $style->style }}</td>
                     <td>{{ $style->size }}</td>

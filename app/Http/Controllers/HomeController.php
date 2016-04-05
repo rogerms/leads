@@ -68,22 +68,4 @@ class HomeController extends Controller
         }
         \Session::flash('message', $message);
     }
-
-    public function get_xls($id)
-    {
-        $lead = Lead::find($id);
-        $content = "";
-
-        $lead_arr = $lead->toArray();
-        $keys = array_keys($lead_arr);
-        $content .= implode(",", $keys)."\n";
-        $content .= implode(",", $lead_arr);
-
-        return response($content)
-            ->withHeaders([
-                'Content-Type' => 'text/csv',
-                'Content-disposition' => 'attachment;filename=MyVerySpecial.csv'
-
-            ]);
-    }
 }

@@ -7,7 +7,7 @@
     <style>
         /*@import url('https://fonts.googleapis.com/css?family=Averia+Gruesa+Libre');*/
         body{
-            font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+            font-family: "Helvetica Neue", Verdana, Geneva, Arial, Helvetica, sans-serif;
             font-size: 11pt;
         }
         #page{
@@ -158,7 +158,8 @@ $palets_sum = 0;
             <table  class="table table-bordered" id="leadstb">
                 <thead>
                 <tr>
-                    <th>Palets</th>
+                    <th>Qty</th>
+                    <th>Unit</th>
                     <th>SQ/FT</th>
                     <th>Name</th>
                     <th>Size</th>
@@ -171,7 +172,8 @@ $palets_sum = 0;
                 <tbody>
                 @foreach($stylegroup->styles as $style)
                     <tr>
-                        <td>{{ $style->palets }}</td>
+                        <td>{{ $style->qty }}</td>
+                        <td>{{ ucfirst ($style->qty_unit) }}</td>
                         <td>{{ $style->sqft }}</td>
                         <td>{{ $style->style }}</td>
                         <td>{{ $style->size }}</td>
@@ -184,7 +186,7 @@ $palets_sum = 0;
                     $footage_sum += $style->sqft;
                     $weight_sum += $style->weight;
                     $price_sum += $style->price;
-                    $palets_sum += $style->palets;
+                    $palets_sum += $style->qty;
                     ?>
                 @endforeach
 
@@ -198,10 +200,12 @@ $palets_sum = 0;
                         <td></td>
                         <td></td>
                         <td></td>
+                        <td></td>
                     </tr>
                 @endfor
                 <tr class="sum-row">
                     <td>{{ $palets_sum }}</td>
+                    <td></td>
                     <td>{{ $footage_sum }}</td>
                     <td></td>
                     <td></td>

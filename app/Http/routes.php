@@ -89,11 +89,9 @@ Route::group(['middleware' => 'web'], function () {
 
     Route::post('rep/update/{id}', 'HomeController@update_rep');
 
-    Route::get('download/{id}', 'HomeController@get_xls');
-
 
 //----------------------------------------------------
-// drawings
+// note
 //----------------------------------------------------
     Route::post('note/add', 'NoteController@add');
 
@@ -129,6 +127,25 @@ Route::group(['middleware' => 'web'], function () {
 
     Route::any('print/job/{id}', 'JobController@print_preview');
 
+    Route::any('email/job/{id}', 'JobController@email_pdf');
+
     Route::post('style/update', 'StyleController@update');
+
+//----------------------------------------------------
+// Report
+//----------------------------------------------------
+    Route::post('report/upload', 'ReportController@upload');
+
+    Route::get('report/upload', 'ReportController@upload_show');
+
+    Route::get('report/leads', 'ReportController@leads');
+
+    Route::get('report/lead/{id}', 'ReportController@lead');
+
+    Route::get('report/jobs', 'ReportController@jobs');
+
+    Route::get('report/job/{id}', 'ReportController@job');
+
+    Route::get('download/{id}', 'HomeController@get_xls');//todo remove it
 
 });

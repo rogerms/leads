@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Job extends Model
 {
+    protected $dates = ['created_at', 'updated_at', 'deleted_at', 'date_sold'];
 	public function lead()
 	{
     	return $this->belongsTo("App\Lead");

@@ -482,7 +482,9 @@ function viewImage(event){
 }
 
 function tableRowGoto () {
-    window.location.href = "lead/" + $(this).data('id');
+    // window.location.href = "lead/" + $(this).data('id');
+    var win = window.open("/lead/"+ $(this).data('id'), '_blank');
+    win.focus();
 }
 
 function updateJob () {
@@ -619,7 +621,8 @@ function getStyleGroups(form, selected)
                     sqft: $(this).find('#sqft').val(),
                     weight: $(this).find('#weight').val(),
                     price: $(this).find('#price').val(),
-                    palets: $(this).find('#palets').val(),
+                    qty: $(this).find('#qty').val(),
+                    qty_unit: $(this).find('#qty_unit').val(),
                     tumbled: $(this).find('#tumbled:checked').length
                 };
                 if (!empty(row)) styles.push(row);
@@ -659,7 +662,8 @@ function getStyleGroup(group)
             sqft: $(this).find('#sqft').val(),
             weight: $(this).find('#weight').val(),
             price: $(this).find('#price').val(),
-            palets: $(this).find('#palets').val(),
+            qty_unit: $(this).find('#qty_unit').val(),
+            qty: $(this).find('#qty').val(),
             tumbled: $(this).find('#tumbled:checked').length
         };
         if (!empty(row)) styles.push(row);
