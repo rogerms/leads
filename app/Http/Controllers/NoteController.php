@@ -55,8 +55,8 @@ class NoteController extends Controller
     {
         $this->authorize('edit');
 
-        $note = Note::find($note_id);
-        $result = $note->delete();
+//        $note = Note::find($note_id);
+        $result = Note::destroy($note_id);
 
         return response()->json(['result' => $result]);
     }

@@ -131,6 +131,8 @@ Route::group(['middleware' => 'web'], function () {
 
     Route::post('style/update', 'StyleController@update');
 
+    Route::post('style/{id}/delete', 'StyleController@delete');
+
 //----------------------------------------------------
 // Report
 //----------------------------------------------------

@@ -54,6 +54,9 @@
                         <input type="checkbox" id="tumbled" name="tumbled" {{ isChecked($style->tumbled) }}>Tumbled
                     </label>
                 </div>
+                <div class="form-group col-md-5 pull-right center-box">
+                    <button class="btn btn-danger delete-style">X</button>
+                </div>
             </div>
             @endcan
         </div>

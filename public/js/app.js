@@ -65,6 +65,8 @@ $(function () {
 
     $('.update-group,#update-all-groups').on('click', updateGroup);
 
+    $('.delete-style').on('click', deleteStyle);
+
 });
 
 
@@ -175,6 +177,7 @@ function addStyle()
     tag.find('#manufacturer').autocomplete({source: autocompleteLists['manus']});
     tag.find('#pavercolor').autocomplete({source: autocompleteLists['colors']});
     tag.find('#paversize').autocomplete({source: autocompleteLists['sizes']});
+    $('.delete-style').on('click', deleteStyle);
 }
 
 function addStyleGroup()
@@ -516,6 +519,27 @@ function updateJob () {
         }
     }).fail(function (){
         showResult('Error trying to update job info!', true);
+    });
+}
+
+function deleteStyle () {
+    event.preventDefault();
+    var tag = $(this).parents('.style-row');
+    var id = tag.attr('id');
+    var result = window.confirm("Are you sure you want to delete this style?");
+    if(result === false) return;
+
+    $.ajax({
+        url: "/style/"+id+"/delete",
+        type: 'POST'
+    }).done(function (msg) {
+        console.log(msg);
+        if (msg.result == 'success') {
+            tag.remove();
+            showResult('Style deleted');
+        }
+    }).fail(function (){
+        showResult('Error trying to delete style', true);
     });
 }
 
@@ -1141,7 +1165,7 @@ function addnote() {
 
 };
 
-function confirm(options, action)
+function confirm2(options, action)
 {
     var divtag = '<div class="modal fade" id="delete-confirmation" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmationLabel">'+
     '<div class="modal-dialog" role="document">'+
@@ -1154,7 +1178,7 @@ function confirm(options, action)
         '<div class="modal-body">'+
     '<p>'+
     '<span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>'+
-        'These Are you sure you want to delete this item?'+
+        'Are you sure you want to delete this item?'+
         '</p>'+
     '</div>'+
     '<div class="modal-footer">'+

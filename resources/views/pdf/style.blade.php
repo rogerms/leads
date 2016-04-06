@@ -222,7 +222,7 @@ $palets_sum = 0;
         <div  class="bottom-div">
             <b>Order placed by:</b> {{ $sg->orderedby }}<br>
             <b>Delivery handled by:</b> {{ $sg->handledby }}<br>
-            <b>Notes for placement pavers:</b> {{ $sg->note }}<br>
+            <b>Notes:</b> {{ $sg->note }}<br>
         </div>
         <div class="footer-text">
             Contact office for questions or confirmation at <b>(801) 815-5704</b><br>

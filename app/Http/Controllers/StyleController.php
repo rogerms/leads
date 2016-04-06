@@ -42,6 +42,14 @@ class StyleController extends Controller
         return response()->json(['result' => $result ]);
     }
 
+    public function delete($id)
+    {
+        $this->authorize('edit-job');
+        $style = Style::find($id);
+        $style->delete();
+        return response()->json(['result' => 'success']);
+    }
+
     private function update_styles($stylegroups, $job_id)
     {
         //return var_dump($request->styles);
