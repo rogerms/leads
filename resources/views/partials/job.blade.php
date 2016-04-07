@@ -231,6 +231,7 @@
                 <ul class="dropdown-menu">
                     <li><a href="/email/job/{{$job->id}}">Email PDF</a></li>
                     <li><a href="/report/job/{{$job->id}}">Export Excel</a></li>
+                    <li><a href="/print/installer/{{$job->id}}">Installer Sheet</a></li>
                 </ul>
             </div>
             @endcan

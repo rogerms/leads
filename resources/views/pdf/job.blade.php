@@ -88,11 +88,12 @@
             position: relative;
             top: 0px;
             left: 0px;
+            padding: .2cm;
         }
         .total-box{
             position: absolute;
             font-size: 11pt;
-            top: 6.8cm;
+            top: 7.2cm;
             left:10.35cm;
             border: thin black solid;
             height: 1.1cm;
@@ -108,7 +109,7 @@
         }
         .job-obs{
             position: absolute;
-            top: -.55cm;
+            top: -.6cm;
             left: 0;
         }
         
@@ -139,7 +140,7 @@
             top: 1cm;
         }
         small {
-            font-size: 7pt;
+            font-size: 6.5pt;
         }
 
         .align-row{
@@ -160,12 +161,10 @@
 /*            width: 100%;*/
             height: 100%;
         }
-        @media print {
-            #page {
-                border: none;
-                margin: 0;
-            }
+        .removals, #feats{
+            margin-left: 1cm;
         }
+
     </style>
 </head>
 <body id="print">
@@ -177,7 +176,7 @@
             <div class="addr">
                 <div class="addr-title">Strong Rock Pavers</div>
                 <div class="addr-body">
-                Northern Utah: (801) 815-5704 Southern Utah: (435) 703-8937
+                Northern Utah: (801) 815-5704 Southern Utah: (435) 703-8937 <br>
                 2176 W. Center St. Provo, UT 84601 <br>
                 Fax: (801) 437-1765 Email: office@strongrockpavers.com
                </div>
@@ -263,31 +262,40 @@
 
         </div>
         <div class="second">
-           <div id='type'>
+           <span id='type'>
                <span class="label">Type:</span> <span class="value">{{ $job->job_type }}</span>
-            </div>
-            <div id="feats">
+            </span>
+            <span id="feats">
                 <span class="label">Features:</span>
-
+                <?php $feats = []; ?>
                 @foreach($job->features as $feat)
                     @if($feat->pivot->active)
-                        <span class="value">{{ $feat->name }}, </span>
+                        <?php $feats[] = $feat->name ?>
                     @endif
                 @endforeach
-            </div>
-
-            <div id="removals">
-                <span class="label">Removals:</span>
-                @foreach($job->removals as $rem)
-                        <span class="value">{{ $rem->name }}, </span>
-                @endforeach
-            </div>
+                <span class="value">{{ implode(', ', $feats) }} </span>
+            </span>
 
             <div id="size">
                 <span class="label">Approx. Size: </span>
                 <span class="value">{{ $job->size }}</span>
                 <span class="label">Sq.Ft.</span>
+
+                <span class="label removals">Removals:</span>
+                <?php $rems = []; ?>
+                @foreach($job->removals as $rem)
+                    <?php $rems[] = $rem->name ?>
+                @endforeach
+                <span class="value">{{ implode(', ', $rems)  }} </span>
             </div>
+
+            {{--<div id="removals">--}}
+                {{--<span class="label">Removals:</span>--}}
+                {{--@foreach($job->removals as $rem)--}}
+                        {{--<span class="value">{{ $rem->name }}, </span>--}}
+                {{--@endforeach--}}
+            {{--</div>--}}
+
             <div id='style'>
                 <span class="label">Pavers: </span>
                 <span class="value">{{ $job->style_summary }}</span>
@@ -295,7 +303,11 @@
         </div>
         
         <div class="drawing">
-            <img class="img-holder" src="{{ url("drawings/$path") }}" alt="">
+            {{--<img class="img-holder" src="{{ url("drawings/$path") }}" alt="">--}}
+
+            @foreach($job->descs as $desc)
+                    {{ str_replace('#description ', '', $desc->note)  }} <br>
+            @endforeach
             <span class="job-obs">
                    Job description: <small>All material and work listed to be performed in accordance with applicable drawing and specifications, completed 
                     in substantial and workman like manner.</small>

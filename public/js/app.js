@@ -380,6 +380,7 @@ function jobFormData(form)
         materials: getMaterials(form),
         startdate: form.find('#startdate').val(),
         signedat: form.find('#signedat').val(),
+        note: form.find('#jobnote').val(),
         removals: getRemovals(form),
         features: getFeats(form)
     };
@@ -516,6 +517,7 @@ function updateJob () {
 
             form.find('.last-update>span:last-child').text(msg.updated);
             showResult('Job info updated!');
+            updateNoteList(msg.note, form);
         }
     }).fail(function (){
         showResult('Error trying to update job info!', true);
@@ -703,6 +705,8 @@ function getStyleGroup(group)
 function updateLead () {
     event.preventDefault();
     var id = $('#leadid').val();
+    var _form = $(this).parents('form');
+
     var fdata = {
         id: id,
         customer: $('#customer').val(),
@@ -717,7 +721,8 @@ function updateLead () {
         takenby: $('#takenby').val(),
         source: $('#source').val(),
         salesrep: $('#salesrep').val(),
-        status: $('#status').val()
+        status: $('#status').val(),
+        note: $('#leadnote').val()
     };
 
     $.ajax({
@@ -729,12 +734,28 @@ function updateLead () {
         if (msg.result == 200) {
 
             showResult("lead info updated");
+            updateNoteList(msg.note, _form);
         }
-
     }).fail(function(){
         showResult('Error trying to update lead info');
     });
 
+}
+function updateNoteList(note, form)
+{
+    if(note.created == true)
+    {
+        var tag = '<a href="#" class="list-group-item active">' +
+        '<button type="button" class="delete-note" data-noteid="' + note.id + '">' +
+        '<span aria-hidden="true">&times;</span></button>' +
+        '<h4 class="list-group-item-heading">' + note.note + '</h4>' +
+        '<p class="list-group-item-text">Created on: ' + note.created + '</p></a>';
+
+        var list = form.find('#notes');
+        form.find('#leadnote').val("");
+        form.find('#jobnote').val("");
+        list.prepend(tag);
+    }
 }
 
 function deleteDrawing(target, drawingid)

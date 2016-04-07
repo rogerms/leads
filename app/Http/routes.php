@@ -127,6 +127,8 @@ Route::group(['middleware' => 'web'], function () {
 
     Route::any('print/job/{id}', 'JobController@print_preview');
 
+    Route::any('print/installer/{id}', 'JobController@print_installer');
+
     Route::any('email/job/{id}', 'JobController@email_pdf');
 
     Route::post('style/update', 'StyleController@update');

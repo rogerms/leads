@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Style;
 use App\StyleGroup;
+use App\User;
 use ClassesWithParents\D;
 use Illuminate\Http\Request;
 use App\Http\Requests;
@@ -323,9 +324,18 @@ class LeadController extends Controller
         $lead->status_id = $request->status;
 
         $result = $lead->save();
+        
+        $note = new Note();
+        if (!empty($request->note))
+        {
+            $note->lead_id = $lead->id;
+            $note->note = $request->note;
+            $note->user_id = Auth::user()->id;
+            $note->created = $note->save();
+        }
 
         $result = ($result  == true)? 200: 400;
-		return response()->json(['result' => $result, 'date'=> $date]);
+		return response()->json(['result' => $result, 'date'=> $date, 'note' => $note]);
 
 		// App\Flight::where('active', 1)
   //         ->where('destination', 'San Diego')
@@ -355,8 +365,6 @@ class LeadController extends Controller
         /*   @var Request $request */
         /*   @var DB  */
         //cities
-
-
         $style_arr = [];
         $color_arr = [];
         $size_arr = [];

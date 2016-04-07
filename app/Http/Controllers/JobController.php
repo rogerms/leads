@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Drawing;
 use App\Feature;
 use App\Material;
+use App\Note;
 use App\StyleGroup;
 use Illuminate\Http\Request;
 use App\Http\Requests;
@@ -14,6 +15,7 @@ use App\Style;
 use App\Removal;
 use DB;
 use PDF;
+use Auth;
 
 
 class JobController extends Controller
@@ -288,9 +290,21 @@ class JobController extends Controller
             $result &= $this->update_materials($request->materials, $job->id);
         }
 
+        $note = new Note();
+        if($result  == true)
+        {
+            if (!empty($request->note))
+            {
+                $note->job_id = $job->id;
+                $note->note = $request->note;
+                $note->user_id = Auth::user()->id;
+                $note->created = $note->save();
+            }
+        }
+
         $result = ($result == true)? 'success': 'failed';
         $updated = $job->updated_at->format('m/d/Y h:i A');
-        return response()->json(['result' => $result, 'updated' => $updated ]);
+        return response()->json(['result' => $result, 'updated' => $updated, 'note' => $note]);
     }
 
     private function update_styles($stylegroups, $job_id)
@@ -464,9 +478,25 @@ class JobController extends Controller
         return $this->get_job_pdf($job);
     }
 
+    public function print_installer($id)
+    {
+        $job = Job::find($id);
+        $draw = Drawing::where('lead_id',  $job->lead_id)->selected()->first();
+
+
+        $path = isset($draw->path)? $draw->path: '';
+        $job->name = $this->get_job_name($job);
+        $job->style_summary = $this->get_style_summary($job);
+
+        $pdf = \PDF::loadView('pdf.installer', compact('job', 'path', 'descs'));
+        $pdf->setPaper('letter', 'portrait');
+        return $pdf->stream();
+    }
+
     private function get_job_pdf(Job $job)
     {
         $draw = Drawing::where('lead_id',  $job->lead_id)->selected()->first();
+        $job->descs = Note::where('job_id', $job->id)->where('note', 'like', '#description %')->get();
 //        $draw = $job->lead->drawings->first(function ($key, $value) {
 //            return $value->selected == true;
 //        });
@@ -503,11 +533,11 @@ class JobController extends Controller
     private function get_style_summary($job)
     {
         $notes = $job->notes->filter(function ($value, $key) {
-            return (0 === strpos($value->note, '#style '));
+            return (0 === strpos($value->note, '#paver '));
         });
 
        if($notes->first() != null)
-           return str_replace("#style ", "", $notes->first()->note);
+           return str_replace("#paver ", "", $notes->first()->note);
 
         return '';
     }
