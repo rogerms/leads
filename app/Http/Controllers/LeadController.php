@@ -282,6 +282,7 @@ class LeadController extends Controller
             $note = new Note;
             $note->note = $request->note;
             $note->lead_id = $lead->id;
+            $note->user_id = Auth::user()->id;
             $result &= $note->save();
         }
 

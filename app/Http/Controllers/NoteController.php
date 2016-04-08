@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Note;
+use Illuminate\Support\Facades\Auth;
 
 class NoteController extends Controller
 {
@@ -23,6 +24,7 @@ class NoteController extends Controller
         $note->lead_id = $request->leadid;
         $note->job_id = $request->jobid;
         $note->note = $request->note;
+        $note->user_id = Auth::user()->id;
         $result &= $note->save();
 
         if($result)
@@ -35,7 +37,7 @@ class NoteController extends Controller
         $note = new Note;
         $note->job_id = $request->jobid;
         $note->lead_id = $request->leadid;
-
+        $note->user_id = Auth::user()->id;
         $note->note = $request->note;
         $result = $note->save();
 

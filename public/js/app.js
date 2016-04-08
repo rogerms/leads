@@ -67,6 +67,8 @@ $(function () {
 
     $('.delete-style').on('click', deleteStyle);
 
+    $('.tags-select').on('change', selectNotes);
+
 });
 
 
@@ -156,7 +158,7 @@ function deletenote (event)
                 showResult('Error trying to delete note', true);
             })
             .done(function(data){
-                console.log(data);
+                // console.log(data);
                 if(data.result) {
                     tag.remove();
                     showResult('Note deleted');
@@ -288,7 +290,7 @@ function setAutoComplete () {
         })
         .done(function (data)
         {
-            console.log(data);
+            // console.log(data);
             // auto complete for cities
             $('#city').autocomplete({
                 source: data['cities'],
@@ -334,7 +336,7 @@ function empty (arow) {
     return true;
 }
 
-function createJob () //todo change to direct post instead of ajax
+function createJob () 
 {
     var form = $('form');
     var leadId = $('#leadid').val();
@@ -489,6 +491,14 @@ function tableRowGoto () {
     // window.location.href = "lead/" + $(this).data('id');
     var win = window.open("/lead/"+ $(this).data('id'), '_blank');
     win.focus();
+}
+
+function selectNotes()
+{
+    var notes = $(this).parents('.note-form');
+    notes.find('.tag-all').hide();
+    var tag = '.'+$(this).val();
+    notes.find(tag).show();
 }
 
 function updateJob () {
@@ -1155,7 +1165,6 @@ function addnote() {
         jobid: target.data('job-id'),
         leadid: target.data('lead-id')
     };
-    console.log(data);
     $.ajax(
         {
             url: "/note/add",
@@ -1163,20 +1172,41 @@ function addnote() {
             type: 'POST'
         })
         .done(function (data) {
-            console.log("done");
-            console.log(data);
+            // console.log("done");
+            var form = target.parents('form');
+            //check if #tag exists
+            var rexp = /#(\w+)/g;
+            var m = rexp.exec(data.note);
+            var htag = '';
+            if(m != null)
+            {
+                htag = 'tag-'+m[1];
+                var found = false;
+                var select = form.find('.tags-select');
+                select.find('option').each(function(){
+                    if($(this).val() == htag)
+                    {
+                        found = true;
+                        return;
+                    }
+                });
+                if(!found)//add new option item
+                    select.append('<option value="'+htag+'">'+m[1]+'</option>');
+            }
 
-            var tag = '<a href="#" class="list-group-item active">' +
+            var tag = '<a href="#" class="list-group-item active tag-all '+htag+'">' +
                 '<button type="button" class="delete-note" data-noteid="'+ data.id +'">'+
                 '<span aria-hidden="true">&times;</span></button>'+
                 '<h4 class="list-group-item-heading">'+ data.note +'</h4>' +
                 '<p class="list-group-item-text">Created on: ' + data.created + '</p></a>';
 
-            var list = target.parents('form').find('#notes');
+            var list = form.find('#notes');
             target.val("");//clear the input text field
             $('#leadnote').val("");
             list.prepend(tag);
 
+            //add to tag filter list
+            
             showResult('New note added');
 
         }).fail(function (){

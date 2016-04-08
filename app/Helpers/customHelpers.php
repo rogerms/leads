@@ -279,4 +279,32 @@
         }
     }
 
+    if(!function_exists('all_tags')) {
+        function all_tags($notes)
+        {
+            $list['tag-all'] = 'all';
+            foreach ($notes as $note)
+            {
+                preg_match('/#(\w+)/', $note, $matches);
+                if(isset($matches[1]))
+                {
+                    $list['tag-'.$matches[1]] = $matches[1];
+                }
+            }
+            return $list;
+        }
+    }
+
+    if(!function_exists('get_tag')) {
+        function get_tag($note)
+        {
+            preg_match('/#(\w+)/', $note, $matches);
+            if(isset($matches[1]))
+            {
+                return ' tag-'.$matches[1];
+            }
+            return '';
+        }
+    }
+
 

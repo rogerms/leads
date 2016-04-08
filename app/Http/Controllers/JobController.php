@@ -394,12 +394,15 @@ class JobController extends Controller
     private function update_job(Job $job, Request $request)
     {
         $sold = $this->dbDate($request->datesold);
+        $just_sold = false;
 
 //        dd($job->date_sold);
 
         if(empty($job->date_sold) && $sold != null)
         {
             $job->code = $this->create_job_code();
+            $just_sold = true;
+            //todo change lead status to sold
         }
 
         $job->size = $request->size;
@@ -420,6 +423,12 @@ class JobController extends Controller
         $job->signed_at = $request->signedat;
 
         $job->save();
+
+        if($just_sold === true)
+        {
+            $this->emailJobSold($job);
+        }
+
         return $job;
     }
 
@@ -568,8 +577,20 @@ class JobController extends Controller
         return $result[0]->code;
     }
 
-    
+    private function emailJobSold(Job $job)
+    {
+        $url = url('lead/'.$job->lead_id);
+        $email_body = "Job with id:$job->id and number:$job->code has been sold\n\n".
+                      "<a href='$url'>$url</a>";
 
+        \Mail::raw($email_body, function ($message) use($job) {
+            $message->from('sales@strongrockpavers.com', 'Strong Rock Pavers');
+            $message->to('office@strongrockpavers.com');
+            $message->subject("Job Sold");
+        });
+        return true;
+    }
+    
 
 //    public function upload($lead_id)
 //    {

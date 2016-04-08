@@ -128,9 +128,16 @@
             <div class="col-md-6 col-lg-6">
                 <div class="form-group note-form">
                     <label>Notes</label>
+                    <div style="display: inline-block; margin: 2px 20px;">
+                        <select class="form-control  tags-select" >
+                            @foreach(all_tags($lead->notes) as $key => $tag)
+                                <option value="{{ $key }}"> {{ $tag }}</option>
+                            @endforeach
+                        </select>
+                    </div>
                     <div class="list-group" id="notes" name="notes">
                         @foreach($lead->notes as $note)
-                             <a href="#" class="list-group-item active">
+                             <a href="#" class="list-group-item active tag-all {{ get_tag($note) }}">
                                  <button type="button" class="delete-note" data-noteid="{{ $note->id }}"><span aria-hidden="true">&times;</span></button>
                                 <h4 class="list-group-item-heading">{{ $note->note }}</h4>
                                 <p class="list-group-item-text">Created on: {{ toFormatted($note->created_at) }}</p>
