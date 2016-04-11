@@ -91,6 +91,8 @@
                             <li><a href="#" class="searchby">Tag</a></li>
                             <li><a href="#" class="searchby">Addr</a></li>
                             <li><a href="#" class="searchby">Job#</a></li>
+                            <li><a href="#" class="searchby">Phone</a></li>
+                            <li><a href="#" class="searchby">Email</a></li>
                         </ul>
                     </div>
                 </div>

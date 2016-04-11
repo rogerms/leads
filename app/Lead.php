@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Lead extends Model
 {
-    
+    protected $dates = ['created_at', 'updated_at', 'deleted_at', 'appointment'];
     public function source()
     {
         return $this->belongsTo('App\Source');

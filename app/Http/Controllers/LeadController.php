@@ -117,11 +117,19 @@ class LeadController extends Controller
             }
             elseif($request->searchby == 'Addr')
             {
-                $query .= " AND leads.street LIKE '%$search%' ";
+                $query .= " AND (leads.street LIKE '%$search%' OR leads.city LIKE '%$search%')";
             }
             elseif($request->searchby == 'Job#')
             {
-                $query .= " AND jobs.id = '$search' ";
+                $query .= " AND (jobs.id = '$search' OR j.code like LIKE '%$search%')";
+            }
+            elseif($request->searchby == 'Email')
+            {
+                $query .= " AND leads.email LIKE '%$search%' ";
+            }
+            elseif($request->searchby == 'Phone')
+            {
+                $query .= " AND leads.phone LIKE '%$search%' ";
             }
             else
             {
@@ -206,7 +214,7 @@ class LeadController extends Controller
         else
         {
 
-            $leads = Lead::orderBy('updated_at', 'desc')->orderBy('status_id', 'asc')->paginate(15); //<< prev  next >>
+            $leads = Lead::with('status')->orderBy('updated_at', 'desc')->orderBy('status_id', 'asc')->paginate(15); //<< prev  next >>
 
             $status = DB::select("SELECT ".
                         "status.name,
@@ -229,6 +237,15 @@ class LeadController extends Controller
                         COUNT(appointment) week
                         FROM leads
                         WHERE appointment >= DATE(now()) AND appointment < ADDDATE(DATE(NOW()), INTERVAL 1 WEEK)");
+
+
+            foreach ($leads as $key => $lead)
+            {
+                $lead->status_name = $lead->status->name;
+                $lead->sales_rep_name = $lead->salesrep->name;
+                $lead->appointmentfmt = $lead->appointment->format('M j, Y \a\t h:ia');
+                $leads[$key] = $lead;
+            }
 
             return view('lead.index', ['leads' => $leads, 'status_count' => $status, 'reps_count' => $reps, 'appts' => $appts[0]]);
         }
