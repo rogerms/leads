@@ -8,7 +8,7 @@
     <form>
         {!! csrf_field() !!}
         <div class="row row-extra-pad">
-            <h2>Lead Info</h2>
+            <h2>Customer</h2>
         </div>
     <div class="row">
         <div class="col-md-6">

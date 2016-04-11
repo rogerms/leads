@@ -1,7 +1,7 @@
 <div class="panel-group">
     <form id="{{$job->id}}">
         <div class="row row-extra-pad">
-            <h2>Job: {{$job->id}} @if($job->code)({{ $job->code }})@endif</h2>
+            <h2> {{-- Job:{{$job->id}} --}} @if($job->code) {{ $job->code }} @endif</h2>
             <div class="last-update" id="{{ $job->id }}">
                 <span>Last Updated: </span><span>{{ format_datetime($job->updated_at) }}</span>
             </div>
