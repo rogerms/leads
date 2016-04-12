@@ -140,9 +140,9 @@
     <script>window.jQuery || document.write('<script src="/js/jquery.min.js"><\/script>')</script>
     <script src="/js/bootstrap.min.js"></script>
     <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
-
-    <script src="/js/jspdf.js"></script>
-    <script src="/js/home.js"></script>
+    <script src='//cdn.tinymce.com/4/tinymce.min.js'></script>
+    {{--<script src="/js/jspdf.js"></script>--}}
+    {{--<script src="/js/home.js"></script>--}}
     <script src="/js/app.js"></script>
 
 </body>

@@ -117,6 +117,8 @@ Route::group(['middleware' => 'web'], function () {
 
     Route::post('job/update', 'JobController@update');
 
+    Route::get('job/note', 'JobController@show_note');
+
     Route::get('job/{id}/style', 'StyleController@show');
 
     Route::any('jobs', 'JobController@index');

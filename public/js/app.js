@@ -15,7 +15,7 @@ $(function () {
 
     $('div[name=notes]').on('click', '.delete-note', deletenote);
 
-    $('#printlead').on('click', processPDF);
+    // $('#printlead').on('click', processPDF); //todo using something else to produce pdf
 
 	$('.stylesgroups').on('click', '.add-style',addStyle);
 
@@ -69,8 +69,25 @@ $(function () {
 
     $('.tags-select').on('change', selectNotes);
 
+   // tinymceInit();
 });
 
+function tinymceInit () {
+    tinymce.init({
+        selector: 'textarea',
+        width: 900,
+        height: 300,
+        browser_spellcheck: true,
+        contextmenu: false,
+        plugins: [
+            'advlist autolink link image lists charmap print preview hr anchor pagebreak spellchecker',
+            'searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking',
+            'save table contextmenu directionality emoticons template paste textcolor'
+        ],
+        toolbar: 'undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | print preview media fullpage | forecolor backcolor emoticons'
+
+    });
+}
 
 function toggleStyles()
 {
@@ -336,7 +353,7 @@ function empty (arow) {
     return true;
 }
 
-function createJob () 
+function createJob ()
 {
     var form = $('form');
     var leadId = $('#leadid').val();
@@ -488,9 +505,10 @@ function viewImage(event){
 }
 
 function tableRowGoto () {
-    // window.location.href = "lead/" + $(this).data('id');
-    var win = window.open("/lead/"+ $(this).data('id'), '_blank');
-    win.focus();
+    window.location.href = "lead/" + $(this).data('id');
+    //open in a new tab
+    // var win = window.open("/lead/"+ $(this).data('id'), '_blank');
+    // win.focus();
 }
 
 function selectNotes()

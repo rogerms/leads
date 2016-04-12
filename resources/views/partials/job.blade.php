@@ -1,7 +1,7 @@
 <div class="panel-group">
     <form id="{{$job->id}}">
         <div class="row row-extra-pad">
-            <h2> {{-- Job:{{$job->id}} --}} @if($job->code) {{ $job->code }} @endif</h2>
+            <h2> {{-- Job:{{$job->id}} --}} @if($job->code) {{ $job->code }} ({{ $job->id }}) @elseif(is_before_2016($job->date_sold))  {{ $job->id }} @endif</h2>
             <div class="last-update" id="{{ $job->id }}">
                 <span>Last Updated: </span><span>{{ format_datetime($job->updated_at) }}</span>
             </div>
@@ -35,10 +35,12 @@
                     @endforeach
                 </select>
             </div>
+            @if(!empty($job->id))
             <div class="form-group col-md-3">
                 <label for="datesold">Date Sold</label>
                 <input type="date" class="form-control" id="datesold" value="{{  toInputDate($job->date_sold) }}">
             </div>
+            @endif
         </div>
 
         @can('read-job')
@@ -84,11 +86,17 @@
             @if( $count++ ) @endif
             <div class="form-group col-md-2">
                 <label class="checkbox-inline">
-                    <input type="checkbox" name="feats" value="{{ $feat->id }}"  @if($feat->pivot){{ isChecked($feat->pivot->active) }}  @endif > {{ $feat->name }}
+                    <input type="checkbox" name="feats" value="{{ $feat->id }}"  @if(isset($feat->pivot)){{ isChecked($feat->pivot->active) }}  @endif > {{ $feat->name }}
                 </label>
             </div>
             @endforeach
         </div> <!-- END FEATURES 2-->
+        {{--<div class="row">--}}
+            {{--<div class="col-xm-12" style="padding: 10px">--}}
+                {{--<label>Proposal Notes:</label>--}}
+                {{--<textarea class="proposal-note">Hello, World!</textarea>--}}
+            {{--</div>--}}
+        {{--</div>--}}
         @can('edit-job')
         <div class="row row-extra-pad">
             <a role="button" class="btn btn-primary" href="/job/{{$job->id}}/style">Paver Styles</a>

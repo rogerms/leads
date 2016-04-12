@@ -53,7 +53,7 @@ class JobController extends Controller
             JOIN sales_reps ON sales_reps.id = leads.sales_rep_id
             JOIN taken_by ON taken_by.id = leads.taken_by_id
             JOIN sources ON sources.id = leads.source_id
-            WHERE 1";
+            WHERE 1 AND jobs.date_sold is not null ";
 
             if($request->searchby == 'Tag')
             {
@@ -526,8 +526,8 @@ class JobController extends Controller
 
         \Mail::raw($email_body, function ($message) use($job, $data) {
             $message->from('sales@strongrockpavers.com', 'Strong Rock Pavers');
-            $message->to($job->lead->email);
-            $message->subject("Service Proposal");
+            $message->to('office@strongrockpavers.com');
+            $message->subject("Job Proposal");
             $message->attachData($data, 'document.pdf');
         });
 
@@ -589,6 +589,16 @@ class JobController extends Controller
             $message->subject("Job Sold");
         });
         return true;
+    }
+
+    public function show_note()
+    {
+        return view('note');
+    }
+
+    public function save_note()
+    {
+        return 'done';
     }
     
 
