@@ -129,7 +129,8 @@ class LeadController extends Controller
             }
             elseif($request->searchby == 'Phone')
             {
-                $query .= " AND leads.phone LIKE '%$search%' ";
+                $phone_number =  str_replace([' ', '(', ')', '-'], "", $search);
+                $query .= " AND REPLACE(REPLACE(REPLACE(REPLACE(leads.phone,' ',''),'(',''),')',''),'-', '') = $phone_number";
             }
             else
             {
