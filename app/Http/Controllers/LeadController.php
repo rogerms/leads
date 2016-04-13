@@ -2,27 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\Style;
-use App\StyleGroup;
-use App\User;
-use ClassesWithParents\D;
+
 use Illuminate\Http\Request;
 use App\Http\Requests;
-use App\Http\Controllers\Controller;
 use App\Lead;
 use App\TakenBy;
 use App\Source;
 use App\Status;
 use App\SalesRep;
 use App\Note;
-use App\Drawing;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
 //use Input; worked before adding upload function
 use Auth;
-use Illuminate\Support\Facades\Input;
 use Cache;
-use App\Person\Hello;
+//use App\Person\Hello;
 
 
 class LeadController extends Controller 
@@ -379,7 +373,7 @@ class LeadController extends Controller
     }
 
     // auto sugest
-    public function getcities(Request $request)
+    public function getcities()
     {
         /*   @var Request $request */
         /*   @var DB  */
