@@ -267,12 +267,13 @@
             </span>
             <span id="feats">
                 <span class="label">Features:</span>
-                <?php $feats = []; ?>
-                @foreach($job->features as $feat)
-                    @if($feat->pivot->active)
-                        <?php $feats[] = $feat->name ?>
-                    @endif
-                @endforeach
+                <?php $feats = [];
+                foreach($job->features as $feat)
+                {
+                    if($feat->pivot->active)
+                        $feats[] = $feat->name;
+                }
+                ?>
                 <span class="value">{{ implode(', ', $feats) }} </span>
             </span>
 
@@ -282,10 +283,11 @@
                 <span class="label">Sq.Ft.</span>
 
                 <span class="label removals">Removals:</span>
-                <?php $rems = []; ?>
-                @foreach($job->removals as $rem)
-                    <?php $rems[] = $rem->name ?>
-                @endforeach
+                <?php $rems = [];
+                    foreach($job->removals as $rem):
+                        $rems[] = $rem->name;
+                    endforeach;
+                ?>
                 <span class="value">{{ implode(', ', $rems)  }} </span>
             </div>
 
