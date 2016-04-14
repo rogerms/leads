@@ -306,7 +306,7 @@
             {{--<img class="img-holder" src="{{ url("drawings/$path") }}" alt="">--}}
 
             @foreach($job->descs as $desc)
-                    {{ str_replace('#description ', '', $desc->note)  }} <br>
+                    {{ str_ireplace('#description ', '', $desc->note)  }} <br>
             @endforeach
             <span class="job-obs">
                    Job description: <small>All material and work listed to be performed in accordance with applicable drawing and specifications, completed 
