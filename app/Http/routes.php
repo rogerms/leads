@@ -105,6 +105,8 @@ Route::group(['middleware' => 'web'], function () {
 
     Route::post('drawing/select/{id}', 'DrawingController@select');
 
+    Route::post('drawing/edit/{id}', 'DrawingController@edit');
+
     Route::post('drawing/add/{leadid}', 'DrawingController@create');
 
 

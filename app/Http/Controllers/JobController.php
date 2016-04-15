@@ -490,7 +490,7 @@ class JobController extends Controller
     public function print_installer($id)
     {
         $job = Job::find($id);
-        $draw = Drawing::where('lead_id',  $job->lead_id)->selected()->first();
+        $draw = Drawing::where('lead_id',  $job->lead_id)->where('label', 'installer')->first();
 
 
         $path = isset($draw->path)? $draw->path: '';

@@ -16,8 +16,8 @@
                     </div>
                     <div class="row row-extra-bm-pad">
                         <div class="form-group">
-                            <label for="title" class="sr-only">Title</label>
-                            <input type="text" class="form-control" id="title" name="title" placeholder="Title">
+                            <label for="title" class="sr-only">Label</label>
+                            <input type="text" class="form-control" id="label" name="label" placeholder="Label">
                         </div>
                     </div>
                 </form>
@@ -49,11 +49,12 @@
 
 
 
-        <!-- context menu -->
+<!-- context menu -->
 <div id="contextMenu" class="dropdown clearfix">
     <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu" style="display:block;position:static;margin-bottom:5px;">
         <li><a tabindex="-1">Delete</a></li>
-        <li><a tabindex="-1">Select</a></li>
+        <li><a tabindex="-1">Private/Public</a></li>
+        <li><a tabindex="-1">Change Label</a></li>
         <li class="divider"></li>
         <li><a tabindex="-1">Cancel</a></li>
     </ul>

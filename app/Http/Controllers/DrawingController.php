@@ -38,14 +38,11 @@ class DrawingController extends Controller
 
         $drawing = Drawing::find($id);
         $lead = $drawing->lead;
-        $path = $drawing->path;
-        $result = $drawing->delete(); //from database
-        if($result == true) // from folder
-        {
-            $result &= unlink($this->destinationPath.$path);
-        }
+        $result = $drawing->delete();
+        $drawings = $this->filter($lead->drawings, $lead);
+        
         return response()->json(['result' => $result,
-            'cards' => view('partials.drawing', ['drawings' => $lead->drawings])->render(),
+            'cards' => view('partials.drawing', ['drawings' => $drawings])->render(),
         ]);
     }
 
@@ -62,10 +59,12 @@ class DrawingController extends Controller
         $d = new Drawing();
         $d->lead_id = $lead_id;
         $d->path = $filename;
-        $d->title = Input::get('title');
+        $d->label = Input::get('label');
+        $d->created_by = Auth::user()->id;
         $d->save();
 
-        $drawings = Drawing::where('lead_id', $lead_id)->get();
+        $drawing = Drawing::where('lead_id', $lead_id)->get();
+        $drawings = $this->filter($drawing);
 
         return response()->json(['success' => true,
             'cards' => view('partials.drawing', ['drawings' => $drawings])->render(),
@@ -77,10 +76,11 @@ class DrawingController extends Controller
 
     public function select(Request $request, $id)
     {
-        $lead_id = $request->leadid;
-        Drawing::where('lead_id', $lead_id)->update(['selected' => false]);
-        Drawing::where('id', $id)->update(['selected' => true]);
-
+        $drw = Drawing::find($id);
+        $drw->selected = !$drw->selected; //switch
+        $result = $drw->save();
+        return response()->json(['success' => $result]);
+       // Drawing::where('id', $id)->update(['selected' => true]);
     }
 
     public function printr($arr)
@@ -92,12 +92,49 @@ class DrawingController extends Controller
     {
         //
     }
-    public function edit($id)
+    public function edit(Request $request, $id)
     {
-        //
+        $this->authorize('edit');
+
+        $drawing = Drawing::find($id);
+        $drawing->label = $request->label;
+        $drawing->save();
+
+        return response()->json([
+            'success' => true,
+            'label' => $drawing->label
+        ]);
     }
+
+    //unused
     public function destroy($id)
     {
-        //
+        $this->authorize('edit');
+
+        $drawing = Drawing::find($id);
+        $lead = $drawing->lead;
+        $path = $drawing->path;
+        $result = $drawing->delete();
+        if($result == true) // from folder 
+        {
+            $result &= unlink($this->destinationPath.$path);
+        }
+        return response()->json(['result' => $result,
+            'cards' => view('partials.drawing', ['drawings' => $lead->drawings])->render(),
+        ]);
+    }
+
+    private function filter($drawings)
+    {
+        if (\Gate::denies('delete-job')) {
+            $draw = [];
+            foreach($drawings as $d)
+            {
+                if($d->selected == 1 || $d->created_by == Auth::user()->id)
+                    $draw[] =  $d;
+            }
+            return $draw;
+        }
+        return $drawings;
     }
 }

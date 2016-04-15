@@ -1,10 +1,10 @@
 @if ($count = 0) @endif
 <div class="row">
     @foreach($drawings as $drawing)
-        <div class="col-md-3 sketch-nail" id="{{ $drawing->id }}" data-drawingid="{{ $drawing->id }}">
+        <div class="col-md-3 sketch-nail" id="{{ $drawing->id }}" data-drawingid="{{ $drawing->id }}" data-label="{{ $drawing->label }}">
             <div class="thumbnail tbn-item {{ $drawing->selected? 'active': '' }}" id="dw-{{ $drawing->id }}">
                 <div class="caption ">
-                    <p>{{ $drawing->title }}</p>
+                    <p id="label">{{ $drawing->label }}</p>
                     <a href="/drawings/{{$drawing->path}}" class="sketch-tbn"><i class="glyphicon glyphicon-picture"></i></a>
                     <a href="/drawings/{{$drawing->path}}"><i class="glyphicon glyphicon-resize-full"></i></a>
                 </div>

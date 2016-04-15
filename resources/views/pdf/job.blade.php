@@ -286,7 +286,7 @@
                 <?php $rems = [];
                     foreach($job->removals as $rem):
                         $rems[] = $rem->name;
-                    endforeach;
+                    endforeach
                 ?>
                 <span class="value">{{ implode(', ', $rems)  }} </span>
             </div>

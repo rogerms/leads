@@ -15,8 +15,6 @@ $(function () {
 
     $('div[name=notes]').on('click', '.delete-note', deletenote);
 
-    // $('#printlead').on('click', processPDF); //todo using something else to produce pdf
-
 	$('.stylesgroups').on('click', '.add-style',addStyle);
 
     $('.add-style-group').click(addStyleGroup);
@@ -210,7 +208,6 @@ function addStyleGroup()
     //tag.find('#tumbled ').prop('checked', false);
     slist.append(tag);
     //add autocomplete to new ones
-    //todo
     //add listener to add style button
     $('.update-group').on('click', updateGroup);
     tag.find('#paverstyle').autocomplete({source: autocompleteLists['styles']});
@@ -239,26 +236,47 @@ function addremovals()
 
 function selectOneDrawing(id)
 {
-    $('.tbn-item').removeClass('active');
-    $('#dw-'+id).addClass('active');
+    var dcard = $('#dw-'+id);
+    if(dcard.hasClass('active'))
+        dcard.removeClass('active');
+    else
+        dcard.addClass('active');
 
     $.ajax({
             url: '/drawing/select/'+id,
             data: {leadid: $('#leadid').val()},
             type: 'POST'
         })
-        .fail(function (data){
-            console.info('delete sketch ajax fail');
-            console.log(data);
-            showResult('Error trying to delete sketch', true);
+        .fail(function (){
+            showResult('Error trying to select sketch', true);
         })
         .done(function(data){
-            console.log(data);
-            if(data.result) {
-                tag.remove();
-                showResult('Sketch deleted');
+            if(data.success) {
+                showResult('Sketch visibility changed');
             }
         });
+}
+
+function editDrawing(target)
+{
+    var id = target.data('drawingid');
+    var label = target.data('label');
+    var result = prompt("Please enter label", label);
+    if (result != null) {
+        $.ajax({
+            url: "/drawing/edit/"+id,
+            data: {label: result},
+            type: 'POST'
+        }).done(function (msg) {
+            console.log(msg);
+            if (msg.success) {
+                target.find('#label').html(msg.label);
+                showResult('Label changed!');
+            }
+        }).fail(function (){
+            showResult('Error trying to change label', true);
+        });
+    }
 }
 
 function changeSearchBy()
@@ -429,6 +447,7 @@ function showContextMenu ()
     var $contextMenu = $("#contextMenu");
     $('#drawings').on("contextmenu", '.sketch-nail', function(e) {
         $contextMenu.data('id', $(this).data('drawingid'));
+        $contextMenu.data('target', $(this));
 
         $contextMenu.css({
             display: "block",
@@ -448,11 +467,16 @@ function runContextMenuAction() {
         console.log('Delete '+ drawingid);
         deleteDrawing($(this), drawingid);
     }
-    if(select == 'Select')
+    if(select == 'Private/Public')
     {
         //console.log('Select '+ $contextMenu.data('id'));
         selectOneDrawing($contextMenu.data('id'));
     }
+    if(select == 'Change Label')
+    {
+        editDrawing($contextMenu.data('target'));
+    }
+
     $contextMenu.hide();
 }
 
@@ -464,11 +488,11 @@ function addImage(event) {
 
     modal.find('#uploadImage').click(function(event) {
         var files = modal.find('#inputfile').prop('files');
-        var title = modal.find('#title').val();
+        var label = modal.find('#label').val();
 
         console.log('button clicked from job -- '+ leadid +' length '+ files.length);
         if(files.length > 0) {
-            uploadFile(event, files[0], leadid, title);
+            uploadFile(event, files[0], leadid, label);
             modal.modal('hide');
         }
     });
@@ -821,7 +845,7 @@ function deleteDrawing(target, drawingid)
 }
 
 // Catch the form submit and upload the files
-function uploadFile(event, file, leadid, title)
+function uploadFile(event, file, leadid, label)
 {
     event.stopPropagation(); // Stop stuff happening
     event.preventDefault(); // Totally stop stuff happening
@@ -835,7 +859,7 @@ function uploadFile(event, file, leadid, title)
     var data = new FormData();
 
     data.append("image", file);
-    data.append('title', title);
+    data.append('label', label);
 
     $.ajax({
         url: '/drawing/add/'+leadid,

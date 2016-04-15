@@ -39,11 +39,11 @@ class LeadController extends Controller
 
         $this->authorize('read', $lead);
 
-        if (\Gate::denies('edit-job', $lead)) {
+        if (\Gate::denies('delete-job', $lead)) {
             $draw = [];
             foreach($lead->drawings as $d)
             {
-               if($d->selected == 1)
+               if($d->selected == 1 || $d->created_by == Auth::user()->id)
                $draw[] =  $d;
             }
             $lead->drawings = $draw;
