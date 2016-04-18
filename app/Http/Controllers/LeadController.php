@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\DB;
 //use Input; worked before adding upload function
 use Auth;
 use Cache;
+use app\Helpers\Helper;
 //use App\Person\Hello;
 
 
@@ -281,7 +282,7 @@ class LeadController extends Controller
 		$lead->zip = $request->zip;
 		$lead->phone = $request->phone;
 		$lead->email = $request->email;
-		$lead->appointment = $request->appointment." ".$request->apptime.":00";
+		$lead->appointment = Helper::db_datetime($request->appointment, $request->apptime);
 		$lead->taken_by_id = $request->takenby;
 		$lead->source_id = $request->source;
 		$lead->sales_rep_id = $request->salesrep;
@@ -319,7 +320,6 @@ class LeadController extends Controller
 
     public function update(Request $request)
     {
-        $date = strtotime($request->appointment." ".$request->apptime);
         $this->authorize('edit');
     	$id = $request->id;
     	$lead = Lead::find($id);
@@ -330,7 +330,7 @@ class LeadController extends Controller
         $lead->zip = $request->zip;
         $lead->phone = $request->phone;
         $lead->email = $request->email;
-        $lead->appointment =  date('Y-m-d H:i:s', $date);
+        $lead->appointment = Helper::db_datetime($request->appointment, $request->apptime);
         $lead->taken_by_id = $request->takenby;
         $lead->source_id = $request->source;
         $lead->sales_rep_id = $request->salesrep;
@@ -348,7 +348,7 @@ class LeadController extends Controller
         }
 
         $result = ($result  == true)? 200: 400;
-		return response()->json(['result' => $result, 'date'=> $date, 'note' => $note]);
+		return response()->json(['result' => $result, 'note' => $note]);
 
 		// App\Flight::where('active', 1)
   //         ->where('destination', 'San Diego')

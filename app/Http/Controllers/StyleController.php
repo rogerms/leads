@@ -6,12 +6,9 @@ namespace App\Http\Controllers;
 use App\StyleGroup;
 use Illuminate\Http\Request;
 use App\Http\Requests;
-use App\Http\Controllers\Controller;
 use App\Job;
 use App\Style;
-use DB;
-use Illuminate\Support\Facades\Input;
-
+use app\Helpers\Helper;
 
 class StyleController extends Controller
 {
@@ -64,9 +61,9 @@ class StyleController extends Controller
             $group->portlands = $sgroup['portland'];
             $group->orderedby = $sgroup['orderedby'];
             $group->handledby = $sgroup['handledby'];
-            $group->delivery_at = $sgroup['delivery'];
+            $group->delivery_at = Helper::db_date($sgroup['delivery']);
             $group->note = $sgroup['note'];
-            $group->order_date = $sgroup['orderdate'];
+            $group->order_date =  Helper::db_date($sgroup['orderdate']);
             $group->delivery_addr = $sgroup['addr'];
 
             $group->job_id = $job_id;

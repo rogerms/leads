@@ -77,7 +77,7 @@
         </div>
         <div class="form-group col-md-2">
             <label for="delivery">Delivery Date</label>
-            <input type="date" class="form-control" name="delivery"  id="delivery" value="" placeholder="mm/dd/yyyy">
+            <input type="text" class="form-control date" name="delivery"  id="delivery" value="" placeholder="mm/dd/yyyy">
         </div>
     </div>
     <div class="row">
@@ -91,7 +91,7 @@
         </div>
         <div class="form-group col-md-2">
             <label for="orderdate">Order Date</label>
-            <input type="date" class="form-control" id="orderdate" value="" >
+            <input type="text" class="form-control date" id="orderdate" value="" >
         </div>
         <div >
             <a href="" class="btn btn-primary update-group">Update Group</a>

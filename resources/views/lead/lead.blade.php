@@ -113,17 +113,19 @@
         <div class="row">
         <div class="col-md-3">
             <div class="form-group">
-                <label for="appointment">Appointment Date</label>
-                <input type="date" class="form-control" id="appointment" value="{{  toInputDate($lead->appointment) }}">
+                <label for="appointment">Appointment Date </label>
+                <input type="text" class="form-control date" id="appointment" value="{{ format_date($lead->appointment) }}">
             </div>
         </div>
         <div class="col-md-3">
             <div class="form-group">
                 <label for="apptime">Time</label>
-                <input type="time" class="form-control" id="apptime" value="{{  toInputTime($lead->appointment) }}">
+                <input type="text" class="form-control time" id="apptime" value="{{  format_time($lead->appointment) }}">
             </div>
         </div>
         </div>
+
+
         <div class="row">
             <div class="col-md-6 col-lg-6">
                 <div class="form-group note-form">

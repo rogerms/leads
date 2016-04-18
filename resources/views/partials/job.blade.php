@@ -1,7 +1,7 @@
 <div class="panel-group">
     <form id="{{$job->id}}">
         <div class="row row-extra-pad">
-            <h2> {{-- Job:{{$job->id}} --}} @if($job->code) {{ $job->code }} ({{ $job->id }}) @elseif(is_before_2016($job->date_sold))  {{ $job->id }} @endif</h2>
+            <h2 id="job-num"> {{ \app\Helpers\Helper::show_job_num($job) }} </h2>
             <div class="last-update" id="{{ $job->id }}">
                 <span>Last Updated: </span><span>{{ format_datetime($job->updated_at) }}</span>
             </div>
@@ -38,7 +38,7 @@
             @if(!empty($job->id))
             <div class="form-group col-md-3">
                 <label for="datesold">Date Sold</label>
-                <input type="date" class="form-control" id="datesold" value="{{  toInputDate($job->date_sold) }}">
+                <input type="text" class="form-control date" id="datesold" value="{{ format_date($job->date_sold) }}">
             </div>
             @endif
         </div>
@@ -70,7 +70,7 @@
             </div>
             <div class="form-group col-md-2">
                 <label for="startdate">Start Date</label>
-                <input type="date" class="form-control" id="startdate" value="{{  toInputDate($job->start_date) }}">
+                <input type="text" class="form-control date" id="startdate" value="{{  format_date($job->start_date) }}">
             </div>
         </div>
         @endcan
@@ -220,7 +220,7 @@
             <div class="col-md-6">
                 <div class="form-group col-md-3">
                     <label for="signedat">Signature Date</label>
-                    <input type="date" class="form-control" id="signedat" value="{{  toInputDate( $job->signed_at) }}">
+                    <input type="text" class="form-control date" id="signedat" value="{{  format_date( $job->signed_at) }}" placeholder="mm/dd/yyyy">
                 </div>
             </div>
         </div>

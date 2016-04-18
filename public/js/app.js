@@ -7,7 +7,7 @@ $(function () {
     processingSearch = false;
     setupAjaxHeader();
     setAutoComplete();
-    fixAppointmentViewFormat();
+    datePickerInit();
     //needs to add listener after a new job is added if using modal form
 	$('#leadnote,.jobnote').keypress(addnote);
 
@@ -67,7 +67,9 @@ $(function () {
 
     $('.tags-select').on('change', selectNotes);
 
-   // tinymceInit();
+    $( "#apptime" ).blur(validateTime);
+
+    // tinymceInit();
 });
 
 function tinymceInit () {
@@ -87,6 +89,33 @@ function tinymceInit () {
     });
 }
 
+function datePickerInit() {
+    $('input.date').datepicker({
+        autoclose: true,
+        clearBtn: true,
+        todayHighlight: true
+    });
+}
+
+function validateTime(){
+    var time = $(this).val();
+    var result = false, m;
+    var re = /^\s*([01]?\d|2[0-3]):?([0-5]\d)?\s?(am|pm)?$/;
+    if ((m = time.match(re))) {
+        var ampm = (m[1] > 12)? '': (m[3] == undefined)? 'am':  m[3];
+        var min = (m[2] == undefined)? '00': m[2];
+        result = (m[1].length === 2 ? "" : "0") + m[1] + ":" + min+ampm;
+    }
+    if(result !== false)
+    {
+        $(this).removeClass('alert-danger');
+        $(this).val(result);
+    }
+    else{
+        $(this).addClass('alert-danger');
+    }
+}
+
 function toggleStyles()
 {
     var id = $(this).attr('id');
@@ -104,14 +133,6 @@ function toggleStyles()
     $(name).toggle();
 }
 
-function fixAppointmentViewFormat()
-{
-    if($('#appointment').prop('type') == 'text')
-    {
-        var date = formDate($('#appointment').val());
-        $('#appointment').val(date);
-    }
-}
 
 function setupAjaxHeader()
 {
@@ -209,6 +230,7 @@ function addStyleGroup()
     slist.append(tag);
     //add autocomplete to new ones
     //add listener to add style button
+    datePickerInit();
     $('.update-group').on('click', updateGroup);
     tag.find('#paverstyle').autocomplete({source: autocompleteLists['styles']});
     tag.find('#manu').autocomplete({source: autocompleteLists['manus']});
@@ -552,8 +574,6 @@ function updateJob () {
 
     fdata['id'] = id;
 
-    console.log(fdata);
-
     $.ajax({
         url: "/job/update",
         data: fdata,
@@ -561,11 +581,7 @@ function updateJob () {
     }).done(function (msg) {
         console.log(msg);
         if (msg.result == 'success') {
-            form.find('.group-count').each(function(){
-                //remove *
-                var txt = $(this).text().replace('*', '');
-                $(this).text(txt);
-            });
+            form.find('#job-num').html(msg.jobnum);
 
             form.find('.last-update>span:last-child').text(msg.updated);
             showResult('Job info updated!');
@@ -782,7 +798,7 @@ function updateLead () {
         data: fdata,
         type: 'POST'
     }).done(function (msg) {
-        console.log(msg);
+        // console.log(msg);
         if (msg.result == 200) {
 
             showResult("lead info updated");

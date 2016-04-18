@@ -10,6 +10,7 @@
     <title>SRP Leads - @yield('title')</title>
     <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
     <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/datepicker/css/bootstrap-datepicker.css" rel="stylesheet">
     <link href="{{ URL::asset('css/style.css') }}" rel="stylesheet">
 
     <!-- Custom styles for this template -->
@@ -141,6 +142,7 @@
     <script src="/js/bootstrap.min.js"></script>
     <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
     <script src='//cdn.tinymce.com/4/tinymce.min.js'></script>
+    <script src='/datepicker/js/bootstrap-datepicker.js'></script>
     {{--<script src="/js/jspdf.js"></script>--}}
     {{--<script src="/js/home.js"></script>--}}
     <script src="/js/app.js"></script>

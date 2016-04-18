@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Drawing;
 use App\Feature;
+use app\Helpers\Helper;
 use App\Material;
 use App\Note;
 use App\StyleGroup;
@@ -304,7 +305,14 @@ class JobController extends Controller
 
         $result = ($result == true)? 'success': 'failed';
         $updated = $job->updated_at->format('m/d/Y h:i A');
-        return response()->json(['result' => $result, 'updated' => $updated, 'note' => $note]);
+
+        return response()->json([
+            'result' => $result, //succesful or not
+            'updated' => $updated, //job data last updated
+            'note' => $note, //if a new note was created return it to be added to the list
+            'sold'=> $request->startdate, //test
+            'jobnum' => Helper::show_job_num($job) //update jobnumber on job title
+        ]);
     }
 
     private function update_styles($stylegroups, $job_id)
@@ -393,14 +401,14 @@ class JobController extends Controller
 
     private function update_job(Job $job, Request $request)
     {
-        $sold = $this->dbDate($request->datesold);
+        $sold = Helper::db_date($request->datesold);
         $just_sold = false;
 
 //        dd($job->date_sold);
 
         if(empty($job->date_sold) && $sold != null)
         {
-            $job->code = $this->create_job_code();
+            $job->code = $this->create_job_code($job);
             $just_sold = true;
             //todo change lead status to sold
         }
@@ -419,8 +427,8 @@ class JobController extends Controller
         $job->property_type = $request->propertytype;
         $job->crew = $request->crew;
         $job->downpayment = $request->downpayment;
-        $job->start_date = $request->startdate;
-        $job->signed_at = $request->signedat;
+        $job->start_date = Helper::db_date($request->startdate);
+        $job->signed_at = Helper::db_date($request->signedat);
 
         $job->save();
 
@@ -430,13 +438,6 @@ class JobController extends Controller
         }
 
         return $job;
-    }
-
-    private function dbDate($datestr)
-    {
-        if(empty($datestr)) return null;
-        $date = strtotime($datestr);
-        return date('Y-m-d H:i:s', $date);
     }
 
     public  function style_pdf($id)
@@ -570,9 +571,11 @@ class JobController extends Controller
         }
     }
 
-    private function create_job_code()
+    private function create_job_code($job)
     {
-        $result = DB::select("SELECT CONCAT('U', DATE_FORMAT(now(), '%y'),'-', RIGHT(CONCAT('000',COUNT(id)+1), 3)) `code` FROM jobs WHERE date_sold IS NOT NULL AND YEAR(date_sold)=YEAR(NOW())");
+        if(!empty($job->code)) return $job->code;
+
+        $result = DB::select("SELECT CONCAT('U', DATE_FORMAT(now(), '%y'),'-', RIGHT(CONCAT('000',COUNT(id)+1), 3)) `code` FROM jobs j WHERE (j.date_sold IS NOT NULL AND YEAR(j.date_sold)=YEAR(NOW())) OR J.code REGEXP CONCAT('^U',DATE_FORMAT(now(),'%y')");
         $result[0]->code;
         return $result[0]->code;
     }

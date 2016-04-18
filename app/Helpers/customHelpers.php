@@ -93,6 +93,34 @@
         }
     }
 
+    if(!function_exists('format_time'))
+    {
+        function format_time($time)
+        {
+            if($time == null)
+            {
+                return '';
+            }
+            if(! $time instanceof Datetime)
+            {
+                if(is_int($time ))
+                {
+                    $tmp = new DateTime();
+                    $tmp->setTimestamp($time);
+                    $time = $tmp;
+                }
+                else{
+                    $time = new Datetime($time);
+                }
+            }
+            if($time->format('Y') < 2000)
+            {
+                return '';
+            }
+            return $time->format('h:ia');
+        }
+    }
+
     if(!function_exists('format_datetime'))
     {
         function format_datetime($time)
@@ -115,33 +143,6 @@
                 return '';
             }
             return $time->format('m/d/Y h:i A');
-        }
-    }
-
-    if(!function_exists('is_before_2016'))
-    {
-        function is_before_2016($time)
-        {
-            $zero = new DateTime('0000-00-00 00:00:00');
-            if(! $time instanceof Datetime)
-            {
-                if(is_int($time ))
-                {
-                    $tmp = new DateTime();
-                    $tmp->setTimestamp($time);
-                    $time = $tmp;
-                }
-                else{
-                    $time = new Datetime($time);
-                }
-            }
-            if($time == $zero)
-            {
-                return false;
-            }
-            if($time->format('Y') < 2016)
-                return true;
-            return false;
         }
     }
 

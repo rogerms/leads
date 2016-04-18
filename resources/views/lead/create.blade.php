@@ -104,13 +104,13 @@
         <div class="col-lg-3 col-md-3">
             <div class="form-group">
                 <label for="appointment">Appointment Date</label>
-                <input type="date" class="form-control" id="appointment" name="appointment" value="">
+                <input type="text" class="form-control date" id="appointment" name="appointment" value="">
             </div>
         </div>
         <div class="col-lg-3 col-md-3">
             <div class="form-group">
                 <label for="apptime">Time</label>
-                <input type="time" class="form-control" id="apptime" name="apptime" value="" placeholder="H:M">
+                <input type="text" class="form-control" id="apptime" name="apptime" value="" placeholder="H:M">
             </div>
         </div>
         </div>
