@@ -554,6 +554,7 @@ button.delete-note {
 
 .alert-dlg-error {
     color: #852307;
+    background-color: #FFF2FF;
 }
 
 .pagination>li>a:focus,.pagination>li>a:hover,.pagination>li>span:focus,.pagination>li>span:hover{
@@ -734,4 +735,9 @@ body {
     filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
     color: #fff;
     text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+}
+
+i.mce-i-icon-sigma:before {
+content: '';         // FONT-AWESOME-CONTENT e.g. "\f166"
+font-family: FontAwesome;
 }

@@ -6,6 +6,7 @@ use Illuminate\Contracts\Auth\Access\Gate as GateContract;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
 use App\Permission;
+use Illuminate\Support\Facades\Auth;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -29,6 +30,16 @@ class AuthServiceProvider extends ServiceProvider
         $this->registerPolicies($gate);
 
         $permissions = Permission::with('roles')->get();
+
+        $gate->before(function ($user, $ability) {
+            if ($user->role_id < 3 ) { //admin 2, superadmin 1
+                return true;
+            }
+        });
+
+        $gate->define('view-proposal', function($user, $job){
+            return  $user->role_id == 3  || $job->proposal_author == $user->id || empty($job->proposal_author);
+        });
 
         foreach($permissions as $permission)
         {

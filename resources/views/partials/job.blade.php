@@ -91,12 +91,15 @@
             </div>
             @endforeach
         </div> <!-- END FEATURES 2-->
-        {{--<div class="row">--}}
-            {{--<div class="col-xm-12" style="padding: 10px">--}}
-                {{--<label>Proposal Notes:</label>--}}
-                {{--<textarea class="proposal-note">Hello, World!</textarea>--}}
-            {{--</div>--}}
-        {{--</div>--}}
+        <input type="hidden" id="proposal-author" value="{{ $job->proposal_author }}">
+        @can('view-proposal', $job)
+        <div class="row">
+            <div class="col-xm-12" style="padding: 10px">
+                <label>Proposal Notes:</label>
+                <textarea class="proposal-note">{{ $job->proposal_note }}</textarea>
+            </div>
+        </div>
+        @endcan
         @can('edit-job')
         <div class="row row-extra-pad">
             <a role="button" class="btn btn-primary" href="/job/{{$job->id}}/style">Paver Styles</a>
@@ -238,7 +241,7 @@
 
             <!-- Split button -->
             <div class="btn-group">
-                <a role="button" href="/print/job/{{$job->id}}" class="btn btn-default" id="print-job">View PDF</a>
+                <a role="button" @can('view-proposal', $job) href="/print/job/{{$job->id}}" @endcan class="btn btn-default" id="print-job">View PDF</a>
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="caret"></span>
                     <span class="sr-only">Toggle Button</span>

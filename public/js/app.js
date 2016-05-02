@@ -69,23 +69,32 @@ $(function () {
 
     $( "#apptime" ).blur(validateTime);
 
-    // tinymceInit();
+    tinymceInit();
 });
 
 function tinymceInit () {
     tinymce.init({
         selector: 'textarea',
-        width: 900,
+        width: 835,
         height: 300,
+        max_height: 270,
         browser_spellcheck: true,
         contextmenu: false,
-        plugins: [
-            'advlist autolink link image lists charmap print preview hr anchor pagebreak spellchecker',
-            'searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking',
-            'save table contextmenu directionality emoticons template paste textcolor'
-        ],
-        toolbar: 'undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | print preview media fullpage | forecolor backcolor emoticons'
+        menubar: false,
+        resize: false,
+        elementpath: false,
+        custom_undo_redo_levels: 10,
+        statusbar: false,
 
+        setup: customRTEButtons,
+
+        plugins: [
+            'advlist lists print preview hr',
+            'save table contextmenu template textcolor'
+        ],
+        toolbar: 'undo redo | save | fontsizeselect | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist | print viewpdf | forecolor | autosum',
+
+        save_onsavecallback: saveProposalNote
     });
 }
 
@@ -116,6 +125,80 @@ function validateTime(){
     }
 }
 
+function customRTEButtons (editor) {
+    editor.addButton('autosum', {
+        icon: 'sigma',
+        title: 'Add numbers',
+        image: '/images/icons/360-sigma.png',
+        onclick: function (event) {
+            var jobid = $(event.target).parents('form').attr('id');
+            var amount = $(event.target).parents('form').find('#proposalamount');
+
+            var re = /(-)?\$(\d+[\d\.,]*)/ig;
+            var str = editor.getContent();
+            var matches;
+            var sum = 0;
+            while ((matches = re.exec(str)) !== null) {
+                var res = matches[2].replace(/,/g, '');
+                sum += parseFloat(res)*(matches[1]? -1: 1);
+            }
+            // console.log(sum);
+            if(sum % 1 != 0)
+            {
+                sum = sum.toFixed(2);
+            }
+            alert('Total $'+sum);
+            amount.val(sum);
+        }
+    });
+
+    editor.addButton('viewpdf', {
+        icon: 'filepdf',
+        title: 'View PDF',
+        image: '/images/icons/480-file-pdf.png',
+        onclick: function (event) {
+            // var targetid = editor.id;
+            // console.log('target '+targetid);
+            var jobid = $(event.target).parents('form').attr('id');
+            // console.log('job'+ jobid);
+            window.location.href = '/print/job/'+jobid;
+        }
+    });
+}
+
+function saveProposalNote(editor){
+    event.preventDefault();
+    var form = $('#'+editor.id).parents('form');
+    var jobid = form.attr('id');
+    // console.log(jobid);
+    //only job owner can upate proposal
+    var result  = false;
+    if(form.find('#proposal-author').val() == "") {
+        result = confirm("Only click ok if you are the assigned sales rep. for this job");
+        if(result !== true) return;
+    }
+    // console.log(target.getContent());
+
+    $.ajax({
+            url: '/proposal/edit/'+jobid,
+            data: {note: editor.getContent() },
+            type: 'POST'
+        })
+        .fail(function (){
+            showResult('Error trying to save text', true);
+        })
+        .done(function(data){
+            if(data.result) {
+                showResult('text saved');
+                //update owner id
+                form.find('#proposal-author').val(data.author);
+            }
+            else{
+                showResult(data.msg, true);
+            }
+        });
+}
+
 function toggleStyles()
 {
     var id = $(this).attr('id');
@@ -132,7 +215,6 @@ function toggleStyles()
     }
     $(name).toggle();
 }
-
 
 function setupAjaxHeader()
 {

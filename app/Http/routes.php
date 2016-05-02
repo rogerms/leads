@@ -139,6 +139,9 @@ Route::group(['middleware' => 'web'], function () {
 
     Route::post('style/{id}/delete', 'StyleController@delete');
 
+    Route::post('proposal/edit/{jobid}', 'JobController@edit_proposal');
+
+
 //----------------------------------------------------
 // Report
 //----------------------------------------------------

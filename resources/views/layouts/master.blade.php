@@ -118,7 +118,7 @@
                     </li>
                 @endif
             </ul>
-        </div><!--/.nav-collapse -->
+        </div><!--/.nav-collapse    -->
       </div>
     </nav>
 

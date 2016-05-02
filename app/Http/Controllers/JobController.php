@@ -440,6 +440,21 @@ class JobController extends Controller
         return $job;
     }
 
+    public function edit_proposal(Request $request, $id)
+    {
+        $job = Job::findOrFail($id);
+        $user_id = Auth::user()->id;
+
+        if($job->proposal_author > 0 && $job->proposal_author != $user_id)
+           return response()->json(['result' => false, 'msg' => 'Nothing saved... unauthorized user!']);
+        if($job->proposal_author == null)
+            $job->proposal_author = $user_id;
+        $job->proposal_note = $request->note;
+        $result = $job->save();
+
+        return response()->json(['result' => $result, 'author' => $job->proposal_author, 'msg' => '']);
+    }
+
     public  function style_pdf($id)
     {
         $stylegroup = StyleGroup::find($id);
@@ -575,7 +590,7 @@ class JobController extends Controller
     {
         if(!empty($job->code)) return $job->code;
 
-        $result = DB::select("SELECT CONCAT('U', DATE_FORMAT(now(), '%y'),'-', RIGHT(CONCAT('000',COUNT(id)+1), 3)) `code` FROM jobs j WHERE (j.date_sold IS NOT NULL AND YEAR(j.date_sold)=YEAR(NOW())) OR J.code REGEXP CONCAT('^U',DATE_FORMAT(now(),'%y')");
+        $result = DB::select("SELECT CONCAT('U', DATE_FORMAT(now(), '%y'),'-', RIGHT(CONCAT('000',COUNT(id)+1), 3)) `code` FROM jobs j WHERE (j.date_sold IS NOT NULL AND YEAR(j.date_sold)=YEAR(NOW())) OR J.code REGEXP CONCAT('^U',DATE_FORMAT(now(),'%y'))");
         $result[0]->code;
         return $result[0]->code;
     }

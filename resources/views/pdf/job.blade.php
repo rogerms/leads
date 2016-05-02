@@ -307,13 +307,16 @@
         <div class="drawing">
             {{--<img class="img-holder" src="{{ url("drawings/$path") }}" alt="">--}}
 
-            @foreach($job->descs as $desc)
-                    {{ str_ireplace('#description ', '', $desc->note)  }} <br>
-            @endforeach
+            {{--@foreach($job->descs as $desc)--}}
+                    {{--{{ str_ireplace('#description ', '', $desc->note)  }} <br>--}}
+            {{--@endforeach--}}
             <span class="job-obs">
                    Job description: <small>All material and work listed to be performed in accordance with applicable drawing and specifications, completed 
                     in substantial and workman like manner.</small>
             </span>
+            <div>
+                {!! $job->proposal_note  !!}
+            </div>
             <div class="total-box">
                 <div>Job Total</div>
                 <div class="total-value">{{ $job->proposal_amount }}</div>

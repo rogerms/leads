@@ -239,7 +239,7 @@ class LeadController extends Controller
             {
                 $lead->status_name = $lead->status->name;
                 $lead->sales_rep_name = $lead->salesrep->name;
-                $lead->appointmentfmt = $lead->appointment->format('M j, Y \a\t h:ia');
+                if($lead->appointment != null) $lead->appointmentfmt = $lead->appointment->format('M j, Y \a\t h:ia');
                 $leads[$key] = $lead;
             }
 

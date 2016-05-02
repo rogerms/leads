@@ -13,10 +13,10 @@
             <table  class="table table-striped table-hover table-bordered" id="leadstb">
                 <thead>
                 <tr>
+                    <th>ID</th>
                     <th>Job#</th>
                     <th>Customer Name</th>
-                    <th>Phone</th>
-                    <th>Street</th>
+                    <th>Date Sold</th>
                     <th>City</th>
                     {{--<th>Appointment</th>--}}
                     <th>Sales Rep</th>
@@ -26,9 +26,9 @@
                 @foreach($jobs as $job)
                     <tr data-id="{{ $job->lead['id'] }}">
                         <td>{{ $job->id }}</td>
+                        <td>{{ $job->code }}</td>
                         <td>{{ $job->lead['customer_name'] }}</td>
-                        <td>{{ $job->lead['phone'] }}</td>
-                        <td>{{ $job->lead['street'] }}</td>
+                        <td>{{ format_date($job->date_sold) }}</td>
                         <td>{{ $job->lead['city'] }}</td>
                         {{--<td>{{ formatAppoint($job->lead['appointment']) }}</td>--}}
                         <td>{{ $job->lead['salesrep']["name"] }}</td>
