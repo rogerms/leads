@@ -19,7 +19,7 @@
                 <label for="customertype">Customer Type </label>
                 <select class="form-control" id="customertype">
                     @foreach($customer_types as $type)
-                        <option {{ isSelected($type->customer_type, $job->customer_type) }}>{{$type->customer_type}}</option>
+                        <option {{ isSelected($type->name, $job->customer_type) }}>{{$type->name}}</option>
                     @endforeach
                 </select>
             </div>
@@ -31,7 +31,7 @@
                 <label for="propertytype">Property Type </label>
                 <select class="form-control" id="propertytype">
                     @foreach($property_types as $type)
-                        <option {{ isSelected($type->property_type, $job->property_type) }}>{{$type->property_type}}</option>
+                        <option {{ isSelected($type->name, $job->property_type) }}>{{$type->name}}</option>
                     @endforeach
                 </select>
             </div>
