@@ -741,3 +741,7 @@ i.mce-i-icon-sigma:before {
 content: '';         // FONT-AWESOME-CONTENT e.g. "\f166"
 font-family: FontAwesome;
 }
+
+.update-row{
+    padding-bottom: 5px;
+}

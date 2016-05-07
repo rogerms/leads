@@ -89,6 +89,10 @@ Route::group(['middleware' => 'web'], function () {
 
     Route::post('rep/update/{id}', 'HomeController@update_rep');
 
+    Route::get('lists', 'HomeController@lists');
+
+    Route::post('list/update/{id}', 'HomeController@update_list');
+
 
 //----------------------------------------------------
 // note

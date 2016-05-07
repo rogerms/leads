@@ -590,7 +590,7 @@ class JobController extends Controller
     {
         if(!empty($job->code)) return $job->code;
 
-        $result = DB::select("SELECT CONCAT('U', DATE_FORMAT(now(), '%y'),'-', RIGHT(CONCAT('000',COUNT(id)+1), 3)) `code` FROM jobs j WHERE (j.date_sold IS NOT NULL AND YEAR(j.date_sold)=YEAR(NOW())) OR J.code REGEXP CONCAT('^U',DATE_FORMAT(now(),'%y'))");
+        $result = DB::select("SELECT CONCAT('U', DATE_FORMAT(now(), '%y'),'-', RIGHT(CONCAT('000',COUNT(id)+1), 3)) `code` FROM jobs j WHERE (j.date_sold IS NOT NULL AND YEAR(j.date_sold)=YEAR(NOW())) OR j.code REGEXP CONCAT('^U',DATE_FORMAT(now(),'%y'))");
         $result[0]->code;
         return $result[0]->code;
     }

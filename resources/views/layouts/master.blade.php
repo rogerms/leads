@@ -50,6 +50,7 @@
                   <li role="separator" class="divider"></li>
                   <li><a href="{{ url('/register') }}">Add New User</a></li>
                   <li><a href="{{ url('/reps') }}">Update Reps</a></li>
+                  <li><a href="{{ url('/lists') }}">Update Lists</a></li>
                   @endcan
 
                   <!--  add more actions

@@ -61,6 +61,8 @@ $(function () {
 
     $('.update-rep').on('click', updateReps);
 
+    $('.update-lists').on('click', updateLists);
+
     $('.update-group,#update-all-groups').on('click', updateGroup);
 
     $('.delete-style').on('click', deleteStyle);
@@ -1037,6 +1039,7 @@ function addReps(event)
 {
     alert('add rep '+$(this).attr('id'));
 }
+
 function updateReps()
 {
     var row = $(this).parent('.row');
@@ -1049,6 +1052,24 @@ function updateReps()
             name: row.find('#name').val(),
             phone: row.find('#phone').val(),
             active: row.find('#active:checked').length
+        }
+    }).done(function(msg){
+        console.log(msg);
+        location.reload();
+    });
+}
+
+function updateLists()
+{
+    var row = $(this).parent('.row');
+    var id = $(this).attr('id');
+
+    $.ajax({
+        url: '/list/update/'+id,
+        type: 'POST',
+        data: {
+            type: $(this).data('type'),
+            name: row.find('#name').val()
         }
     }).done(function(msg){
         console.log(msg);

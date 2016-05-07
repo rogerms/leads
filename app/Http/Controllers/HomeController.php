@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests;
 use App\Lead;
+use App\Source;
+use App\Status;
+use App\TakenBy;
 use Illuminate\Http\Request;
 use App\SalesRep;
 
@@ -67,5 +70,40 @@ class HomeController extends Controller
             $message['title'] = 'Error!';
         }
         \Session::flash('message', $message);
+    }
+
+    public  function lists()
+    {
+        $this->authorize('edit-user');
+        $takers = TakenBy::all();
+        $statuses = Status::all();
+        $sources = Source::all();
+
+        return view('lists', compact('takers', 'statuses', 'sources'));
+    }
+
+    public  function update_list(Request $request, $id)
+    {
+        $this->authorize('edit-user');
+
+        $obj = null;
+        switch ($request->type)
+        {
+            case 'status':
+                $obj = Status::findOrNew($id);
+                break;
+            case 'takenby':
+                $obj = TakenBy::findOrNew($id);
+                break;
+            case 'source':
+                $obj = Source::findOrNew($id);
+                break;
+        }
+
+        $obj->name = $request->name;
+        $result = $obj->save();
+        $message = 'Item Created/Updated successfully';
+        $this->get_message($message, $result);
+        return response()->json($message);
     }
 }
