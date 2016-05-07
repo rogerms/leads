@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use app\Helpers\Helper;
 use App\Http\Requests;
-use App\Lead;
 use App\Source;
 use App\Status;
 use App\TakenBy;
 use Illuminate\Http\Request;
 use App\SalesRep;
+use DB;
 
 class HomeController extends Controller
 {
@@ -25,7 +26,7 @@ class HomeController extends Controller
     /**
      * Show the application dashboard.
      *
-     * @return Response
+     * @return
      */
     public function index()
     {
@@ -58,20 +59,6 @@ class HomeController extends Controller
         return response()->json($message);
     }
 
-    private function get_message($text, $passed = false)
-    {
-        $message['text'] = $text;
-        $message['class'] = 'alert-success';
-        $message['title'] = 'Info!';
-
-        if($passed == false)
-        {
-            $message['class'] = 'alert-danger';
-            $message['title'] = 'Error!';
-        }
-        \Session::flash('message', $message);
-    }
-
     public  function lists()
     {
         $this->authorize('edit-user');
@@ -79,7 +66,11 @@ class HomeController extends Controller
         $statuses = Status::all();
         $sources = Source::all();
 
-        return view('lists', compact('takers', 'statuses', 'sources'));
+        $property_types = DB::table('property_types')->get();
+        $customer_types = DB::table('customer_types')->get();
+        $job_types = DB::table('job_types')->get();
+
+        return view('lists', compact('takers', 'statuses', 'sources', 'property_types', 'customer_types', 'job_types'));
     }
 
     public  function update_list(Request $request, $id)
@@ -87,6 +78,10 @@ class HomeController extends Controller
         $this->authorize('edit-user');
 
         $obj = null;
+        $table_name =  null;
+        $result = false;
+        if(empty($request->name)) return false;
+
         switch ($request->type)
         {
             case 'status':
@@ -98,12 +93,29 @@ class HomeController extends Controller
             case 'source':
                 $obj = Source::findOrNew($id);
                 break;
+            default:
+                $table_name = $request->type;
         }
 
-        $obj->name = $request->name;
-        $result = $obj->save();
+        if($obj != null)
+        {
+            $obj->name = $request->name;
+            $result = $obj->save();
+        }
+        elseif (!empty($table_name)) {
+            if ($id == 0) {
+                $result = DB::table($table_name)->insert(
+                    ['name' => $request->name, 'updated_at' => date("Y-m-d H:i:s")]
+                );
+            } else {
+                $result = DB::table($table_name)
+                    ->where('id', $id)
+                    ->update(['name' => $request->name, 'updated_at' => date("Y-m-d H:i:s")]);
+            }
+        }
+        
         $message = 'Item Created/Updated successfully';
-        $this->get_message($message, $result);
+        Helper::get_message($message, $result);
         return response()->json($message);
     }
 }

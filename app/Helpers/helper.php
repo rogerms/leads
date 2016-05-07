@@ -49,4 +49,18 @@
                 return true;
             return false;
         }
+
+        public static function get_message($text, $passed = false)
+        {
+            $message['text'] = $text;
+            $message['class'] = 'alert-success';
+            $message['title'] = 'Info!';
+
+            if($passed == false)
+            {
+                $message['class'] = 'alert-danger';
+                $message['title'] = 'Error!';
+            }
+            \Session::flash('message', $message);
+        }
     }

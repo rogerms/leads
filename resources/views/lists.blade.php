@@ -6,6 +6,7 @@
     @include('partials.feedback')
 <div class="row">
     <form class="form-inline" action="">
+        <div class="row row-extra-bm-pad">
     <div class="col-sm-4">
     <div class="row">
         <h4>Taken By</h4>
@@ -28,7 +29,7 @@
         </div>
     </div>
 
-{{--sources--}}
+    {{--sources--}}
     <div class="col-sm-4">
         <div class="row">
             <h4>Sources</h4>
@@ -49,9 +50,10 @@
             </div>
             <button type="button" id="0" class="btn btn-info update-lists" data-type="source">Add</button>
         </div>
-        </div>
-        {{--statuses--}}
-        <div class="col-sm-4">
+    </div>
+
+    {{--statuses--}}
+    <div class="col-sm-4">
         <div class="row">
             <h4>Status</h4>
         </div>
@@ -70,6 +72,74 @@
                 <input type="text" class="form-control" id="name"  placeholder="Alive">
             </div>
             <button type="button" id="0" class="btn btn-info update-lists" data-type="status">Add</button>
+        </div>
+    </div>
+        </div>
+        <div class="row row-extra-pad">
+
+    {{--property_types--}}
+    <div class="col-sm-4">
+        <div class="row">
+            <h4>Property Type</h4>
+        </div>
+        @foreach($property_types as $property_type)
+            <div class="row update-row">
+                <div class="form-group">
+                    <label class="sr-only" for="name">Name</label>
+                    <input type="text" class="form-control" id="name" value="{{ $property_type->name }}">
+                </div>
+                <button type="button" id="{{ $property_type->id  }}" class="btn btn-default update-lists" data-type="property_types">Update</button>
+            </div>
+        @endforeach
+        <div class="row reps-add">
+            <div class="form-group">
+                <label class="sr-only" for="name">Name</label>
+                <input type="text" class="form-control" id="name"  placeholder="type">
+            </div>
+            <button type="button" id="0" class="btn btn-info update-lists" data-type="property_types">Add</button>
+        </div>
+    </div>
+        <div class="col-sm-4">
+            <div class="row">
+                <h4>Customer Type</h4>
+            </div>
+            @foreach($customer_types as $customer_type)
+                <div class="row update-row">
+                    <div class="form-group">
+                        <label class="sr-only" for="name">Name</label>
+                        <input type="text" class="form-control" id="name" value="{{ $customer_type->name }}">
+                    </div>
+                    <button type="button" id="{{ $customer_type->id  }}" class="btn btn-default update-lists" data-type="customer_types">Update</button>
+                </div>
+            @endforeach
+            <div class="row reps-add">
+                <div class="form-group">
+                    <label class="sr-only" for="name">Name</label>
+                    <input type="text" class="form-control" id="name"  placeholder="type">
+                </div>
+                <button type="button" id="0" class="btn btn-info update-lists" data-type="customer_types">Add</button>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="row">
+                <h4>Job Type</h4>
+            </div>
+            @foreach($job_types as $job_type)
+                <div class="row update-row">
+                    <div class="form-group">
+                        <label class="sr-only" for="name">Name</label>
+                        <input type="text" class="form-control" id="name" value="{{ $job_type->name }}">
+                    </div>
+                    <button type="button" id="{{ $job_type->id  }}" class="btn btn-default update-lists" data-type="job_types">Update</button>
+                </div>
+            @endforeach
+            <div class="row reps-add">
+                <div class="form-group">
+                    <label class="sr-only" for="name">Name</label>
+                    <input type="text" class="form-control" id="name"  placeholder="type">
+                </div>
+                <button type="button" id="0" class="btn btn-info update-lists" data-type="job_types">Add</button>
+            </div>
         </div>
         </div>
     </form>
