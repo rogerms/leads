@@ -4,7 +4,6 @@ namespace Illuminate\Foundation\Auth;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Role;
 
 trait RegistersUsers
 {
@@ -30,8 +29,8 @@ trait RegistersUsers
         if (property_exists($this, 'registerView')) {
             return view($this->registerView);
         }
-        $roles = Role::where('name', 'not like', '%admin%')->get();
-        return view('auth.register', compact('roles'));
+
+        return view('auth.register');
     }
 
     /**

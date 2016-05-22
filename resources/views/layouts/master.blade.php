@@ -53,6 +53,11 @@
                   <li><a href="{{ url('/lists') }}">Update Lists</a></li>
                   @endcan
 
+                  @can('admin')
+                  <li role="separator" class="divider"></li>
+                  <li><a href="{{ url('/gapi') }}">Google Auth</a></li>
+                  @endcan
+
                   <!--  add more actions
                 <li><a href="#">Another action</a></li>
                 <li><a href="#">Something else here</a></li>

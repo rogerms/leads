@@ -111,16 +111,22 @@
         </div>
     </div>
         <div class="row">
-        <div class="col-md-3">
+        <div class="col-md-2">
             <div class="form-group">
                 <label for="appointment">Appointment Date </label>
                 <input type="text" class="form-control date" id="appointment" value="{{ format_date($lead->appointment) }}">
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
             <div class="form-group">
                 <label for="apptime">Time</label>
                 <input type="text" class="form-control time" id="apptime" value="{{  format_time($lead->appointment) }}">
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                <label for="addtocalendar" class="sr-only">Add to calendar</label>
+                <input type="button" class="btn btn-default input-btn-margin" id="addtocalendar" value="Add to Calendar"/>
             </div>
         </div>
         </div>

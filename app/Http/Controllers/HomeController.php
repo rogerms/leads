@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use app\Helpers\Helper;
 use App\Http\Requests;
+use App\Lead;
 use App\Source;
 use App\Status;
 use App\TakenBy;
 use Illuminate\Http\Request;
 use App\SalesRep;
 use DB;
+use Illuminate\Support\Facades\Session;
 
 class HomeController extends Controller
 {
@@ -18,6 +20,8 @@ class HomeController extends Controller
      *
      * @return void
      */
+    private $google_auth_page = "/gapi";
+
     public function __construct()
     {
         $this->middleware('auth');
@@ -55,7 +59,7 @@ class HomeController extends Controller
         $rep->active = $request->active;
         $result = $rep->save();
         $message = $is_new == true? 'Rep added successfully': 'Rep Updated successfully';
-        $this->get_message($message, $result);
+        Helper::flash_message($message, $result);
         return response()->json($message);
     }
 
@@ -115,7 +119,122 @@ class HomeController extends Controller
         }
         
         $message = 'Item Created/Updated successfully';
-        Helper::get_message($message, $result);
+        Helper::flash_message($message, $result);
         return response()->json($message);
+    }
+
+    public function gapi()
+    {
+        $google = Helper::google_client();
+
+        if (\Request::has('code'))
+        {//store token
+            $google->authenticate(\Request::input('code'));
+            Session::put('access_token', $google->getAccessToken());
+            Helper::put_refresh_token($google->getRefreshToken());
+
+            Helper::flash_message('You are now successfully authenticated!', true);
+            return redirect($this->google_auth_page);
+        }
+
+        $refresh_token = Helper::get_refresh_token();
+        if(!empty($refresh_token))
+        {
+            return view('gapi.index');
+        }
+        // if user is authorized, but token is not set
+        if ($google->getRefreshToken())
+        {
+            Helper::put_refresh_token($google->getRefreshToken());
+            return view('gapi.index');
+        }
+        // if token is not set, print Google API Auth link
+        else
+        {
+            return view('gapi.index')->with('google_auth_url', $google->createAuthUrl());
+        }
+    }
+
+    public function logout_gapi()
+    {
+        $refresh_token = Helper::get_refresh_token();
+        $google_client = Helper::google_client();
+
+        if(empty($refresh_token))
+        {//if no refresh token try to get access_code from session...
+            $google_client->setAccessToken(Session::get('access_token'));
+        }
+        else//with refresh token we can get auth
+        {
+            $google_client->refreshToken($refresh_token);
+        }
+
+        $google_client->revokeToken();
+        Session::forget('access_token');
+        Helper::del_refresh_token();
+        Helper::flash_message('Successfully logged out! ', true);
+        return redirect($this->google_auth_page);
+    }
+
+    public function add_calendar_event($id)
+    {
+        $refresh_token = Helper::get_refresh_token();
+        if(empty($refresh_token)) {
+            return response()->json(['success' => false, 'url' => $this->google_auth_page]);
+        }
+
+        $google = Helper::google_client();
+        $google->refreshToken($refresh_token);
+
+        $service = new \Google_Service_Calendar($google);
+        $event = $this->calendar_event($id);
+        $calendarId = 'primary';
+        $event = $service->events->insert($calendarId, $event);
+        return response()->json(['success' => true, 'msg' => $event->htmlLink]);
+    }
+
+    private function calendar_event($id)
+    {
+        $lead = Lead::findOrFail($id);
+
+        $event = new \Google_Service_Calendar_Event([
+            'summary' => $lead->customer_name,
+            'location' => "$lead->street, $lead->city, UT $lead->zip",
+            'description' => "http://leads.strongrockpavers/lead/$id",
+
+            'start' => [
+                'dateTime' => $lead->appointment->format("Y-m-d\TH:i:s"),
+                'timeZone' => 'America/Denver',
+            ],
+
+            'end' => [
+                'dateTime' => $lead->appointment->addHour()->format("Y-m-d\TH:i:s"),
+                'timeZone' => 'America/Denver',
+            ],
+                'attendees' => [
+                    ['email' => strtolower($lead->salesrep->name).'@strongrockpavers.com' ],
+                    ['email' => 'sales@strongrockpavers.com'],
+                ],
+            'reminders' => [
+                'useDefault' => FALSE,
+                'overrides' => [
+                    ['method' => 'email', 'minutes' => 24 * 60],
+                    ['method' => 'popup', 'minutes' => 15],
+                ],
+            ],
+        ]);
+
+        return $event;
+    }
+
+    public function sqltest()
+    {
+//        $users = DB::connection('sqlsrv')->table('users')->get();
+//        foreach ($users as $user)
+//        {
+//            echo $user;
+//        }
+        phpinfo();
+        return 'done';
     }
 }

@@ -39,7 +39,7 @@ $(function () {
 
     addSearchAutoComplete();
 
-    $('[data-toggle="offcanvas"]').click(function () {$('.row-offcanvas').toggleClass('active')}); //todo cleanup
+    $('[data-toggle="offcanvas"]').click(toggleData);
 
     $('.tbfilter').on('change', searchLeads);
 
@@ -71,8 +71,15 @@ $(function () {
 
     $( "#apptime" ).blur(validateTime);
 
+    $( "#addtocalendar" ).on('click', addCalendarEvent);
+
     tinymceInit();
 });
+
+function toggleData()
+{
+    $('.row-offcanvas').toggleClass('active');
+}
 
 function tinymceInit () {
     tinymce.init({
@@ -164,6 +171,25 @@ function customRTEButtons (editor) {
             var jobid = $(event.target).parents('form').attr('id');
             // console.log('job'+ jobid);
             window.location.href = '/print/job/'+jobid;
+        }
+    });
+}
+
+function addCalendarEvent()
+{
+    var leadid = $(this).parents('form').find('#leadid').val();
+    //console.log('add calendar');
+    $.ajax({
+        url: "/calendar/add/"+leadid,
+        type: 'POST'
+    }).done(function (result) {
+        if(result.success)
+        {
+            showResult("Event added: "+result.msg);
+        }
+        if(result.success == false)
+        {
+            window.location = result.url;
         }
     });
 }

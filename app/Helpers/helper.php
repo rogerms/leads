@@ -2,6 +2,7 @@
     namespace  app\Helpers;
 
     use DateTime;
+    use DB;
 
     class Helper{
         
@@ -50,7 +51,7 @@
             return false;
         }
 
-        public static function get_message($text, $passed = false)
+        public static function flash_message($text, $passed = false)
         {
             $message['text'] = $text;
             $message['class'] = 'alert-success';
@@ -62,5 +63,36 @@
                 $message['title'] = 'Error!';
             }
             \Session::flash('message', $message);
+        }
+        public static function google_client()
+        {
+            $google = new \Google_Client();
+            $google->setAuthConfigFile(storage_path('app/client_secrets.json'));
+            $google->setAccessType('offline');
+            $google->setRedirectUri(url('gapi'));
+            $google->addScope('https://www.googleapis.com/auth/calendar');
+            return $google;
+        }
+
+        public static function get_refresh_token()
+        {
+            return DB::table('tokens')->where('name', 'google')->value('token');
+        }
+
+        public static function put_refresh_token($token)
+        {
+            $result = DB::table('tokens')->where('name', 'google')->value('name');
+            if($result == 'google')
+            {
+            //  update
+                return DB::table('tokens')->where('name', 'google')->update(['token' => $token]);
+            }
+
+            return DB::table('tokens')->insert(['name' => 'google', 'token' => $token]);
+        }
+
+        public static function del_refresh_token()
+        {
+            return DB::table('tokens')->where('name', 'google')->update(['token' => null]);
         }
     }

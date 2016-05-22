@@ -5,7 +5,6 @@
 
 @section('content')
     @include('partials.feedback')
-
     {{--<div>--}}
       {{--<div class="form-group ">--}}
           {{--<label for="searchtext">Search</label>--}}

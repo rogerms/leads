@@ -1,5 +1,4 @@
 <?php
-
 /*
 |--------------------------------------------------------------------------
 | Routes File
@@ -93,7 +92,9 @@ Route::group(['middleware' => 'web'], function () {
 
     Route::post('list/update/{id}', 'HomeController@update_list');
 
+    Route::get('sqlt', 'HomeController@sqltest');
 
+    
 //----------------------------------------------------
 // note
 //----------------------------------------------------
@@ -162,5 +163,14 @@ Route::group(['middleware' => 'web'], function () {
     Route::get('report/job/{id}', 'ReportController@job');
 
     Route::get('download/{id}', 'HomeController@get_xls');//todo remove it
+
+//   -------------------------------------------------------
+//Google Calendar
+//----------------------------------------------------------
+    Route::get('gapi', 'HomeController@gapi');
+
+    Route::get('gapi/logout', 'HomeController@logout_gapi');
+
+    Route::any('calendar/add/{id}', 'HomeController@add_calendar_event');
 
 });
