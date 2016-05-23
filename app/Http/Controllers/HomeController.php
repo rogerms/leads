@@ -130,9 +130,8 @@ class HomeController extends Controller
         if (\Request::has('code'))
         {//store token
             $google->authenticate(\Request::input('code'));
-            Session::put('access_token', $google->getAccessToken());
+            $this->sessionAccessToken($google->getAccessToken());
             Helper::put_refresh_token($google->getRefreshToken());
-
             Helper::flash_message('You are now successfully authenticated!', true);
             return redirect($this->google_auth_page);
         }
@@ -140,6 +139,10 @@ class HomeController extends Controller
         $refresh_token = Helper::get_refresh_token();
         if(!empty($refresh_token))
         {
+            if(!Session::has('access_token'))
+            {
+                Session::put('access_token', "placeholder");//forcing logout button to appear
+            }
             return view('gapi.index');
         }
         // if user is authorized, but token is not set
@@ -225,6 +228,11 @@ class HomeController extends Controller
         ]);
 
         return $event;
+    }
+
+    private function  sessionAccessToken($token)
+    {
+        Session::put('access_token', $token);
     }
 
     public function sqltest()
