@@ -269,6 +269,16 @@ class JobController extends Controller
 
         $result = ($job != null);
 
+        if($job->just_sold === true)
+        {
+            //update lead status
+            $ld = $job->lead;
+            $ld->status_id = 7; //status=sold
+            $ld->save();
+            //send email
+            $this->emailJobSold($job);
+        }
+
 		foreach($request->features as $k => $v)
 		{
 			DB::table('feature_job')
@@ -410,7 +420,6 @@ class JobController extends Controller
         {
             $job->code = $this->create_job_code($job);
             $just_sold = true;
-            //todo change lead status to sold
         }
 
         $job->size = $request->size;
@@ -432,10 +441,7 @@ class JobController extends Controller
 
         $job->save();
 
-        if($just_sold === true)
-        {
-            $this->emailJobSold($job);
-        }
+        $job->just_sold = $just_sold;
 
         return $job;
     }
