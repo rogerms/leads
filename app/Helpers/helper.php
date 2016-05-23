@@ -71,6 +71,7 @@
             $google->setAccessType('offline');
             $google->setRedirectUri(url('gapi'));
             $google->addScope('https://www.googleapis.com/auth/calendar');
+            $google->setLoginHint("sales.strongrockpavers@gmail.com");
             return $google;
         }
 
