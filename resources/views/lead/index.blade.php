@@ -39,6 +39,7 @@
                   </tbody>
               </table>
           </div>
+          <div class="pagelinks"></div>
       </div>
       <div class="col-xs-6 col-sm-3 sidebar-offcanvas" style="" id="sidebar">
           <div class="list-group">
@@ -64,24 +65,24 @@
               <a class="list-group-item thin-item">
                   <input class="tbfilter" type="checkbox" name="today" value="today" aria-label="today">
                   Today
-                  <span class="badge">{{ $appts->today }}</span>
+                  <span class="badge">0</span>
               </a>
               <a class="list-group-item thin-item">
                   <input class="tbfilter" type="checkbox" name="tomorrow" value="tomorrow" aria-label="tomorrow">
                   Tomorrow
-                  <span class="badge">{{ $appts->tomorrow }}</span>
+                  <span class="badge">0</span>
               </a>
               <a class="list-group-item thin-item">
                   <input class="tbfilter" type="checkbox" name="week" value="week" aria-label="week">
                   Seven Days
-                  <span class="badge">{{ $appts->week }}</span>
+                  <span class="badge">0</span>
               </a>
 
           </div>
       </div><!--/.sidebar-offcanvas-->
 
   </div>
-{!! $leads->render() !!}
+{{--{!! $leads->render() !!}--}}
 @endsection
 <!-- #7D1935
 #4A96AD

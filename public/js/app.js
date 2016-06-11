@@ -8,8 +8,11 @@ $(function () {
     setupAjaxHeader();
     setAutoComplete();
     datePickerInit();
+    populateTable();
     //needs to add listener after a new job is added if using modal form
 	$('#leadnote,.jobnote').keypress(addnote);
+
+    $('.pagelinks').on('click', '.pagination a', nextLeadsPage);
 
     $('.addremoval').on('click', addremovals);
 
@@ -647,7 +650,7 @@ function seachLeadsEnter (e) {
     if (e.which == 13) {
         e.preventDefault();
         $('#searchtx').autocomplete('close');
-        searchLeads();
+        searchLeads(e);
     }
 }
 
@@ -1103,11 +1106,27 @@ function updateLists()
     });
 }
 
-function searchLeads() {
+function populateTable (event) {
+    if(location.pathname == '/' || location.pathname == '/leads')
+    {
+        showResult('Loading items...');
+        searchLeads(event);
+    }
+}
+
+function nextLeadsPage(e)
+{
+    e.preventDefault();
+    var url = $(this).attr('href');
+    searchLeads(e, url);
+}
+
+function searchLeads(event, url) {
     if (processingSearch == true) return;
     processingSearch = true;
+    var hasUrl = (url != undefined);
     $.ajax({
-            url: "/leads?page=2",
+            url: hasUrl? url: '/?page=1',
             data: {
                 searchtx: $('#searchtx').val(),
                 statuses: getFilters('status_count'),
@@ -1116,24 +1135,16 @@ function searchLeads() {
                 today: $('input[name="today"]:checked').length,
                 tomorrow: $('input[name="tomorrow"]:checked').length,
                 week: $('input[name="week"]:checked').length,
-                searchby: $('small#searchby').text(),
-                page: 1
+                searchby: $('small#searchby').text()
             },
-            type: 'POST'
+            type: 'GET'
         })
         .done(function (result) {
             var tbody = $('#leadstb > tbody');
-
-            console.log(result);
+            $('.pagelinks').html(result.links);
+            //console.log(result);
             var leads = result.leads;
-            //var pager = $('ul.pager');
             tbody.html(leads);
-
-            //pager.addClass('j-pager');
-            //pager.find('li:first').children().remove();
-            //pager.find('li:first').append('<a href="0">«</a>');
-            //pager.find('li:nth-child(2) a').prop('href', 2);
-
             //filter panel categories count
             $('[name="status_count"]').each(function () {
                 var value = $(this).val();
@@ -1144,8 +1155,6 @@ function searchLeads() {
                 else {
                     $(this).siblings('.badge').text(result.status[value]);
                 }
-                //console.log(value);
-                //console.log(result.status[value]);
             });
 
             $('[name="reps_count"]').each(function () {
@@ -1165,7 +1174,7 @@ function searchLeads() {
             $('input[name="tomorrow"]').siblings('.badge').text(result.tomorrow);
             $('input[name="week"]').siblings('.badge').text(result.week);
 
-
+            if(!hasUrl)
             showResult('Total: ' + result.count + ' leads found');
             console.log(result.status);
             console.log(result.reps);

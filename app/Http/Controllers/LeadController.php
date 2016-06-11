@@ -11,7 +11,7 @@ use App\Source;
 use App\Status;
 use App\SalesRep;
 use App\Note;
-use Illuminate\Pagination\Paginator;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 //use Input; worked before adding upload function
 use Auth;
@@ -187,15 +187,17 @@ class LeadController extends Controller
                 $tomorrow_count += $lead->tomorrow;
                 $week_count += $lead->week;
             }
+            $perPage = 15;
+            $currentPage = $request->page?:1;
+            $currentItems = array_slice($leads, $perPage * ($currentPage - 1), $perPage);
 
+            $leads = new LengthAwarePaginator($currentItems, $leads_count, 15, $currentPage);
 
-             $leads = new Paginator($leads, 15); //<<  >> array_slice($leads, 0, 15),
-
-//            $pagination  =  $this->my_pagination($leads, 15, 1);
-//            $leads = $pagination['data'];
+//            dd($leads);
 
             return response()->json([
                 'leads' => view('partials.leads', ['leads' => $leads ])->render(),
+                'links' => sprintf('<div>%s</div>', $leads->links()),
                 'status' => $status_count,
                 'reps' => $reps_count,
                 'today' => $today_count,
@@ -209,41 +211,10 @@ class LeadController extends Controller
         }
         else
         {
+            $status = DB::select("SELECT name, 0 as count FROM status");
+            $reps = DB::select("SELECT name, 0 as count FROM sales_reps");
 
-            $leads = Lead::with('status')->orderBy('updated_at', 'desc')->orderBy('status_id', 'asc')->paginate(15); //<< prev  next >>
-
-            $status = DB::select("SELECT ".
-                        "status.name,
-                        count(leads.status_id) count
-                        FROM leads
-                        RIGHT JOIN status ON status.id = leads.status_id
-                        GROUP BY status.name");
-
-            $reps = DB::select("SELECT ".
-                        "sales_reps.name,
-                        count(leads.sales_rep_id) count
-                        FROM leads
-                        RIGHT JOIN sales_reps ON sales_reps.id = leads.sales_rep_id
-                        GROUP BY sales_reps.name");
-
-            $appts = DB::select(
-                        "SELECT ".
-                        "SUM(if(DATE(appointment) = DATE(now()), 1, 0)) today,
-                        SUM(if(DATE(appointment) = DATE(ADDDATE(now(), 1)), 1, 0)) tomorrow,
-                        COUNT(appointment) week
-                        FROM leads
-                        WHERE appointment >= DATE(now()) AND appointment < ADDDATE(DATE(NOW()), INTERVAL 1 WEEK)");
-
-
-            foreach ($leads as $key => $lead)
-            {
-                $lead->status_name = $lead->status->name;
-                $lead->sales_rep_name = $lead->salesrep->name;
-                if($lead->appointment != null) $lead->appointmentfmt = $lead->appointment->format('M j, Y \a\t h:ia');
-                $leads[$key] = $lead;
-            }
-
-            return view('lead.index', ['leads' => $leads, 'status_count' => $status, 'reps_count' => $reps, 'appts' => $appts[0]]);
+            return view('lead.index', ['leads' => [], 'status_count' => $status, 'reps_count' => $reps]);
         }
 
 /*         $admins = DB::table('users')
