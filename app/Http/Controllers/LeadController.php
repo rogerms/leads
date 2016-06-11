@@ -423,31 +423,6 @@ class LeadController extends Controller
          ]);
     }
 
-    public function get_pagination(Request $request)
-    {
-        $leads = Cache::get('leads_pages');
-        $pagination  =  $this->my_pagination($leads, 15, $request->page);
-        $leads = $pagination['data'];
-
-        return response()->json([
-            'leads' => view('layouts.leads', ['leads' => $leads ])->render(),
-            'next_page' => $pagination['next'],
-            'prev_page' => $pagination['prev']
-
-        ]);
-    }
-
-    function my_pagination($array, $size=15, $page=1)
-    {
-        if(!is_numeric($page)) return [];
-        $chunks = array_chunk($array, $size);
-        $chunks_size = sizeof($chunks);
-        $_page = ($page-1 < 0)? 0: ($page > $chunks_size)? $chunks_size -1: $page -1;
-        $prev = ($_page == 0)? null: $_page - 1;
-        $next = ($_page+1 == $chunks_size)? null: $_page+1;
-//        dd(['data' => $chunks[$_page], 'prev' => $prev, 'next' => $next]);
-        return ['data' => $chunks[$_page], 'prev' => $prev, 'next' => $next];
-    }
 
     public function services()
     {
