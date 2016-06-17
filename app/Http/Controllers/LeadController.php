@@ -158,8 +158,21 @@ class LeadController extends Controller
             {
                 $query .= " AND DATE(appointment) = ADDDATE(DATE(NOW()), 1)";
             }
-            //group
-            $query .= " GROUP BY leads.id ORDER BY jobs.id DESC";
+
+            $sort = "jobs.id DESC";
+            if($request->sortby)
+            {
+                $sortby = str_replace(
+                    ['customer name', 'sales rep', 'status'],
+                    ['customer_name', 'sales_reps.name', 'status.name'],
+                    strtolower($request->sortby)
+                );
+
+                $direction = ($request->sortdirection == 1)? 'ASC': 'DESC';
+                $sort = "$sortby $direction";
+            }
+
+            $query .= " GROUP BY leads.id ORDER BY $sort";
 
 
             //return $query;

@@ -2,6 +2,8 @@
 
 var processingSearch = false;
 var autocompleteLists = [];
+var sortby = '';
+var sortdirection = 1; // 1=asc -1=desc
 
 $(function () {
     processingSearch = false;
@@ -13,6 +15,8 @@ $(function () {
 	$('#leadnote,.jobnote').keypress(addnote);
 
     $('.pagelinks').on('click', '.pagination a', nextLeadsPage);
+
+    $('#leadstb th').on('click', sortLeads);
 
     $('.addremoval').on('click', addremovals);
 
@@ -1106,6 +1110,16 @@ function updateLists()
     });
 }
 
+function sortLeads()
+{
+    var title = $(this).text();
+    // if the same heading is click twice change sort direction
+    sortdirection = (sortby == title)? sortdirection*-1: 1;
+    sortby = title;
+
+    searchLeads();
+}
+
 function populateTable (event) {
     if(location.pathname == '/' || location.pathname == '/leads')
     {
@@ -1135,7 +1149,9 @@ function searchLeads(event, url) {
                 today: $('input[name="today"]:checked').length,
                 tomorrow: $('input[name="tomorrow"]:checked').length,
                 week: $('input[name="week"]:checked').length,
-                searchby: $('small#searchby').text()
+                searchby: $('small#searchby').text(),
+                sortby: sortby,
+                sortdirection: sortdirection
             },
             type: 'GET'
         })
