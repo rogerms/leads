@@ -94,16 +94,16 @@
             position: absolute;
             font-size: 11pt;
             top: 7.2cm;
-            left:10.35cm;
+            left:14.35cm;
             border: thin black solid;
             height: 1.1cm;
-            width: 8.5cm;
+            width: 4.5cm;
             padding: .15cm 0 0 .2cm;
             background-color: white;
         }
         .total-value{
             font-size: 15pt;
-            margin-left: 4cm;
+            margin-left: 1.5cm;
             text-align: center;
             font-weight: 700;
         }
@@ -319,7 +319,7 @@
             </div>
             <div class="total-box">
                 <div>Job Total</div>
-                <div class="total-value">{{ $job->proposal_amount }}</div>
+                <div class="total-value">{{ currency_format($job->proposal_amount) }}</div>
             </div>
         </div>
 
