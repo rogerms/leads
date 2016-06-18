@@ -30,164 +30,37 @@ class JobController extends Controller
 
     public function index(Request $request)
     {
-        //$leads = DB::table('leads')->paginate(15);
-
         if ($request->ajax())
         {
-            $search = str_replace(["'", '"', 'delete', 'update'], ["\\'", "\\\"", ''], $request->searchtx);
+            $sortby = ($request->sortby) ? $request->sortby : 'jobs.id';
+            $sortby = str_replace(
+                ['ID', 'Job#', 'Customer Name', 'Date Sold', 'City', 'Sales Rep'],
+                ['jobs.id', 'code', 'customer_name', 'date_sold', 'city', 'sales_reps.name'],
+                $sortby
+            );
 
-            $query = "SELECT ".
-                "leads.*,
-            DATE_FORMAT(leads.appointment, '%b %e, %Y at %h:%i%p') appointmentfmt,
-            status.name as status_name,
-            sales_reps.name as sales_rep_name,
-            taken_by.name as taken_by_name,
-            sources.name as source_name,
-            GROUP_CONCAT(DISTINCT jobs.id ORDER BY jobs.id SEPARATOR ' ') as job_ids,
-            IF(DATE(appointment) = DATE(NOW()),1,0) today,
-            IF(DATE(appointment) = ADDDATE(DATE(NOW()),1),1,0) tomorrow,
-            IF(appointment >= DATE(now()) AND appointment < ADDDATE(DATE(NOW()), INTERVAL 1 WEEK),1,0) week
-            FROM leads
-            LEFT JOIN notes ON notes.lead_id = leads.id
-            LEFT JOIN jobs ON jobs.lead_id=leads.id
-            JOIN status ON status.id = leads.status_id
-            JOIN sales_reps ON sales_reps.id = leads.sales_rep_id
-            JOIN taken_by ON taken_by.id = leads.taken_by_id
-            JOIN sources ON sources.id = leads.source_id
-            WHERE 1 AND jobs.date_sold is not null ";
+            $direction = ($request->sortdirection == 1) ? 'ASC' : 'DESC';
 
-            if($request->searchby == 'Tag')
-            {
-                if(strpos($search, '#') === false || strpos($search, '#') != 0) $search = '#'.$search;
-//                $query .= sprintf(" AND notes.note LIKE '%s%%' ", $search);
-                $query .= " AND notes.note LIKE '$search%'";
-            }
-            elseif($request->searchby == 'Addr')
-            {
-                $query .= " AND leads.street LIKE '%$search%' ";
-            }
-            elseif($request->searchby == 'Job#')
-            {
-                $query .= " AND jobs.id = '$search' ";
-            }
-            else
-            {
-                $query .= " AND leads.customer_name LIKE '%$search%' ";
-            }
+            $jobs = Job::join('leads', 'jobs.lead_id', '=', 'leads.id')
+                ->join('sales_reps', 'sales_reps.id', '=', 'leads.sales_rep_id')
+                ->orderBy($sortby, $direction)
+                ->select('jobs.id', 'code', 'leads.id as lead_id', 'customer_name', 'date_sold', 'city', 'sales_reps.name as sales_rep')
+                ->paginate(15);
 
-            if (count($request->statuses) > 0)
-            {
-                $query .= " AND status.name IN (".implode(",", $request->statuses).")";
-            }
-
-            if(count($request->reps) > 0)
-            {
-                $query .= " AND sales_reps.name IN (".implode(",", $request->reps).")";
-            }
-
-            if($request->week == '1')
-            {
-                $query .= " AND appointment >= DATE(now()) AND appointment < ADDDATE(DATE(NOW()), INTERVAL 1 WEEK)";
-            }
-            if($request->today == '1' && $request->tomorrow == '1')
-            {
-                $query .= " AND (DATE(appointment) = DATE(NOW()) OR DATE(appointment) = ADDDATE(DATE(NOW()), 1))";
-            }
-            elseif($request->today == '1' && $request->week != '1')
-            {
-                $query .= " AND DATE(appointment) = DATE(NOW())";
-            }
-            elseif($request->tomorrow == '1' && $request->week != '1')
-            {
-                $query .= " AND DATE(appointment) = ADDDATE(DATE(NOW()), 1)";
-            }
-            //group
-            $query .= " GROUP BY leads.id ORDER BY jobs.id DESC";
-
-
-            //return $query;
-
-            $leads = DB::select($query);
-            $status_count = [];
-            $reps_count = [];
-            $today_count = 0;
-            $tomorrow_count = 0;
-            $week_count = 0;
-            $leads_count = count($leads);
-
-            Cache::forever('jobs_pages', $leads);
-
-
-            foreach($leads as $lead)
-            {
-                if(!isset($status_count[$lead->status_name]))
-                    $status_count[$lead->status_name] = 0;
-                if(!isset($reps_count[$lead->sales_rep_name]))
-                    $reps_count[$lead->sales_rep_name] = 0;
-
-                $status_count[$lead->status_name]++;
-                $reps_count[$lead->sales_rep_name]++;
-
-                $today_count += $lead->today;
-                $tomorrow_count += $lead->tomorrow;
-                $week_count += $lead->week;
-            }
-
-
-            $leads = new Paginator($leads, 15); //<<  >> array_slice($leads, 0, 15),
-
-//            $pagination  =  $this->my_pagination($leads, 15, 1);
-//            $leads = $pagination['data'];
+            $jobs->appends(['sortby' => $sortby, 'sortdirection' => $request->sortdirection]);
 
             return response()->json([
-                'leads' => view('layouts.leads', ['leads' => $leads ])->render(),
-                'status' => $status_count,
-                'reps' => $reps_count,
-                'today' => $today_count,
-                'tomorrow' => $tomorrow_count,
-                'week' => $week_count,
-                'count' => $leads_count,
-                'next_page' => 0,
-                'prev_page' => 1,
-                'q' => $query
+                'jobs' => view('partials.jobs', ['jobs' => $jobs])->render(),
+                'sortby' => $sortby,
+                'links' => sprintf('<div>%s</div>', $jobs->links())
             ]);
         }
         else
         {
-
-            $jobs = Job::orderBy('id', 'desc')->paginate(15); //<< prev  next >>
-
-            $status = DB::select("SELECT ".
-                "status.name,
-                        count(leads.status_id) count
-                        FROM leads
-                        RIGHT JOIN status ON status.id = leads.status_id
-                        GROUP BY status.name");
-
-            $reps = DB::select("SELECT ".
-                "sales_reps.name,
-                        count(leads.sales_rep_id) count
-                        FROM leads
-                        RIGHT JOIN sales_reps ON sales_reps.id = leads.sales_rep_id
-                        GROUP BY sales_reps.name");
-
-            $appts = DB::select(
-                "SELECT ".
-                "SUM(if(DATE(appointment) = DATE(now()), 1, 0)) today,
-                        SUM(if(DATE(appointment) = DATE(ADDDATE(now(), 1)), 1, 0)) tomorrow,
-                        COUNT(appointment) week
-                        FROM leads
-                        WHERE appointment >= DATE(now()) AND appointment < ADDDATE(DATE(NOW()), INTERVAL 1 WEEK)");
-
-            return view('job.index', compact('jobs'));
+            return view('job.index');
         }
-
-        /*         $admins = DB::table('users')
-                ->join('users_roles', 'users.id', '=', 'users_roles.user_id')
-                ->where('users_roles.role_id', '=' ,0)
-                ->orderBy($sort, $sort_dir)
-                ->paginate($this->perpage);*/
     }
+
 	public function create($id)
     {
         $this->authorize('edit-job');

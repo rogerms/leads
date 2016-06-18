@@ -11,12 +11,17 @@ $(function () {
     setAutoComplete();
     datePickerInit();
     populateTable();
+    populateJobsTable();
     //needs to add listener after a new job is added if using modal form
 	$('#leadnote,.jobnote').keypress(addnote);
 
     $('.pagelinks').on('click', '.pagination a', nextLeadsPage);
 
+    $('.jobs-pagelinks').on('click', '.pagination a', nextJobsPage);
+
     $('#leadstb th').on('click', sortLeads);
+
+    $('#jobstb th').on('click', sortJobs);
 
     $('.addremoval').on('click', addremovals);
 
@@ -35,6 +40,8 @@ $(function () {
 	$('.updatejob').click(updateJob);
 
     $("#leadstb tbody").on("click", "tr", tableRowGoto);
+
+    $("#jobstb tbody").on("click", "tr", tableRowGoto);
 
     $('#addImageModal').on('show.bs.modal', addImage);
 
@@ -668,7 +675,7 @@ function viewImage(event){
 }
 
 function tableRowGoto () {
-    window.location.href = "lead/" + $(this).data('id');
+    window.location.href = "/lead/" + $(this).data('id');
     //open in a new tab
     // var win = window.open("/lead/"+ $(this).data('id'), '_blank');
     // win.focus();
@@ -1120,11 +1127,67 @@ function sortLeads()
     searchLeads();
 }
 
+function nextJobsPage(e)
+{
+    e.preventDefault();
+    var url = $(this).attr('href');
+
+    $.ajax({
+            url: url,
+            type: 'GET'
+        })
+        .done(function (result) {
+            var tbody = $('#jobstb > tbody');
+            tbody.html(result.jobs);
+            $('.jobs-pagelinks').html(result.links);
+        })
+        .fail(function () {
+            showResult('Error trying to get next page', true);
+        });
+}
+
+function sortJobs()
+{
+    var title = $(this).text();
+    // if the same heading is click twice change sort direction
+    sortdirection = (sortby == title)? sortdirection*-1: 1;
+    sortby = title;
+
+   // alert(sortby);
+
+    $.ajax({
+            url: '/jobs',
+            data: {
+                sortby: sortby,
+                sortdirection: sortdirection
+            },
+            type: 'GET'
+        })
+        .done(function (result) {
+            var tbody = $('#jobstb > tbody');
+            var jobs = result.jobs;
+            tbody.html(jobs);
+            $('.jobs-pagelinks').html(result.links);
+        })
+        .fail(function () {
+            showResult('Error trying to get jobs', true);
+        });
+}
+
 function populateTable (event) {
     if(location.pathname == '/' || location.pathname == '/leads')
     {
         showResult('Loading items...');
         searchLeads(event);
+    }
+}
+
+function populateJobsTable()
+{
+    if(location.pathname == '/jobs')
+    {
+        showResult('Loading items...');
+        sortJobs();
     }
 }
 
