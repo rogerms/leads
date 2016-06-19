@@ -125,7 +125,8 @@ function datePickerInit() {
     $('input.date').datepicker({
         autoclose: true,
         clearBtn: true,
-        todayHighlight: true
+        todayHighlight: true,
+        calendarWeeks: true
     });
 }
 
@@ -1523,6 +1524,14 @@ function confirm2(options, action)
     $(divtag).modal();
     //$(divtag).remove();
 }
+/***
+ * Libaries Docs
+ * Datepicker:
+ * https://github.com/eternicode/bootstrap-datepicker
+ * https://bootstrap-datepicker.readthedocs.io/en/stable/index.html
+ * ----------------------------------------------------------------
+ *
+ * ***/
 
     /*
      Copyright (c) 2011 Damien Antipa, http://www.nethead.at/, http://damien.antipa.at
