@@ -41,7 +41,8 @@
                 <h4 class="modal-title" id="showImageModalLabel">Image</h4>
             </div>
             <div class="modal-body">
-                <img src=""  alt="view sketch" id="img-holder" class="img-thumbnail">
+                {{--<img src=""  alt="view sketch" id="img-holder" class="img-thumbnail">--}}
+                <iframe id="img-holder" src="" style="width:870px; height:750px;" frameborder="0"></iframe>
             </div>
         </div>
     </div>
