@@ -12,6 +12,7 @@ $(function () {
     datePickerInit();
     populateTable();
     populateJobsTable();
+    initPrototype();
     //needs to add listener after a new job is added if using modal form
 	$('#leadnote,.jobnote').keypress(addnote);
 
@@ -83,9 +84,11 @@ $(function () {
 
     $('.tags-select').on('change', selectNotes);
 
-    $( "#apptime" ).blur(validateTime);
+    $("#apptime").blur(validateTime);
 
-    $( "#addtocalendar" ).on('click', addCalendarEvent);
+    $("#addtocalendar").on('click', addCalendarEvent);
+
+    $(".calendarhash").on('click', addCalendarHash);
 
     tinymceInit();
 });
@@ -93,6 +96,19 @@ $(function () {
 function toggleData()
 {
     $('.row-offcanvas').toggleClass('active');
+}
+
+function initPrototype()
+{
+    Date.prototype.getWeek = function () {
+        return $.datepicker.iso8601Week(this);
+    };
+
+    Number.prototype.pad = function(size) {
+        var s = String(this);
+        while (s.length < (size || 2)) {s = "0" + s;}
+        return s;
+    }
 }
 
 function tinymceInit () {
@@ -207,6 +223,27 @@ function addCalendarEvent()
             window.location = result.url;
         }
     });
+}
+
+function addCalendarHash(e)
+{
+    e.preventDefault();
+    var appointment = $('#appointment').val();
+    if(appointment != "")
+    {
+        var dt = new Date(appointment);
+        var tag = $(this).data('tag');
+        var msg = tag+dt.getWeek()+"-"+(dt.getFullYear()-2000);
+
+        if(tag == '#day')
+        {
+            msg = $(this).data('tag') +""+(dt.getMonth()+1).pad()+""+dt.getDate().pad()+""+(dt.getFullYear()-2000);
+        }
+        var note = $(this).parents('form').find('#leadnote');
+        note.val(msg);
+        var evt = jQuery.Event('keypress', { which: 13});
+        note.trigger(evt);
+    }
 }
 
 function saveProposalNote(editor){
@@ -1429,7 +1466,7 @@ function response()
     console.log('Delete Note');
 }
 
-function addnote() {
+function addnote(event) {
     var target = $(this);
     if (event.which != 13) return;
 

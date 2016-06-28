@@ -126,7 +126,18 @@
         <div class="col-md-2">
             <div class="form-group">
                 <label for="addtocalendar" class="sr-only">Add to calendar</label>
-                <input type="button" class="btn btn-default input-btn-margin" id="addtocalendar" value="Add to Calendar"/>
+                <div class="btn-group" role="group">
+                    <button type="button" id="addtocalendar"  class="btn btn-default input-btn-margin">
+                        Add to Calendar
+                    </button>
+                    <button type="button" class="btn btn-default dropdown-toggle input-btn-margin" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="calendarhash" data-tag="#week" href="#">Add #week</a></li>
+                        <li><a class="calendarhash" data-tag="#day" href="#">Add #day</a></li>
+                    </ul>
+                </div>
             </div>
         </div>
         </div>
