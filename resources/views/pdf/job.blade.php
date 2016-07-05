@@ -58,10 +58,11 @@
             height: 2.4cm;
         }
         .logo{
-            width: 4.5cm;
-            height: 2.4cm;
+            width: 3.5cm;
+            height: 1.87cm;
             display: inline-block;
             position: relative;
+            background-color: #2e2e2e;
             top: -1.7cm;
         }
         
@@ -171,7 +172,7 @@
        <div id="page">
         <div class="head-div">
             <div class="logo">
-
+                <img class="logo" width="1cm" src={{  url("/images/logo_srp.jpg") }}>
             </div>
             <div class="addr">
                 <div class="addr-title">Strong Rock Pavers</div>
