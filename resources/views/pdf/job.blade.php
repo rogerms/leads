@@ -181,10 +181,6 @@
                 Fax: (801) 437-1765 Email: office@strongrockpavers.com
                </div>
             </div>
-            <div class="srce">
-                <span class="label">Source:</span>
-                <span class="value">{{ $job->lead->source->name }}</span>
-            </div>
         </div>
 <!--        first block -->
         <div class="top-section"> 
