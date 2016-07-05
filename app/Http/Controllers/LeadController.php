@@ -129,7 +129,7 @@ class LeadController extends Controller
             }
             else
             {
-                $query .= " AND leads.customer_name LIKE '%$search%' ";
+                $query .= " AND (leads.customer_name LIKE '%$search%' OR leads.contact_name LIKE '%$search%')";
             }
 
             if (count($request->statuses) > 0)
