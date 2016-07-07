@@ -748,3 +748,12 @@ font-family: FontAwesome;
 .input-btn-margin{
     margin-top: 25px;
 }
+
+.extra-phone {
+    margin-top: 10px;
+}
+
+.badge-btn {
+    background-color: darkgrey;
+    font-weight: bold;
+}

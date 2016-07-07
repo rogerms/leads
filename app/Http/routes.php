@@ -103,6 +103,13 @@ Route::group(['middleware' => 'web'], function () {
 
     Route::post('note/delete/{noteid}', 'NoteController@delete');
 
+//-----------------------------------------------------
+// phone
+//-----------------------------------------------------
+    Route::any('phone/add', 'PhoneController@add');
+    Route::post('phone/delete/{noteid}', 'PhoneController@delete');
+
+
 
 //----------------------------------------------------
 // drawings

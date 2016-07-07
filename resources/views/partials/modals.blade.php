@@ -61,3 +61,21 @@
     </ul>
 </div>
 <!-- /context menu -->
+
+{{--add phone modal form *************************************************************************  --}}
+<div id="add-phone-modal" class="modal fade">
+    <form class="form-horizontal">
+        <div class="form-group">
+            <label for="number" class="col-sm-2 control-label">Phone</label>
+            <div class="col-sm-8">
+                <input type="text" class="form-control" id="number" placeholder="phone#">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="label" class="col-sm-2 control-label">Label</label>
+            <div class="col-sm-8">
+                <input type="text" class="form-control" id="label" placeholder="home">
+            </div>
+        </div>
+    </form>
+</div>

@@ -90,6 +90,10 @@ $(function () {
 
     $(".calendarhash").on('click', addCalendarHash);
 
+    $(".delete-phone").on('click', deletePhone);
+
+    $("#addphone").on('click', addPhone);
+
     tinymceInit();
 });
 
@@ -936,7 +940,16 @@ function updateLead () {
     event.preventDefault();
     var id = $('#leadid').val();
     var _form = $(this).parents('form');
-
+    
+    var phones = [];
+    _form.find('.extra-phone').each(function(){
+        var p = {
+            number: $(this).find('.extra-phone-num').val(),
+            id: $(this).find('.delete-phone').data('id')
+        };
+        phones.push(p);
+    });
+    
     var fdata = {
         id: id,
         customer: $('#customer').val(),
@@ -952,7 +965,8 @@ function updateLead () {
         source: $('#source').val(),
         salesrep: $('#salesrep').val(),
         status: $('#status').val(),
-        note: $('#leadnote').val()
+        note: $('#leadnote').val(),
+        phones: phones
     };
 
     $.ajax({
@@ -1464,6 +1478,100 @@ function formDate(value)
 function response()
 {
     console.log('Delete Note');
+}
+
+function deletePhone()
+{
+    event.preventDefault();
+    var phoneid = $(this).data('id');
+    var phone = $(this).parents('.extra-phone');
+
+    var dialog = $('#delete-confirmation');
+
+    //remove any listener leftover from older calls
+    dialog.find('#confirmOk').off('click');
+    //delete item if OK button is pressed
+    dialog.find('#confirmOk').on('click', function () {
+
+        dialog.modal('hide');
+        $(this).off( "click");
+
+        $.ajax({
+                url: '/phone/delete/'+phoneid,
+                type: 'POST'
+            })
+            .fail(function (data){
+                console.info('delete phone ajax fail');
+                console.log(data);
+                showResult('Error trying to delete phone', true);
+            })
+            .done(function(data){
+                // console.log(data);
+                if(data.result) {
+                    phone.remove();
+                    showResult('Phone deleted');
+                }
+            });
+    });
+
+    dialog.modal('show');
+}
+
+function addPhone(e)
+{
+    e.preventDefault();
+
+    bootbox.dialog({
+        title: "Add Phone Number",
+        message: $('#add-phone-modal').html(),
+        buttons: {
+            success: {
+                label: "Save",
+                className: "btn-success",
+                callback: addPhoneAjax
+            },
+            danger: {
+                label: "Cancel",
+                className: "btn-danger",
+                callback: function () {}
+            }
+        }
+    });
+}
+
+function addPhoneAjax()
+{
+    var _number = $(this).find('#number').val();
+    var _label = $(this).find('#label').val();
+    var _leadid = $('#leadid').val();
+
+    $.ajax(
+        {
+            url: "/phone/add",
+            data: {
+                number: _number, 
+                label: _label, 
+                leadid: _leadid
+            },
+            type: 'POST'
+        }).done(function(data){
+            if(data.result) {
+                var tag = $('#templates').find('#phone').clone();
+
+                tag.find('.badge-btn').first().text(data.label);
+                tag.find('.extra-phone-num').first().val(data.number);
+                tag.find('a').attr('href', 'tel:'+data.number);
+                tag.find(".delete-phone").data('id', data.id);
+                tag.find(".delete-phone").on('click', deletePhone);
+                
+                $('.phone-group').append(tag);
+
+                showResult('Phone number added');
+            }
+            else{
+                showResult('Error adding phone number', true);
+            }
+        });
 }
 
 function addnote(event) {

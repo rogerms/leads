@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 
+use App\Phone;
 use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Lead;
@@ -329,6 +330,19 @@ class LeadController extends Controller
             $note->note = $request->note;
             $note->user_id = Auth::user()->id;
             $note->created = $note->save();
+        }
+
+        if (!empty($request->phones))
+        {
+            foreach($request->phones as $p)
+            {
+                $phone = Phone::find($p['id']);
+                if($phone != null)
+                {
+                    $phone->number = $p['number'];
+                    $phone->save();
+                }
+            }
         }
 
         $result = ($result  == true)? 200: 400;

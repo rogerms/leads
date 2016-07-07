@@ -41,4 +41,9 @@ class Lead extends Model
     {
         return $this->hasMany('App\Drawing')->orderBy('created_at', 'asc');
     }
+
+    public function phones()
+    {
+        return $this->hasMany('App\Phone');
+    }
 }

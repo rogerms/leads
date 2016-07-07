@@ -115,4 +115,13 @@
             </span>
         </div>
 </div><!-- /.col-lg-6 -->
+
+    <div id="phone" class="input-group extra-phone">
+        <input type="tel" class="form-control extra-phone-num" aria-label="phone-number" value="" placeholder="Phone #">
+        <div class="input-group-btn">
+            <button type="button" class="btn btn-default disabled badge-btn"></button>
+            <a class="btn btn-default" role="button" href=""><span class="glyphicon glyphicon-earphone"></span></a>
+            <button type="button" data-id="" class="btn btn-default delete-phone" ><span class="glyphicon glyphicon-trash"></span></button>
+        </div><!-- /btn-group -->
+    </div><!-- /input-group -->
 </div>

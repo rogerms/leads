@@ -149,6 +149,8 @@
     <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
     <script src='//cdn.tinymce.com/4/tinymce.min.js'></script>
     <script src='/libs/datepicker/js/bootstrap-datepicker.min.js'></script>
+    <script src='/js/bootbox.min.js'></script>
+
     {{--<script src="/js/jspdf.js"></script>--}}
     {{--<script src="/js/home.js"></script>--}}
     <script src="/js/app.js"></script>

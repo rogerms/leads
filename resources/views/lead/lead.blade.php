@@ -26,15 +26,33 @@
     </div>
     <div class="row">
         <div class="col-md-6">
-        <div class="form-group">
+        <div class="form-group phone-group">
             <label for="phone">Phone</label>
             <div class="input-group">
-                <input type="tel" class="form-control" id="phone" value="{{$lead->phone}}" placeholder="Phone #">
-                    <span class="input-group-btn">
-                        <a class="btn btn-default" role="button" href="tel:{{ $lead->phone }}"><span class="glyphicon glyphicon-earphone"></span></a>
-                    </span>
-            </div>
+                <input type="tel" class="form-control" aria-label="phone-number" id="phone" value="{{$lead->phone}}" placeholder="Phone #">
+                <div class="input-group-btn">
+                    <button type="button" class="btn btn-default disabled badge-btn">main</button>
+                    <a class="btn btn-default" role="button" href="tel:{{ $lead->phone }}"><span class="glyphicon glyphicon-earphone"></span></a>
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>
+                    <ul class="dropdown-menu dropdown-menu-right">
+                        <li><a href="#" class="icon" id="addphone"><span class="glyphicon glyphicon-plus"></span>Add Phone#</a></li>
+                    </ul>
+                </div><!-- /btn-group -->
+            </div><!-- /input-group -->
+
+            {{--other phone numbers--}}
+            @foreach($lead->phones as $phone)
+                <div class="input-group extra-phone">
+                    <input type="tel" class="form-control extra-phone-num" aria-label="phone-number" value="{{ $phone->number }}" placeholder="Phone #">
+                    <div class="input-group-btn">
+                        <button type="button" class="btn btn-default disabled badge-btn">{{ $phone->label }}</button>
+                        <a class="btn btn-default" role="button" href="tel:{{ $phone->number }}"><span class="glyphicon glyphicon-earphone"></span></a>
+                        <button type="button" data-id="{{ $phone->id }}" class="btn btn-default delete-phone" ><span class="glyphicon glyphicon-trash"></span></button>
+                    </div><!-- /btn-group -->
+                </div><!-- /input-group -->
+            @endforeach
         </div>
+
         </div>
         <div class="col-md-6">
         <div class="form-group">
