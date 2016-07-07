@@ -255,12 +255,12 @@ function saveProposalNote(editor){
     var form = $('#'+editor.id).parents('form');
     var jobid = form.attr('id');
     // console.log(jobid);
-    //only job owner can upate proposal
-    var result  = false;
-    if(form.find('#proposal-author').val() == "") {
-        result = confirm("Only click ok if you are the assigned sales rep. for this job");
-        if(result !== true) return;
-    }
+    //only job owner can upate proposal -- changed
+    // var result  = false;
+    // if(form.find('#proposal-author').val() == "") {
+    //     result = confirm("Only click ok if you are the assigned sales rep. for this job");
+    //     if(result !== true) return;
+    // }
     // console.log(target.getContent());
 
     $.ajax({

@@ -324,8 +324,8 @@ class JobController extends Controller
         $job = Job::findOrFail($id);
         $user_id = Auth::user()->id;
 
-        if($job->proposal_author > 0 && $job->proposal_author != $user_id)
-           return response()->json(['result' => false, 'msg' => 'Nothing saved... unauthorized user!']);
+//        if($job->proposal_author > 0 && $job->proposal_author != $user_id)
+//           return response()->json(['result' => false, 'msg' => 'Nothing saved... unauthorized user!']);
         if($job->proposal_author == null)
             $job->proposal_author = $user_id;
         $job->proposal_note = $request->note;
