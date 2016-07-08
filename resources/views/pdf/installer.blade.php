@@ -73,6 +73,10 @@
         table {
             width: 100%;
         }
+        .extra-pad{
+            margin-left: 0.15cm;
+            margin-top: 0.25cm;
+        }
 
     </style>
 </head>
@@ -108,8 +112,8 @@
                         <div class='field-value'>{{ $job->lead->street }}</div>
                     </td>
                     <td  colspan="6">
-                         <div class="field-name">Paver</div>
-                         <div class='field-value'>{{ $job->style_summary }}</div>
+                         {{--<div class="field-name">Paver</div>--}}
+                         {{--<div class='field-value'>{{ $job->style_summary }}</div>--}}
                     </td>
                 </tr>
                 <tr>
@@ -146,19 +150,35 @@
                 </tr>
             </table>
         </div>
-       <div>
+
+       <div class="extra-pad">
+           <b>Paver: </b> {{ $job->style_summary }}
+       </div>
+       <div class="extra-pad">
            <?php
-               $note = "";
-               foreach ($job->notes as $n)
+                $remove = [];
+               foreach ($job->removals as $r)
                {
-                   if (strpos($n->note, '#installer ') !== FALSE)
-                   {
-                       $note.= str_replace('#installer ', '', $n->note);
-                   }
+                   $remove[] = $r->name;
                }
            ?>
+           @if(!empty($remove))
+               <b>Removals: </b> {{ implode(", ", $remove) }}
+           @endif
+       </div>
+       <div class="extra-pad">
+           <?php
+           $note = "";
+           foreach ($job->notes as $n)
+           {
+               if (strpos($n->note, '#installer ') !== FALSE)
+               {
+                   $note.= str_replace('#installer ', '', $n->note);
+               }
+           }
+           ?>
            @if(!empty($note))
-               Note: {{ $note }}
+               <b>Note: </b>{{ $note }}
            @endif
        </div>
         <div class="drawing">
