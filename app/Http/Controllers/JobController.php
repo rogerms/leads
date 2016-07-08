@@ -66,17 +66,10 @@ class JobController extends Controller
         $this->authorize('edit-job');
 
         $job = new Job;
-        $lead = Lead::find($id);
-         return view('job/create',
-        	[
-                'property_types' => DB::table('property_types')->get(),
-                'customer_types' => DB::table('customer_types')->get(),
-                'job_types' => DB::table('job_types')->Orderby('name', 'asc')->get(),
-                'features' => DB::table('features')->Orderby('name', 'asc')->get(),
-                'lead' => $lead,
-                'job' => $job,
-                'features' => Feature::all()
-        	]); 
+        $job->lead_id = $id;
+        $job->save();
+
+        return redirect("lead/$id");
     }
 
 	public function store(Request $request)

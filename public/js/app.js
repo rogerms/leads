@@ -94,6 +94,8 @@ $(function () {
 
     $("#addphone").on('click', addPhone);
 
+    $("#addjobbt").on('click', addJob);
+
     tinymceInit();
 });
 
@@ -1572,6 +1574,18 @@ function addPhoneAjax()
                 showResult('Error adding phone number', true);
             }
         });
+}
+
+function addJob(e)
+{
+    e.preventDefault();
+    var url = $(this).attr('href');
+
+    bootbox.confirm("Are you sure you want to create a new job?", function(result) {
+        if (result === true) {
+            window.location = url;
+        }
+    });
 }
 
 function addnote(event) {
