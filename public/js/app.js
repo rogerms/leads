@@ -96,6 +96,8 @@ $(function () {
 
     $("#addjobbt").on('click', addJob);
 
+    $('#emailtocustomer').on('click', emailToCustomer);
+
     tinymceInit();
 });
 
@@ -119,7 +121,7 @@ function initPrototype()
 
 function tinymceInit () {
     tinymce.init({
-        selector: 'textarea',
+        selector: 'textarea.proposal-note',
         width: 835,
         height: 300,
         max_height: 270,
@@ -1584,6 +1586,39 @@ function addJob(e)
     bootbox.confirm("Are you sure you want to create a new job?", function(result) {
         if (result === true) {
             window.location = url;
+        }
+    });
+}
+
+function emailToCustomer(e)
+{
+    e.preventDefault();
+    var url = $(this).attr('href');
+    var _email = $('#email').val();
+    var _message = $('#email-customer-modal').html();
+
+    _message = _message.replace('=email=', _email);
+
+    bootbox.dialog({
+        title: "Email:",
+        message: _message,
+        buttons: {
+            success: {
+                label: "Send",
+                className: "btn-success",
+                callback: function ()
+                {
+                    var subject = $(this).find('#subject').val();
+                    var msg = $(this).find('#message').val();
+                    var email = $(this).find('#email').val();
+                    window.location = url+'?subject='+subject+'&message='+encodeURI(msg)+'&email='+email;
+                }
+            },
+            danger: {
+                label: "Cancel",
+                className: "btn-default",
+                callback: function () {}
+            }
         }
     });
 }

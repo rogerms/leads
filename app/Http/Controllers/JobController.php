@@ -15,6 +15,7 @@ use App\Job;
 use App\Style;
 use App\Removal;
 use DB;
+use Illuminate\Support\Facades\Validator;
 use PDF;
 use Auth;
 
@@ -418,12 +419,40 @@ class JobController extends Controller
             $message->subject("Job Proposal");
             $message->attachData($data, 'document.pdf');
         });
+        $passed = true;
+        Helper::flash_message('Email sent successufully', $passed);
 
-        $message['text'] = 'Email sent successufully';
-        $message['class'] = 'alert-success';
-        $message['title'] = 'Info!';
-        \Session::flash('message', $message);
+        return back();
+    }
 
+    public function email_pdf_customer(Request $request, $id)
+    {
+        $job = Job::find($id);
+        $data = $this->get_job_pdf($job);
+
+        $email_body = urldecode($request->message);
+
+        $v = Validator::make($request->all(), [
+            'email' => 'required|email|max:100',
+            'message'  => 'required',
+            'subject'  => 'required'
+        ]);
+
+        if ($v->fails())
+        {
+            $error = implode(' ', $v->errors()->all());
+            Helper::flash_message($error, false);
+            return redirect()->back();
+        }
+
+        \Mail::raw($email_body, function ($message) use($data, $request) {
+            $message->from('sales@strongrockpavers.com', 'Strong Rock Pavers');
+            $message->to($request->email);
+            $message->subject($request->subject);
+            $message->attachData($data, 'document.pdf');
+        });
+
+        Helper::flash_message('Email sent successufully', true);//passed=true|false
         return back();
     }
 

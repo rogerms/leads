@@ -148,6 +148,8 @@ Route::group(['middleware' => 'web'], function () {
 
     Route::any('email/job/{id}', 'JobController@email_pdf');
 
+    Route::any('email/customer/{id}', 'JobController@email_pdf_customer');
+
     Route::post('style/update', 'StyleController@update');
 
     Route::post('style/{id}/delete', 'StyleController@delete');

@@ -240,7 +240,7 @@
 
 
             <!-- Split button -->
-            <div class="btn-group">
+            <div class="btn-group dropup">
                 <a role="button" @can('view-proposal', $job) href="/print/job/{{$job->id}}" @endcan class="btn btn-default" id="print-job">View PDF</a>
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="caret"></span>
@@ -248,6 +248,7 @@
                 </button>
                 <ul class="dropdown-menu">
                     <li><a href="/email/job/{{$job->id}}">Email PDF</a></li>
+                    <li><a id="emailtocustomer" href="/email/customer/{{$job->id}}">Email Customer</a></li>
                     <li><a href="/report/job/{{$job->id}}">Export Excel</a></li>
                     <li><a href="/print/installer/{{$job->id}}">Installer Sheet</a></li>
                 </ul>

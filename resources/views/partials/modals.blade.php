@@ -79,3 +79,27 @@
         </div>
     </form>
 </div>
+
+{{--email customer modal form *************************************************************************  --}}
+<div id="email-customer-modal" class="modal fade">
+    <form class="form-horizontal">
+        <div class="form-group">
+            <label for="email" class="col-sm-2 control-label">To</label>
+            <div class="col-sm-8">
+                <input type="text" class="form-control" id="email" value="=email=">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="subject" class="col-sm-2 control-label">Subject</label>
+            <div class="col-sm-8">
+                <input type="text" class="form-control" id="subject" placeholder="Job Proposal">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="message" class="col-sm-2 control-label">Message</label>
+            <div class="col-sm-8">
+                <textarea id="message" class="form-control" rows="3" placeholder="Message..."></textarea>
+            </div>
+        </div>
+    </form>
+</div>
