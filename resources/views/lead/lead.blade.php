@@ -174,10 +174,19 @@
                     </div>
                     <div class="list-group" id="notes" name="notes">
                         @foreach($lead->notes as $note)
-                             <a href="#" class="list-group-item active tag-all {{ get_tag($note) }}">
-                                 <button type="button" class="delete-note" data-noteid="{{ $note->id }}"><span aria-hidden="true">&times;</span></button>
+                            <?php
+                                $deleted = !empty($note->deleted_at);
+                                $tagall = ($deleted)? ' success tag-deleted': ' active tag-all';
+                            ?>
+                             <a href="#" class="list-group-item  {{ $tagall }} {{ get_tag($note) }}">
+                                 @if(!$deleted)
+                                    <button type="button" class="delete-note" data-noteid="{{ $note->id }}"><span aria-hidden="true">&times;</span></button>
+                                 @endif
                                 <h4 class="list-group-item-heading">{{ $note->note }}</h4>
                                 <p class="list-group-item-text">Created on: {{ toFormatted($note->created_at) }}</p>
+                                 @if($deleted)
+                                     <p class="list-group-item-text item-text-deletedat">Deleted on: {{ toFormatted($note->deleted_at) }}</p>
+                                 @endif
                               </a>
                         @endforeach
         <!--  diffForHumans() -->

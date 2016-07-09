@@ -757,3 +757,6 @@ font-family: FontAwesome;
     background-color: darkgrey;
     font-weight: bold;
 }
+.item-text-deletedat{
+    color: #840F26 !important;
+}

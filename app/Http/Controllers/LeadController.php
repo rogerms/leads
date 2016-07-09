@@ -109,7 +109,7 @@ class LeadController extends Controller
             {
                 if(strpos($search, '#') === false || strpos($search, '#') != 0) $search = '#'.$search;
 //                $query .= sprintf(" AND notes.note LIKE '%s%%' ", $search);
-                $query .= " AND (notes.note LIKE '$search%'  OR  j_notes.note LIKE '$search%')";
+                $query .= " AND ((notes.note LIKE '$search%' AND notes.deleted_at is null) OR  (j_notes.note LIKE '$search%' AND j_notes.deleted_at is null))";
             }
             elseif($request->searchby == 'Addr')
             {

@@ -29,7 +29,7 @@ class Lead extends Model
 
     public function notes()
     {
-        return $this->hasMany('App\Note')->orderBy('created_at', 'desc');
+        return $this->hasMany('App\Note')->withTrashed()->orderBy('created_at', 'desc');
     }
 
     public function jobs()

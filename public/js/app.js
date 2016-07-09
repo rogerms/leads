@@ -84,6 +84,8 @@ $(function () {
 
     $('.tags-select').on('change', selectNotes);
 
+    $('.tags-select').trigger('change');
+
     $("#apptime").blur(validateTime);
 
     $("#addtocalendar").on('click', addCalendarEvent);
@@ -241,7 +243,7 @@ function addCalendarHash(e)
     {
         var dt = new Date(appointment);
         var tag = $(this).data('tag');
-        var msg = tag+dt.getWeek()+"-"+(dt.getFullYear()-2000);
+        var msg = tag+dt.getWeek()+""+(dt.getFullYear()-2000);
 
         if(tag == '#day')
         {
@@ -730,7 +732,7 @@ function tableRowGoto () {
 function selectNotes()
 {
     var notes = $(this).parents('.note-form');
-    notes.find('.tag-all').hide();
+    notes.find('.tag-all, .tag-deleted').hide();
     var tag = '.'+$(this).val();
     notes.find(tag).show();
 }

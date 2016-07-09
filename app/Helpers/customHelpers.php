@@ -25,6 +25,7 @@
 	{
         function toFormatted($time)
         {
+            if(empty($time)) return "";
         	$zero = new DateTime('0000-00-00 00:00:00');
         	$now = new DateTime("now");
             if(! $time instanceof Datetime)
@@ -311,14 +312,20 @@
         function all_tags($notes)
         {
             $list['tag-all'] = 'all';
+            $has_deleted = false;
             foreach ($notes as $note)
             {
                 preg_match('/#(\w+)/', $note, $matches);
                 if(isset($matches[1]))
                 {
-                    $list['tag-'.$matches[1]] = $matches[1];
+                    if(empty($note->deleted_at))
+                    {
+                        $list['tag-'.$matches[1]] = $matches[1];
+                    }
                 }
+                if(!empty($note->deleted_at)) $has_deleted = true;
             }
+            if($has_deleted) $list['tag-deleted'] = 'deleted';
             return $list;
         }
     }
@@ -329,6 +336,7 @@
             preg_match('/#(\w+)/', $note, $matches);
             if(isset($matches[1]))
             {
+                if(!empty($note->deleted_at)) return '';
                 return ' tag-'.$matches[1];
             }
             return '';
