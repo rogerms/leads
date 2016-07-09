@@ -41,15 +41,8 @@ class LeadController extends Controller
 
         $this->authorize('read', $lead);
 
-        if (\Gate::denies('delete-job', $lead)) {
-            $draw = [];
-            foreach($lead->drawings as $d)
-            {
-               if($d->selected == 1 || $d->created_by == Auth::user()->id)
-               $draw[] =  $d;
-            }
-            $lead->drawings = $draw;
-        }
+        $lead->drawings = DrawingController::filter($lead->drawings);
+
         $lead->address = $this->get_address($lead);
         return view('lead.lead',
         	[

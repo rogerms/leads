@@ -34,7 +34,7 @@ class DrawingController extends Controller
 
     public function delete($id)
     {
-        $this->authorize('edit');
+        $this->authorize('edit-job');
 
         $drawing = Drawing::find($id);
         $lead = $drawing->lead;
@@ -60,6 +60,7 @@ class DrawingController extends Controller
         $d->lead_id = $lead_id;
         $d->path = $filename;
         $d->label = Input::get('label');
+        $d->selected = Input::get('protection');
         $d->created_by = Auth::user()->id;
         $d->save();
 
@@ -74,10 +75,11 @@ class DrawingController extends Controller
 
     }
 
-    public function select(Request $request, $id)
+    public function change_protection(Request $request, $id)
     {
+        $this->authorize('edit-job');
         $drw = Drawing::find($id);
-        $drw->selected = !$drw->selected; //switch
+        $drw->selected = $request->protection; //switch
         $result = $drw->save();
         return response()->json(['success' => $result]);
        // Drawing::where('id', $id)->update(['selected' => true]);
@@ -94,7 +96,7 @@ class DrawingController extends Controller
     }
     public function edit(Request $request, $id)
     {
-        $this->authorize('edit');
+        $this->authorize('edit-job');
 
         $drawing = Drawing::find($id);
         $drawing->label = $request->label;
@@ -109,7 +111,7 @@ class DrawingController extends Controller
     //unused
     public function destroy($id)
     {
-        $this->authorize('edit');
+        $this->authorize('delete-job');
 
         $drawing = Drawing::find($id);
         $lead = $drawing->lead;
@@ -124,17 +126,28 @@ class DrawingController extends Controller
         ]);
     }
 
-    private function filter($drawings)
+    public static function filter($drawings)
     {
         if (\Gate::denies('delete-job')) {
             $draw = [];
             foreach($drawings as $d)
             {
-                if($d->selected == 1 || $d->created_by == Auth::user()->id)
+                if(DrawingController::can_see($d))
                     $draw[] =  $d;
             }
             return $draw;
         }
         return $drawings;
+    }
+    
+    private static function can_see($item)
+    {
+        //public
+        if($item->selected == 2) return true;
+        //createdd by user
+        if($item->created_by == Auth::user()->id) return true;
+        //role = user and  protection = protected
+        if(Auth::user()->role->name == 'User' && $item->selected == 1) return true;
+        //dd(Auth::user()->role);
     }
 }

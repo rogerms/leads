@@ -44,7 +44,7 @@ $(function () {
 
     $("#jobstb tbody").on("click", "tr", tableRowGoto);
 
-    $('#addImageModal').on('show.bs.modal', addImage);
+    $('#addImageModal').on('click', addImage);
 
     $('.sketch-group').on('click', '.sketch-tbn', viewImage);
 
@@ -428,27 +428,35 @@ function addremovals()
     });
 }
 
-function selectOneDrawing(id)
+function changeDrawingProtection(id, level)
 {
     var dcard = $('#dw-'+id);
-    if(dcard.hasClass('active'))
-        dcard.removeClass('active');
-    else
-        dcard.addClass('active');
 
     $.ajax({
-            url: '/drawing/select/'+id,
-            data: {leadid: $('#leadid').val()},
+            url: '/drawing/protection/'+id,
+            data: {leadid: $('#leadid').val(), protection: level },
             type: 'POST'
         })
         .fail(function (){
-            showResult('Error trying to select sketch', true);
+            showResult('Error trying to change protection', true);
         })
         .done(function(data){
             if(data.success) {
-                showResult('Sketch visibility changed');
+
+                removeVClass(dcard);
+                dcard.addClass('visibility-'+level);
+                showResult('Sketch protection changed');
             }
         });
+}
+
+function removeVClass(elem)
+{
+    elem.removeClass('visibility-');
+    for(var i=0; i < 3; i++)
+    {
+        elem.removeClass('visibility-'+i);
+    }
 }
 
 function editDrawing(target)
@@ -658,13 +666,20 @@ function runContextMenuAction() {
     if(select == 'Delete')
     {
         var drawingid = $contextMenu.data('id');
-        console.log('Delete '+ drawingid);
+        //console.log('Delete '+ drawingid);
         deleteDrawing($(this), drawingid);
     }
-    if(select == 'Private/Public')
+    if(select == 'Private')
     {
-        //console.log('Select '+ $contextMenu.data('id'));
-        selectOneDrawing($contextMenu.data('id'));
+        changeDrawingProtection($contextMenu.data('id'), 0);
+    }
+    if(select == 'Protected')
+    {
+        changeDrawingProtection($contextMenu.data('id'), 1);
+    }
+    if(select == 'Public')
+    {
+        changeDrawingProtection($contextMenu.data('id'), 2);
     }
     if(select == 'Change Label')
     {
@@ -675,21 +690,43 @@ function runContextMenuAction() {
 }
 
 function addImage(event) {
-    var button = $(event.relatedTarget); // Button that triggered the modal
     var leadid = $('#leadid').val();
 
-    var modal = $(this);
-
-    modal.find('#uploadImage').click(function(event) {
-        var files = modal.find('#inputfile').prop('files');
-        var label = modal.find('#label').val();
-
-        console.log('button clicked from job -- '+ leadid +' length '+ files.length);
-        if(files.length > 0) {
-            uploadFile(event, files[0], leadid, label);
-            modal.modal('hide');
+    bootbox.dialog({
+        title: "Image",
+        message: $('#add-image-modal').html(),
+        buttons: {
+            success: {
+                label: "Upload image",
+                className: "btn-success",
+                callback: function(event)
+                {
+                    var files = $(this).find('#inputfile').prop('files');
+                    var label = $(this).find('#label').val();
+                    var protection = $(this).find('#protection').val();
+                    if(files.length > 0) {
+                        uploadFile(event, files[0], leadid, label, protection);
+                    }
+                }
+            },
+            danger: {
+                label: "Cancel",
+                className: "btn-default",
+                callback: function () {}
+            }
         }
     });
+
+    // modal.find('#uploadImage').click(function(event) {
+    //     var files = modal.find('#inputfile').prop('files');
+    //     var label = modal.find('#label').val();
+    //
+    //     console.log('button clicked from job -- '+ leadid +' length '+ files.length);
+    //     if(files.length > 0) {
+    //         uploadFile(event, files[0], leadid, label);
+    //         modal.modal('hide');
+    //     }
+    // });
 }
 
 function addSearchAutoComplete()
@@ -1043,21 +1080,18 @@ function deleteDrawing(target, drawingid)
 }
 
 // Catch the form submit and upload the files
-function uploadFile(event, file, leadid, label)
+function uploadFile(event, file, leadid, label, protection)
 {
     event.stopPropagation(); // Stop stuff happening
     event.preventDefault(); // Totally stop stuff happening
 
-
     // START A LOADING SPINNER HERE
-
-    //var files = event.target.files;
-
     // Create a formdata object and add the files
     var data = new FormData();
 
     data.append("image", file);
     data.append('label', label);
+    data.append('protection', protection);
 
     $.ajax({
         url: '/drawing/add/'+leadid,
@@ -1074,16 +1108,9 @@ function uploadFile(event, file, leadid, label)
             {
                 // Success so call function to process the form
                 console.log('SUCCESS: ' + data.file);
-                //add to list
-                //var newItem = '<a href="'+ data.file +'" class="sketch-tbn" >'+
-                //                '<img src="/drawings/placeholder.png"  alt="sketch" id="drawing-'+data.id+'"' +
-                //    'class="img-rounded sketch-nail" data-drawingid="'+data.id+'"></a>';
-                //
-
                 $('#drawings').html(data.cards);
 
                 showResult('New sketch added')
-
             }
             else
             {

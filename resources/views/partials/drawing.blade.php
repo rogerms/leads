@@ -2,7 +2,7 @@
 <div class="row">
     @foreach($drawings as $drawing)
         <div class="col-md-3 sketch-nail" id="{{ $drawing->id }}" data-drawingid="{{ $drawing->id }}" data-label="{{ $drawing->label }}">
-            <div class="thumbnail tbn-item {{ $drawing->selected? 'active': '' }}" id="dw-{{ $drawing->id }}">
+            <div class="thumbnail tbn-item visibility-{{ $drawing->selected }}"  id="dw-{{ $drawing->id }}">
                 <div class="caption ">
                     <p id="label">{{ $drawing->label }}</p>
                     <a href="/drawings/{{$drawing->path}}" class="sketch-tbn"><i class="glyphicon glyphicon-picture"></i></a>

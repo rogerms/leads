@@ -1,33 +1,29 @@
 {{--add image modal form *************************************************************************  --}}
-<div class="modal fade" id="addImageModal" tabindex="-1" role="dialog" aria-labelledby="addImageModalLabel">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="addImageModalLabel">Image</h4>
-            </div>
-            <div class="modal-body">
-                <form class="form-inline">
-                    <div class="row-extra-bm-pad">
-                    <div class="form-group">
-                        <input type="file" id="inputfile" name="photos[]" multiple  >
-                    </div>
-                    </div>
-                    <div class="row row-extra-bm-pad">
-                        <div class="form-group">
-                            <label for="title" class="sr-only">Label</label>
-                            <input type="text" class="form-control" id="label" name="label" placeholder="Label">
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                <button type="button" id="uploadImage" class="btn btn-primary">Upload image</button>
+<div class="modal fade" id="add-image-modal" tabindex="-1" role="dialog" aria-labelledby="addImageModalLabel">
+    <form class="form-horizontal">
+        <div class="form-group">
+            <label for="inputfile" class="col-sm-2 control-label">File</label>
+            <div class="col-sm-8">
+                <input type="file" id="inputfile" name="photos[]" multiple >
             </div>
         </div>
-    </div>
+        <div class="form-group">
+            <label for="label" class="col-sm-2 control-label">Label</label>
+            <div class="col-sm-8">
+                <input type="text" class="form-control" id="label" value="" placeholder="proposal">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="protection" class="col-sm-2 control-label">Protection</label>
+            <div class="col-sm-8">
+                <select class="form-control col-sm-6" id="protection">
+                    <option value="0">Private</option>
+                    <option value="1" selected>Protected</option>
+                    <option value="2">Public</option>
+                </select>
+            </div>
+        </div>
+    </form>
 </div>
 
 
@@ -51,15 +47,20 @@
 
 
 <!-- context menu -->
+@can('edit-job')
 <div id="contextMenu" class="dropdown clearfix">
     <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu" style="display:block;position:static;margin-bottom:5px;">
         <li><a tabindex="-1">Delete</a></li>
-        <li><a tabindex="-1">Private/Public</a></li>
         <li><a tabindex="-1">Change Label</a></li>
+        <li class="divider"></li>
+        <li><a tabindex="-1">Private</a></li>
+        <li><a tabindex="-1">Protected</a></li>
+        <li><a tabindex="-1">Public</a></li>
         <li class="divider"></li>
         <li><a tabindex="-1">Cancel</a></li>
     </ul>
 </div>
+@endcan
 <!-- /context menu -->
 
 {{--add phone modal form *************************************************************************  --}}

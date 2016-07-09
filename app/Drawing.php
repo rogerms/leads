@@ -19,6 +19,6 @@ class Drawing extends Model
 
     public function scopeSelected($query)
     {
-        return $query->where('selected', '=', true);
+        return $query->where('selected', '=', 2);
     }
 }

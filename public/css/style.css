@@ -760,3 +760,15 @@ font-family: FontAwesome;
 .item-text-deletedat{
     color: #840F26 !important;
 }
+
+.visibility-, .visibility-0{
+    background-color: rgba(156, 13, 13, 0.10);
+}
+
+.visibility-1{
+    background-color: rgba(232, 205, 54, 0.15);
+}
+
+.visibility-2{
+    background-color: rgba(142, 219, 38, 0.15);
+}

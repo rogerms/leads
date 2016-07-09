@@ -215,7 +215,7 @@
                 <div>
                     <div class="col-md-12">
                     @can('edit')
-                    <button type="button" class="btn btn-default" data-toggle="modal" data-target="#addImageModal">Add New Sketch</button>
+                    <button type="button" class="btn btn-default" id="addImageModal">Add New Sketch</button>
                     @endcan
                     </div>
                 </div>
