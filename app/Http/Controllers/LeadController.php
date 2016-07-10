@@ -153,7 +153,7 @@ class LeadController extends Controller
                 $query .= " AND DATE(appointment) = ADDDATE(DATE(NOW()), 1)";
             }
 
-            $sort = "jobs.id DESC";
+            $sort = "leads.updated_at DESC";
             if($request->sortby)
             {
                 $sortby = str_replace(

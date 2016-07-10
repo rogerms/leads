@@ -141,7 +141,7 @@ function tinymceInit () {
             'advlist lists print preview hr',
             'save table contextmenu template textcolor'
         ],
-        toolbar: 'undo redo | save | fontsizeselect | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist | print viewpdf | forecolor | autosum',
+        toolbar: 'undo redo | newdoc save | fontsizeselect | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist | print viewpdf | forecolor | autosum viewversions',
 
         save_onsavecallback: saveProposalNote
     });
@@ -214,6 +214,28 @@ function customRTEButtons (editor) {
             window.location.href = '/print/job/'+jobid;
         }
     });
+
+    editor.addButton('viewversions', {
+        icon: 'viewversions',
+        title: 'View Versions',
+        image: '/images/icons/stopwatch.png',
+        onclick: function (event) {
+            var jobid = $(event.target).parents('form').attr('id');
+            window.location.href = '/proposal/index/'+jobid;
+        }
+    });
+
+    editor.addButton('newdoc', {
+        icon: 'newdoc',
+        title: 'New',
+        image: '/images/icons/file-empty.png',
+        onclick: function (event) {
+            var form = $(event.target).parents('form');
+            // console.log('job'+ jobid);
+            newProposalNote(editor, form)
+        }
+    });
+
 }
 
 function addCalendarEvent()
@@ -260,6 +282,8 @@ function saveProposalNote(editor){
     event.preventDefault();
     var form = $('#'+editor.id).parents('form');
     var jobid = form.attr('id');
+    var id = form.find('.proposal-note').data('id');
+    id = (id != "")? id: 0;
     // console.log(jobid);
     //only job owner can upate proposal -- changed
     // var result  = false;
@@ -270,8 +294,8 @@ function saveProposalNote(editor){
     // console.log(target.getContent());
 
     $.ajax({
-            url: '/proposal/edit/'+jobid,
-            data: {note: editor.getContent() },
+            url: '/proposal/edit/'+id,
+            data: {text: editor.getContent(), jobid: jobid },
             type: 'POST'
         })
         .fail(function (){
@@ -282,9 +306,35 @@ function saveProposalNote(editor){
                 showResult('text saved');
                 //update owner id
                 form.find('#proposal-author').val(data.author);
+                form.find('.proposal-note').data('id', data.id);
             }
             else{
                 showResult(data.msg, true);
+            }
+        });
+}
+
+function newProposalNote(editor, form){
+    event.preventDefault();
+    var jobid = form.attr('id');
+    var id = form.find('.proposal-note').data('id');
+
+    $.ajax({
+            url: '/proposal/new/'+jobid,
+            data: {text: '', jobid: jobid },
+            type: 'POST'
+        })
+        .fail(function (){
+            showResult('Error trying to create doc', true);
+        })
+        .done(function(data){
+            if(data.result) {
+                showResult('new doc created');
+                form.find('.proposal-note').data('id', "");
+                editor.setContent("");
+            }
+            else{
+                showResult('new doc created');
             }
         });
 }

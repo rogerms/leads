@@ -154,7 +154,12 @@ Route::group(['middleware' => 'web'], function () {
 
     Route::post('style/{id}/delete', 'StyleController@delete');
 
-    Route::post('proposal/edit/{jobid}', 'JobController@edit_proposal');
+    Route::post('proposal/edit/{id}', 'JobController@edit_proposal');
+
+    Route::post('proposal/new/{id}', 'JobController@new_proposal');
+
+    Route::get('/proposal/index/{jobid}', 'JobController@index_proposal');
+
 
 
 //----------------------------------------------------

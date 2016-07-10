@@ -92,11 +92,11 @@
             @endforeach
         </div> <!-- END FEATURES 2-->
         <input type="hidden" id="proposal-author" value="{{ $job->proposal_author }}">
-        @can('view-proposal', $job)
+        @can('edit-job', $job)
         <div class="row">
             <div class="col-xm-12" style="padding: 10px">
                 <label>Proposal Notes:</label>
-                <textarea class="proposal-note">{{ $job->proposal_note }}</textarea>
+                <textarea class="proposal-note" data-id="{{ $job->proposal['id'] }}">{{ $job->proposal['text'] }}</textarea>
             </div>
         </div>
         @endcan
@@ -251,7 +251,7 @@
 
             <!-- Split button -->
             <div class="btn-group dropup">
-                <a role="button" @can('view-proposal', $job) href="/print/job/{{$job->id}}" @endcan class="btn btn-default" id="print-job">View PDF</a>
+                <a role="button" @can('edit-job', $job) href="/print/job/{{$job->id}}" @endcan class="btn btn-default" id="print-job">View PDF</a>
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="caret"></span>
                     <span class="sr-only">Toggle Button</span>

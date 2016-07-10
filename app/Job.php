@@ -36,4 +36,9 @@ class Job extends Model
     {
         return $this->hasMany('App\Material');
     }
+
+    public function proposal()
+    {
+        return $this->hasOne('App\Proposal');
+    }
 }

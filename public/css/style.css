@@ -772,3 +772,11 @@ font-family: FontAwesome;
 .visibility-2{
     background-color: rgba(142, 219, 38, 0.15);
 }
+
+.panel-footer{
+    padding-top: 5px;
+    padding-bottom: 5px;
+    background-color: white;
+    font-size: 12px;
+    color: darkgrey;
+}

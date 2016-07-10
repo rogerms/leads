@@ -312,7 +312,7 @@
                     in substantial and workman like manner.</small>
             </span>
             <div>
-                {!! $job->proposal_note  !!}
+                {!! $job->proposal['text']  !!}
             </div>
             <div class="total-box">
                 <div>Job Total</div>

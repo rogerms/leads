@@ -7,6 +7,7 @@ use App\Feature;
 use app\Helpers\Helper;
 use App\Material;
 use App\Note;
+use App\Proposal;
 use App\StyleGroup;
 use Illuminate\Http\Request;
 use App\Http\Requests;
@@ -33,7 +34,7 @@ class JobController extends Controller
     {
         if ($request->ajax())
         {
-            $sortby = ($request->sortby) ? $request->sortby : 'jobs.id';
+            $sortby = ($request->sortby) ? $request->sortby : 'jobs.updated_at';
             $sortby = str_replace(
                 ['ID', 'Job#', 'Customer Name', 'Date Sold', 'City', 'Sales Rep'],
                 ['jobs.id', 'code', 'customer_name', 'date_sold', 'city', 'sales_reps.name'],
@@ -315,17 +316,50 @@ class JobController extends Controller
 
     public function edit_proposal(Request $request, $id)
     {
-        $job = Job::findOrFail($id);
+        $this->authorize('edit-job');
+
+        $job_id = $request->jobid;
+        $job = Job::find($job_id);
+        $_id = $job->proposal['id'];
+        $proposal = Proposal::find($_id);
         $user_id = Auth::user()->id;
 
-//        if($job->proposal_author > 0 && $job->proposal_author != $user_id)
-//           return response()->json(['result' => false, 'msg' => 'Nothing saved... unauthorized user!']);
-        if($job->proposal_author == null)
-            $job->proposal_author = $user_id;
-        $job->proposal_note = $request->note;
-        $result = $job->save();
 
-        return response()->json(['result' => $result, 'author' => $job->proposal_author, 'msg' => '']);
+        if($proposal == null)
+        {
+            $version = count(Proposal::withTrashed()->where('job_id', $job_id)->get()) + 1;
+            $proposal = new Proposal();
+            $proposal->job_id  = $job_id;
+            $proposal->version  = $version;
+        }
+
+        $proposal->text = $request->text;
+
+        if($proposal->created_by == null)
+            $proposal->created_by = $user_id;
+        $proposal->updated_by = $user_id;
+
+        $result = $proposal->save();
+
+        return response()->json(['result' => $result, 'author' => $proposal->created_by, 'id' =>  $proposal->id]);
+    }
+
+    public function new_proposal(Request $request, $id)
+    {
+        $this->authorize('edit-job');
+
+        $result = Proposal::where('job_id', $id)->delete();
+
+        return response()->json(['result' => $result]);
+    }
+
+    public function index_proposal(Request $request, $id)
+    {
+        $this->authorize('edit-job');
+
+        $props = Proposal::withTrashed()->where('job_id', $id)->orderby('updated_at', 'desc')->get();
+
+        return view('job.proposals', compact('props'));
     }
 
     public  function style_pdf($id)
