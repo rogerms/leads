@@ -188,4 +188,12 @@ Route::group(['middleware' => 'web'], function () {
 
     Route::any('calendar/add/{id}', 'HomeController@add_calendar_event');
 
+//   -------------------------------------------------------
+// User
+//----------------------------------------------------------
+    Route::get('/user/create', 'UserController@create');
+
+    Route::post('/user/store', 'UserController@store');
+
+
 });
