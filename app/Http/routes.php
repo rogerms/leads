@@ -195,5 +195,10 @@ Route::group(['middleware' => 'web'], function () {
 
     Route::post('/user/store', 'UserController@store');
 
+    Route::post('/user/update/{id}', 'UserController@update');
+
+    Route::get('/user/{id}', 'UserController@show');
+
+    Route::get('/users', 'UserController@index');
 
 });

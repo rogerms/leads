@@ -51,6 +51,7 @@
                   <li><a href="{{ url('/user/create') }}">Add New User</a></li>
                   <li><a href="{{ url('/reps') }}">Update Reps</a></li>
                   <li><a href="{{ url('/lists') }}">Update Lists</a></li>
+                  <li><a href="{{ url('/users') }}">List Users</a></li>
                   @endcan
 
                   @can('admin')
