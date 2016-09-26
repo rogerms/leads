@@ -395,6 +395,7 @@ class JobController extends Controller
     public function print_preview_html($id)
     {
         $job = Job::find($id);
+        $job->load('lead');
         $draw = Drawing::where('lead_id',  $job->lead_id)->where('selected', true)->get();
 
         $path = count($draw) > 0? $draw[0]->path: '';

@@ -203,7 +203,7 @@
                  <tr>
                     <td  colspan="10">
                         <div class="field-name">Job Address</div>
-                        <div class='field-value'>{{ $job->lead->street }}</div>
+                        <div class='field-value'>{{ $job->lead->street.", ".$job->lead->city.", UT ".$job->lead->zip}}</div>
                     </td>
                     <td colspan="2">
                        <div class="field-name">Est. Start Date</div>
