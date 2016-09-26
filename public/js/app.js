@@ -1049,6 +1049,7 @@ function updateLead () {
         contact: $('#contact').val(),
         street: $('#street').val(),
         city: $('#city').val(),
+        state: $('#state').val(),
         zip: $('#zip').val(),
         phone: $('#phone').val(),
         email: $('#email').val(),

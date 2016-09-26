@@ -109,7 +109,7 @@
                  <tr>
                     <td  colspan="6">
                         <div class="field-name">Job Address</div>
-                        <div class='field-value'>{{ $job->lead->street }}</div>
+                        <div class='field-value'>{{ $job->lead->street.", ".$job->lead->city.", ".$job->lead->state." ".$job->lead->zip }}</div>
                     </td>
                     <td  colspan="6">
                          {{--<div class="field-name">Paver</div>--}}

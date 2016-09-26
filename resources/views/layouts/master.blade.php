@@ -13,6 +13,7 @@
     <link href="/libs/datepicker/css/bootstrap-datepicker.min.css" rel="stylesheet">
     <link href="{{ URL::asset('css/style.css') }}" rel="stylesheet">
 
+    <link rel="icon" type="image/png" href="/images/Logo16x16.png">
     <!-- Custom styles for this template -->
     {{--<link href="/css/offcanvas.css" rel="stylesheet">--}}
 </head>

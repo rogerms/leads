@@ -85,6 +85,12 @@
                 <input type="text" class="form-control" id="zip" value="{{$lead->zip}}" placeholder="84601">
             </div>
         </div>
+        <div class="col-md-1">
+            <div class="form-group">
+                <label for="state">State</label>
+                <input type="text" class="form-control" id="state" value="{{ !empty($lead->state)? $lead->state: 'UT'  }}" >
+            </div>
+        </div>
     </div>
         <div class="row">
         <div class="col-md-3">

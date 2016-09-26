@@ -305,6 +305,7 @@ class LeadController extends Controller
         $lead->contact_name = $request->contact;
         $lead->street = $request->street;
         $lead->city = $request->city;
+        $lead->state = $request->state;
         $lead->zip = $request->zip;
         $lead->phone = $request->phone;
         $lead->email = $request->email;

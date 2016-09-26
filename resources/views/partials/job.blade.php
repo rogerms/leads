@@ -102,7 +102,7 @@
         @endcan
         @can('edit-job')
         <div class="row row-extra-pad">
-            <a role="button" class="btn btn-primary" href="/job/{{$job->id}}/style">Paver Styles</a>
+            <a role="button" class="btn btn-primary" href="/job/{{$job->id}}/style">Pavers</a>
         </div>
         @endcan
         <div class="row">
