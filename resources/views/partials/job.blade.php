@@ -94,12 +94,15 @@
         <input type="hidden" id="proposal-author" value="{{ $job->proposal_author }}">
         @can('edit-job', $job)
         <div class="row">
-            <div class="col-xm-12" style="padding: 10px">
+            <div style="padding: 10px;">
                 <label>Proposal Notes:</label>
-                <textarea class="proposal-note" data-id="{{ $job->proposal['id'] }}">{{ $job->proposal['text'] }}</textarea>
+                <div class="proposal-box" >
+                    <textarea class="proposal-note" data-id="{{ $job->proposal['id'] }}">{{ $job->proposal['text'] }}</textarea>
+                </div>
             </div>
         </div>
         @endcan
+
         @can('edit-job')
         <div class="row row-extra-pad">
             <a role="button" class="btn btn-primary" href="/job/{{$job->id}}/style">Pavers</a>
@@ -117,7 +120,11 @@
                     <span class="input-group-addon" id="basic-addon2">%</span>
                 </div>
             </div>
-
+            <div class="form-group col-md-4 cbox-valign">
+                <label class="checkbox-inline">
+                    <input type="checkbox" id="noaddfee"  {{ isChecked($job->noadd_fee) }} value="additionalfee">No additional fees
+                </label>
+            </div>
         </div> <!--  -->
 
         <div class="row">
@@ -184,6 +191,7 @@
                             <input type="checkbox" id="bluestakes" {{ isChecked($job->bluestakes) }}  value="bluestakes">Bluestakes
                         </label>
                     </div>
+
                 </div>
                 @if($job->id > 0)
                 <div class="row">

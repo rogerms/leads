@@ -664,6 +664,7 @@ function jobFormData(form)
         paversordered: form.find('#paversordered').prop('checked'),
         prelien: form.find('#prelien').prop('checked'),
         bluestakes: form.find('#bluestakes').prop('checked'),
+        noaddfee: form.find('#noaddfee').prop('checked'),
         crew: form.find('#crew').val(),
         downpayment: form.find('#downpayment').val(),
         materials: getMaterials(form),

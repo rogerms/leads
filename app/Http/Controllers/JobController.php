@@ -301,6 +301,7 @@ class JobController extends Controller
         $job->pavers_ordered = ($request->paversordered == 'true');
         $job->prelien = ($request->prelien == 'true');
         $job->bluestakes = ($request->bluestakes == 'true');
+        $job->noadd_fee = ($request->noaddfee == 'true');
         $job->property_type = $request->propertytype;
         $job->crew = $request->crew;
         $job->downpayment = $request->downpayment;

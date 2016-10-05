@@ -142,6 +142,27 @@
             </div>
         </div>
         </div>
+        <div class="col-sm-4">
+            <div class="row">
+                <h4>Job Features</h4>
+            </div>
+            @foreach($features as $feature)
+                <div class="row update-row">
+                    <div class="form-group">
+                        <label class="sr-only" for="name">Name</label>
+                        <input type="text" class="form-control" id="name" value="{{ $feature->name }}">
+                    </div>
+                    <button type="button" id="{{ $feature->id  }}" class="btn btn-default update-lists" data-type="feature">Update</button>
+                </div>
+            @endforeach
+            {{--<div class="row features-add">--}}
+                {{--<div class="form-group">--}}
+                    {{--<label class="sr-only" for="name">Name</label>--}}
+                    {{--<input type="text" class="form-control" id="name"  placeholder="feature">--}}
+                {{--</div>--}}
+                {{--<button type="button" id="0" class="btn btn-info update-lists" data-type="feature">Add</button>--}}
+            {{--</div>--}}
+        </div>
     </form>
 </div>
 @endsection

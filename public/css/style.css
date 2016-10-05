@@ -411,6 +411,18 @@ small{
     .center-box {
         margin-top: 30px;
     }
+
+}
+
+@media screen and (max-width: 992px) {
+    .mce-panel {
+        width: 100% !important;
+        /*border: 2px dotted red !important;*/
+    }
+    .proposal-box {
+        border: 2px dashed red;
+        padding-right: 2px;
+    }
 }
 
 .inner-row {
@@ -585,7 +597,7 @@ body {
  * Off Canvas
  * --------------------------------------------------
  */
-@media screen and (max-width: 767px) {
+@media screen and (max-width: 768px) {
     .row-offcanvas {
         position: relative;
         -webkit-transition: all .25s ease-out;
@@ -779,4 +791,7 @@ font-family: FontAwesome;
     background-color: white;
     font-size: 12px;
     color: darkgrey;
+}
+.cbox-valign{
+    margin-top: 30px;
 }

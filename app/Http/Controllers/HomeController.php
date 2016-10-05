@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Feature;
 use app\Helpers\Helper;
 use App\Http\Requests;
 use App\Lead;
@@ -69,12 +70,13 @@ class HomeController extends Controller
         $takers = TakenBy::all();
         $statuses = Status::all();
         $sources = Source::all();
+        $features = Feature::all();
 
         $property_types = DB::table('property_types')->get();
         $customer_types = DB::table('customer_types')->get();
         $job_types = DB::table('job_types')->get();
 
-        return view('lists', compact('takers', 'statuses', 'sources', 'property_types', 'customer_types', 'job_types'));
+        return view('lists', compact('takers', 'statuses', 'sources', 'property_types', 'customer_types', 'job_types', 'features'));
     }
 
     public  function update_list(Request $request, $id)
@@ -96,6 +98,9 @@ class HomeController extends Controller
                 break;
             case 'source':
                 $obj = Source::findOrNew($id);
+                break;
+            case 'feature':
+                $obj = Feature::findOrNew($id);
                 break;
             default:
                 $table_name = $request->type;
