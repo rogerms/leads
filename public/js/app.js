@@ -630,7 +630,6 @@ function createJob ()
     var formdata = jobFormData(form);
 
     formdata['leadid'] = leadId;
-
     console.log(formdata);
 
     $.ajax({
@@ -670,7 +669,6 @@ function jobFormData(form)
         materials: getMaterials(form),
         startdate: form.find('#startdate').val(),
         signedat: form.find('#signedat').val(),
-        note: form.find('#jobnote').val(),
         removals: getRemovals(form),
         features: getFeats(form)
     };
@@ -833,6 +831,14 @@ function updateJob () {
     var fdata = jobFormData(form);
 
     fdata['id'] = id;
+
+    // update proposal note if button is enabled
+    var proposalsavebt = form.find('.mce-i-save').parent('button');
+    if(proposalsavebt.css('cursor') == 'pointer')
+    {
+        //trigger button click (save button of the tynemce text editor)
+        proposalsavebt.trigger('click');
+    }
 
     $.ajax({
         url: "/job/update",

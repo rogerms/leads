@@ -6,12 +6,14 @@ use App\Role;
 use App\User;
 use Illuminate\Http\Request;
 use App\Http\Requests;
+use Auth;
+use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth');
+        $this->middleware('auth', ['except' => ['get_token']]);
     }
 
     /**
@@ -91,5 +93,60 @@ class UserController extends Controller
         $user->save();
         \Helper::flash_message('User succefully updated', true);
         return redirect()->back();
+    }
+
+    public function get_token(Request $request)
+    {
+        $email = $request->email;
+        $password = base64_decode($request->password);
+
+//        $input = "SmackFactory";
+//
+//        $encrypted = $this->encryptIt( $input );
+//        $decrypted = $this->decryptIt( $encrypted );
+
+        if (Auth::attempt(['email' => $email, 'password' => $password])) {
+
+            $user = Auth::user();
+            $token = $user->api_token;
+
+            $names = DB::table('permissions')->select('slug')->get();
+            $permissions = [];
+
+            foreach ($names as $name)
+            {
+                if($user->can($name->slug))
+                $permissions[] = $name->slug;
+            }
+
+            return response()->json([
+                'success'=> true,
+                'token' => $token,
+                'uname' => $user->name,
+                'email' => $user->email,
+                'role' => $user->role->name,
+                'permissions' => $permissions
+                ]);
+        }
+        return response()->json([
+            'success'=> false,
+            'token' => '',
+            'uname' => '',
+            'email' => '',
+            'role' => '',
+            'permissions' => []
+        ]);
+    }
+
+    function encryptIt( $q ) {
+        $cryptKey  = 'qJB0rGtIn5UB1xG03efyCp';
+        $qEncoded      = base64_encode( mcrypt_encrypt( MCRYPT_RIJNDAEL_256, md5( $cryptKey ), $q, MCRYPT_MODE_CBC, md5( md5( $cryptKey ) ) ) );
+        return( $qEncoded );
+    }
+
+    function decryptIt( $q ) {
+        $cryptKey  = 'qJB0rGtIn5UB1xG03efyCp';
+        $qDecoded      = rtrim( mcrypt_decrypt( MCRYPT_RIJNDAEL_256, md5( $cryptKey ), base64_decode( $q ), MCRYPT_MODE_CBC, md5( md5( $cryptKey ) ) ), "\0");
+        return( $qDecoded );
     }
 }

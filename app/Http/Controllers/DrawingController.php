@@ -46,11 +46,12 @@ class DrawingController extends Controller
         ]);
     }
 
-    public function create($lead_id)
+    public function create(Request $request, $lead_id)
     {
         //$this->authorize('edit-job');
 
         $file = Input::file('image');
+        //dd($file);
         $filename = md5(microtime() . $file->getClientOriginalName()) . "." . $file->getClientOriginalExtension();
         Input::file('image')->move($this->destinationPath, $filename);
 
@@ -66,6 +67,11 @@ class DrawingController extends Controller
 
         $drawing = Drawing::where('lead_id', $lead_id)->get();
         $drawings = $this->filter($drawing);
+
+        if($request->fmt == 'json')
+        {
+            return response()->json(['drawing' => $d]);
+        }
 
         return response()->json(['success' => true,
             'cards' => view('partials.drawing', ['drawings' => $drawings])->render(),
@@ -128,16 +134,18 @@ class DrawingController extends Controller
 
     public static function filter($drawings)
     {
-        if (\Gate::denies('delete-job')) {
+        if (\Gate::denies('delete-job')) {// not admin
             $draw = [];
             foreach($drawings as $d)
             {
                 if(DrawingController::can_see($d))
+                {
                     $draw[] =  $d;
+                }
             }
             return $draw;
         }
-        return $drawings;
+        return $drawings; //admin gets everything
     }
     
     private static function can_see($item)
@@ -149,5 +157,6 @@ class DrawingController extends Controller
         //role = user and  protection = protected
         if(Auth::user()->role->name == 'User' && $item->selected == 1) return true;
         //dd(Auth::user()->role);
+        return false;
     }
 }

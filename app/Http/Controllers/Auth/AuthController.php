@@ -69,7 +69,8 @@ class AuthController extends Controller
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => bcrypt($data['password']),
-            'role_id' => $data['usertype']
+            'role_id' => $data['usertype'],
+            'api_token' => str_random(60)
         ]);
     }
 

@@ -27,35 +27,49 @@ class LeadController extends Controller
 
     public function __construct()
     {
-        $this->middleware('auth');
+       $this->middleware('auth');
     }
 
     /**
      * @param $id
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function show($id)
+    public function show(Request $request, $id)
     {
 
         $lead = Lead::findOrFail($id);
 
         $this->authorize('read', $lead);
+        
+        $lead->load('jobs', 'notes', 'drawings');
 
-        $lead->drawings = DrawingController::filter($lead->drawings);
+        $lead->jobs->load('features', 'removals', 'materials', 'proposal');
+
+        if($request->fmt == 'json')
+            $lead->_drawings = DrawingController::filter($lead->drawings);
+        else
+            $lead->drawings = DrawingController::filter($lead->drawings);
 
         $lead->address = $this->get_address($lead);
-        return view('lead.lead',
-        	[
-        	'lead' => $lead,
-        	'statuses' => Status::orderBy('name')->get(),
-        	'salesreps' => SalesRep::all(),
-        	'takenbies' => TakenBy::all(),
-    		'sources' => Source::all(),
+
+        $arr = [
+            'lead' => $lead,
+            'statuses' => Status::orderBy('name')->get(),
+            'salesreps' => SalesRep::all(),
+            'takenbies' => TakenBy::all(),
+            'sources' => Source::all(),
             'property_types' => DB::table('property_types')->get(),
             'customer_types' => DB::table('customer_types')->get(),
             'job_types' => DB::table('job_types')->Orderby('name', 'asc')->get(),
             'features' => DB::table('features')->Orderby('name', 'asc')->get()
-        	]); 
+        ];
+
+        if($request->fmt == 'json')
+        {
+            return response()->json($arr);
+        }
+
+        return view('lead.lead', $arr);
     }
 
     private function get_address($lead)
@@ -73,7 +87,7 @@ class LeadController extends Controller
     {
         //$leads = DB::table('leads')->paginate(15);
 
-        if ($request->ajax()) 
+        if ($request->ajax() || $request->fmt == 'json')
         {
             $search = str_replace(["'", '"', 'delete', 'update'], ["\\'", "\\\"", ''], $request->searchtx);
 
@@ -92,10 +106,10 @@ class LeadController extends Controller
             LEFT JOIN notes ON notes.lead_id = leads.id
             LEFT JOIN jobs ON jobs.lead_id=leads.id
             LEFT JOIN notes j_notes ON j_notes.job_id = jobs.id
-            JOIN status ON status.id = leads.status_id
-            JOIN sales_reps ON sales_reps.id = leads.sales_rep_id
-            JOIN taken_by ON taken_by.id = leads.taken_by_id
-            JOIN sources ON sources.id = leads.source_id
+            LEFT JOIN status ON status.id = leads.status_id
+            LEFT JOIN sales_reps ON sales_reps.id = leads.sales_rep_id
+            LEFT JOIN taken_by ON taken_by.id = leads.taken_by_id
+            LEFT JOIN sources ON sources.id = leads.source_id
             WHERE 1";
 
             if($request->searchby == 'Tag')
@@ -200,10 +214,15 @@ class LeadController extends Controller
 
             $leads = new LengthAwarePaginator($currentItems, $leads_count, 15, $currentPage);
 
-//            dd($leads);
+//            dd($leads);\
+
+            if($request->fmt == 'json')
+            {
+                return response()->json(compact('leads'));
+            }
 
             return response()->json([
-                'leads' => view('partials.leads', ['leads' => $leads ])->render(),
+                'leads' => view('partials.leads', ['leads' => $leads])->render(),
                 'links' => sprintf('<div>%s</div>', $leads->links()),
                 'status' => $status_count,
                 'reps' => $reps_count,
@@ -215,6 +234,7 @@ class LeadController extends Controller
                 'prev_page' => 1,
                 'q' => $query
             ]);
+
         }
         else
         {
@@ -246,6 +266,15 @@ class LeadController extends Controller
                     'takenbies' => TakenBy::all(),
                     'sources' => Source::all()
                 ]);
+    }
+
+    public function api_create()
+    {
+        $this->authorize('edit');
+        $lead = new Lead();
+        $lead->save();
+
+        return response()->json(['id' => $lead->id]);
     }
 
     public function store(Request $request)
@@ -447,6 +476,13 @@ class LeadController extends Controller
 
     public function services()
     {
+//        for($i=0; $i < 20; $i++)
+//            echo "update users set api_token='".str_random(60)."' where id=$i;<br>";
+//        $users = \App\User::all();
+//        foreach ($users as $user)
+//        {
+//            echo sprintf("UPDATE users set api_token='%s' where id='%s';<br>", str_random(60), $user->id);
+//        }
         
 //        return $pdf->stream();
 

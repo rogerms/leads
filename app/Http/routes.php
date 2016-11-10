@@ -48,6 +48,43 @@
 | kernel and includes session state, CSRF protection, and more.
 |
 */
+Route::post('oath/token', 'UserController@get_token');
+
+Route::group(['prefix' => 'api', 'middleware' => 'auth:api'], function()
+{
+    Auth::onceUsingId(Auth::guard('api')->id());
+
+    Route::any('lead/create', 'LeadController@api_create');
+
+    Route::get('lead/update', 'LeadController@update');
+
+    Route::get('lead/{id}', 'LeadController@show');
+
+    Route::any('job/update', 'JobController@update');
+
+    Route::any('job/create/{leadid}', 'JobController@create');
+
+    Route::get('job/{id}/style', 'StyleController@show');
+
+    Route::get('job/{id}', 'JobController@show');
+
+    Route::get('leads', 'LeadController@index');
+
+    Route::get('cities', 'LeadController@getcities');
+
+    Route::any('note/add', 'NoteController@add');
+
+    Route::post('drawing/add/{leadid}', 'DrawingController@create');
+
+    Route::get('style/update', 'StyleController@update');
+
+    Route::post('proposal/edit/{id}', 'JobController@edit_proposal');
+
+    Route::get('proposal/{id}', 'JobController@show_proposal');
+
+    Route::get( 'print/job/{id}', 'JobController@print_preview');
+});
+
 
 
 Route::group(['middleware' => 'web'], function () {
@@ -200,5 +237,4 @@ Route::group(['middleware' => 'web'], function () {
     Route::get('/user/{id}', 'UserController@show');
 
     Route::get('/users', 'UserController@index');
-
 });

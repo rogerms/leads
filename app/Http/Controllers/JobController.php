@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Drawing;
-use App\Feature;
 use app\Helpers\Helper;
 use App\Material;
 use App\Note;
@@ -11,11 +10,11 @@ use App\Proposal;
 use App\StyleGroup;
 use Illuminate\Http\Request;
 use App\Http\Requests;
-use App\Lead;
 use App\Job;
 use App\Style;
 use App\Removal;
 use DB;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Validator;
 use PDF;
 use Auth;
@@ -28,6 +27,34 @@ class JobController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+    }
+
+    /**
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function show(Request $request, $id)
+    {
+        $job = Job::findOrFail($id);
+
+        $job->load('notes', 'features', 'removals', 'materials', 'proposal');
+
+        $this->authorize('read-job', $job);
+
+        $arr = [
+            'job' => $job,
+            'property_types' => DB::table('property_types')->get(),
+            'customer_types' => DB::table('customer_types')->get(),
+            'job_types' => DB::table('job_types')->Orderby('name', 'asc')->get(),
+            'features' => DB::table('features')->Orderby('name', 'asc')->get()
+        ];
+
+        if($request->fmt == 'json')
+        {
+            return response()->json($arr);
+        }
+
+        return view('lead.lead', $arr);
     }
 
     public function index(Request $request)
@@ -47,6 +74,7 @@ class JobController extends Controller
                 ->join('sales_reps', 'sales_reps.id', '=', 'leads.sales_rep_id')
                 ->orderBy($sortby, $direction)
                 ->select('jobs.id', 'code', 'leads.id as lead_id', 'customer_name', 'date_sold', 'city', 'sales_reps.name as sales_rep')
+                ->where('jobs.date_sold', '<>', '')
                 ->paginate(15);
 
             $jobs->appends(['sortby' => $sortby, 'sortdirection' => $request->sortdirection]);
@@ -63,7 +91,7 @@ class JobController extends Controller
         }
     }
 
-	public function create($id)
+	public function create(Request $request, $id)
     {
         $this->authorize('edit-job');
 
@@ -71,6 +99,10 @@ class JobController extends Controller
         $job->lead_id = $id;
         $job->save();
 
+        if ($request->fmt == 'json')
+        {
+            return response()->json(['id' => $job->id]);
+        }
         return redirect("lead/$id");
     }
 
@@ -129,7 +161,6 @@ class JobController extends Controller
     public function update(Request $request)
     {
         $this->authorize('edit-job');
-
         $id = $request->id;
     	$job = Job::findOrFail($id);
 
@@ -147,11 +178,25 @@ class JobController extends Controller
             $this->emailJobSold($job);
         }
 
+
+        if($request->features)
 		foreach($request->features as $k => $v)
 		{
-			DB::table('feature_job')
-				->where(['job_id' => $job->id, 'feature_id' => $k])
-				->update(['active' => ($v == 'true')]);
+            $id = DB::table('feature_job')->where(['job_id' => $job->id, 'feature_id' => $k])->value('feature_id');
+            if(empty($id))
+            {
+                DB::table('feature_job')->insert([
+                        'job_id' => $job->id,
+                        'feature_id' => $k,
+                        'active' => ($v == 'true')
+                    ]);
+            }
+            else
+            {
+                DB::table('feature_job')
+                    ->where(['job_id' => $job->id, 'feature_id' => $k])
+                    ->update(['active' => ($v == 'true')]);
+            }
 		}
 
 		if (count($request->stylegroups) > 0)//doesn't break if style is empty
@@ -318,7 +363,6 @@ class JobController extends Controller
     public function edit_proposal(Request $request, $id)
     {
         $this->authorize('edit-job');
-
         $job_id = $request->jobid;
         $job = Job::find($job_id);
         $_id = $job->proposal['id'];
@@ -406,10 +450,12 @@ class JobController extends Controller
         return view('pdf.job', compact('job', 'path'));
     }
 
-    public function print_preview($id)
+    public function print_preview(Request $request, $id)
     {
+        $this->authorize('edit');
         $job = Job::find($id);
-        return $this->get_job_pdf($job);
+        $output = isset($request->output);
+        return $this->get_job_pdf($job, $output);
     }
 
     public function print_installer($id)
@@ -427,7 +473,7 @@ class JobController extends Controller
         return $pdf->stream();
     }
 
-    private function get_job_pdf(Job $job)
+    private function get_job_pdf(Job $job, $output=false)
     {
         $draw = Drawing::where('lead_id',  $job->lead_id)->selected()->first();
         $job->descs = Note::where('job_id', $job->id)->where('note', 'like', '#description %')->get();
@@ -440,6 +486,9 @@ class JobController extends Controller
 
         $pdf = \PDF::loadView('pdf.job', compact('job', 'path'));
         $pdf->setPaper('letter', 'portrait');
+
+        if($output === true)
+            return $pdf->output();
         return $pdf->stream();
     }
 
@@ -555,7 +604,17 @@ class JobController extends Controller
     {
         return 'done';
     }
-    
+
+    public function show_proposal(Request $request, $id)
+    {
+        $job = Job::find($id);
+        $job->load('proposal');
+        $proposal = $job->proposal ? $job->proposal: new Proposal();
+        $proposal->job_id = $id;
+        $url = URL::to('/');
+        $token = $request->api_token;
+        return view('proposal', compact('proposal', 'url', 'token'));
+    }
 
 //    public function upload($lead_id)
 //    {

@@ -18,10 +18,16 @@ class StyleController extends Controller
         $this->middleware('auth');
     }
 
-    public function show($job_id)
+    public function show(Request $request, $job_id)
     {
         $job = Job::find($job_id);
+        $job->load('stylegroups');
+        $job->stylegroups->load('styles');
 
+        if($request->fmt == 'json')
+        {
+            return response()->json(['stylegroups' =>  $job->stylegroups]);
+        }
         return view('job.style', compact('job'));
     }
 
