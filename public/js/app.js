@@ -1252,7 +1252,8 @@ function updateLists()
         type: 'POST',
         data: {
             type: $(this).data('type'),
-            name: row.find('#name').val()
+            name: row.find('#name').val(),
+            order: row.find('#order').val()
         }
     }).done(function(msg){
         console.log(msg);

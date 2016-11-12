@@ -52,30 +52,9 @@
         </div>
     </div>
 
-    {{--statuses--}}
-    <div class="col-sm-4">
-        <div class="row">
-            <h4>Status</h4>
-        </div>
-        @foreach($statuses as $status)
-            <div class="row update-row">
-                <div class="form-group">
-                    <label class="sr-only" for="name">Name</label>
-                    <input type="text" class="form-control" id="name" value="{{ $status->name }}">
-                </div>
-                <button type="button" id="{{ $status->id }}" class="btn btn-default update-lists" data-type="status">Update</button>
-            </div>
-        @endforeach
-        <div class="row reps-add">
-            <div class="form-group">
-                <label class="sr-only" for="name">Name</label>
-                <input type="text" class="form-control" id="name"  placeholder="Alive">
-            </div>
-            <button type="button" id="0" class="btn btn-info update-lists" data-type="status">Add</button>
-        </div>
     </div>
-        </div>
-        <div class="row row-extra-pad">
+
+    <div class="row row-extra-pad">
 
     {{--property_types--}}
     <div class="col-sm-4">
@@ -163,6 +142,37 @@
                 {{--<button type="button" id="0" class="btn btn-info update-lists" data-type="feature">Add</button>--}}
             {{--</div>--}}
         </div>
-    </form>
+
+        {{--statuses--}}
+        <div class="col-sm-6">
+            <div class="row">
+                <h4>Status</h4>
+            </div>
+            @foreach($statuses as $status)
+                <div class="row update-row">
+                    <div class="form-group">
+                        <label class="sr-only" for="name">Name</label>
+                        <input type="text" class="form-control" id="name" value="{{ $status->name }}">
+                    </div>
+                    <div class="form-group">
+                        <label class="sr-only" for="order">Display Order</label>
+                        <input type="text" class="form-control" id="order" value="{{ $status->display_order }}" placeholder="display order">
+                    </div>
+                    <button type="button" id="{{ $status->id }}" class="btn btn-default update-lists" data-type="status">Update</button>
+                </div>
+            @endforeach
+            <div class="row reps-add">
+                <div class="form-group">
+                    <label class="sr-only" for="name">Name</label>
+                    <input type="text" class="form-control" id="name"  placeholder="Alive">
+                </div>
+                <div class="form-group">
+                    <label class="sr-only" for="order">Display Order</label>
+                    <input type="text" class="form-control" id="order" placeholder="display order">
+                </div>
+                <button type="button" id="0" class="btn btn-info update-lists" data-type="status">Add</button>
+            </div>
+        </div>
+</form>
 </div>
 @endsection

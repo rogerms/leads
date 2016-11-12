@@ -68,7 +68,7 @@ class HomeController extends Controller
     {
         $this->authorize('edit-user');
         $takers = TakenBy::all();
-        $statuses = Status::all();
+        $statuses = Status::OrderBy('display_order')->get();
         $sources = Source::all();
         $features = Feature::all();
 
@@ -109,6 +109,9 @@ class HomeController extends Controller
         if($obj != null)
         {
             $obj->name = $request->name;
+            if($request->type == 'status')
+                $obj->display_order = $request->order;
+
             $result = $obj->save();
         }
         elseif (!empty($table_name)) {

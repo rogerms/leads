@@ -193,7 +193,6 @@ class LeadController extends Controller
             $week_count = 0;
             $leads_count = count($leads);
 
-
             foreach($leads as $lead)
             {
                 if(!isset($status_count[$lead->status_name]))
@@ -208,6 +207,7 @@ class LeadController extends Controller
                 $tomorrow_count += $lead->tomorrow;
                 $week_count += $lead->week;
             }
+
             $perPage = 15;
             $currentPage = $request->page?:1;
             $currentItems = array_slice($leads, $perPage * ($currentPage - 1), $perPage);
@@ -238,7 +238,7 @@ class LeadController extends Controller
         }
         else
         {
-            $status = DB::select("SELECT name, 0 as count FROM status");
+            $status = DB::select("SELECT name, 0 as count FROM status ORDER BY display_order");
             $reps = DB::select("SELECT name, 0 as count FROM sales_reps");
 
             return view('lead.index', ['leads' => [], 'status_count' => $status, 'reps_count' => $reps]);
