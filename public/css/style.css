@@ -795,3 +795,8 @@ font-family: FontAwesome;
 .cbox-valign{
     margin-top: 30px;
 }
+.context-menu-button{
+    right: -20px;
+    bottom: -15px;
+    position: relative;
+}

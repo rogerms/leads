@@ -64,6 +64,8 @@ $(function () {
 
     $('#drawings').on("contextmenu", '.sketch-nail', showContextMenu);
 
+    $('.sketch-group').on('click', '.context-menu-button', showContextMenuOption);
+
     $("#contextMenu").on("click", "a", runContextMenuAction);
 
     $('ul.j-pager li').on('click', 'a', updatePagination);
@@ -691,6 +693,22 @@ function getRemovals(form)
     });
 
     return removals;
+}
+
+function showContextMenuOption(e) {
+    e.preventDefault();
+    var $contextMenu = $("#contextMenu");
+    var drawing = $(this).parents('.sketch-nail');
+
+    $contextMenu.data('id', drawing.attr('id'));
+    $contextMenu.data('target', drawing);
+
+    $contextMenu.css({
+        display: "block",
+        left: e.pageX,
+        top: e.pageY
+    });
+    return false;
 }
 
 function showContextMenu ()
