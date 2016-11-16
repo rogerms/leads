@@ -4,7 +4,9 @@
 
 
 @section('content')
+    <div class="container">
     @include('partials.feedback')
+    </div>
     {{--<div>--}}
       {{--<div class="form-group ">--}}
           {{--<label for="searchtext">Search</label>--}}
@@ -16,10 +18,11 @@
       {{--@endcan--}}
     {{--</div>--}}
 
+  <div class="fullscreen-container">
   <div class="row row-sidebar row-offcanvas row-offcanvas-right">
-      <div class="col-sm-9">
+      <div class="col-sm-10" style="overflow: auto;" >
           <p class="pull-right visible-xs">
-              <button type="button" class="btn btn-primary btn-xs" data-toggle="offcanvas">Toggle nav</button>
+              <button type="button" class="btn btn-primary btn-xs" data-toggle="offcanvas">Toggle bar</button>
           </p>
           <div id="table-holder">
               <table  class="table table-striped table-hover table-bordered" id="leadstb">
@@ -50,7 +53,7 @@
           </div>
           <div class="pagelinks"></div>
       </div>
-      <div class="col-sm-3 sidebar-offcanvas" style="" id="sidebar">
+      <div class="col-sm-2 sidebar-offcanvas" style="" id="sidebar">
           <div class="list-group">
               <a href="#" id="statusa" class="list-group-item list-header">Status</a>
               @foreach($status_count as $sta)
@@ -101,7 +104,8 @@
       </div><!--/.sidebar-offcanvas-->
 
   </div>
-{{--{!! $leads->render() !!}--}}
+  </div>
+    {{--{!! $leads->render() !!}--}}
 @endsection
 <!-- #7D1935
 #4A96AD

@@ -3,6 +3,7 @@
 @section('title', 'Details')
 
 @section('content')
+<div class="container">
     @include('partials.feedback')
 <div class="panel-group">
     <form>
@@ -243,11 +244,14 @@
         </div>
     </form>
 </div>
+</div>
 <!--     Jobs start here ************************************************************************************************************-->
 @can('read')
+<div class="container inner-container-top">
     @foreach($lead->jobs as $job)
         @include('partials.job')
     @endforeach
+</div>
 @endcan
     @include('partials.modals')
     @include('partials.confirmdlg')

@@ -323,10 +323,13 @@ a.list-header, a.list-header:focus, a.list-header:hover{
 }
 
 .list-header {
-    margin-top: 15px;
+
     background-color: #3B3738;
     padding-top: 5px;
     padding-bottom: 5px;
+}
+.list-group .list-header:not(:first-child) {
+    margin-top: 15px;
 }
 
 .thin-item
@@ -804,4 +807,13 @@ font-family: FontAwesome;
     right: -20px;
     bottom: -15px;
     position: relative;
+}
+.inner-container-top{
+    padding-top:1px !important;
+}
+
+.fullscreen-container{
+    margin-left:15px;
+    margin-right: 15px;
+    margin-top: -30px;
 }

@@ -3,7 +3,9 @@
 @section('title', 'Update Selection Lists')
 
 @section('content')
+<div class="container">
     @include('partials.feedback')
+
 <div class="row">
     <form class="form-inline" action="">
         <div class="row row-extra-bm-pad">
@@ -208,5 +210,6 @@
         </div>
 
 </form>
+</div>
 </div>
 @endsection

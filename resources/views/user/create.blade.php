@@ -1,8 +1,9 @@
 @extends('layouts.master')
 
 @section('content')
-    @include('partials.feedback')
 <div class="container">
+    @include('partials.feedback')
+
     <div class="row auth-form">
         <div class="col-md-8 col-md-offset-2">
             <div class="panel panel-default">

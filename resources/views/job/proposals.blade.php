@@ -3,6 +3,7 @@
 @section('title', 'Proposal Notes')
 
 @section('content')
+<div class="container">
 
     @foreach($props as $prop)
     <div class="panel panel-default">
@@ -16,4 +17,5 @@
     </div>
     @endforeach
 
+</div>
 @endsection

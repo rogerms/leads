@@ -3,6 +3,7 @@
 @section('title', 'Pavers Style')
 
 @section('content')
+<div class="container">
     @include('partials.feedback')
 
 <div class="panel-group">
@@ -27,6 +28,7 @@
             </div>
         </div>
     </form>
+</div>
 </div>
     @include('partials.templates')
 @stop

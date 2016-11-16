@@ -1,6 +1,7 @@
 @extends('layouts.master')
 
 @section('content')
+<div class="container">
     <form action="/report/upload"
           enctype="multipart/form-data" method="post">
         {!! csrf_field() !!}
@@ -16,4 +17,5 @@
         {{--</div>--}}
         <button type="submit" class="btn btn-default">Upload</button>
     </form>
+</div>
 @stop

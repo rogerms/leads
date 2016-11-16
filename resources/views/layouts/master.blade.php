@@ -133,10 +133,10 @@
     <div class="alert-dlg">The note was deleted successfully</div>
 
     <!-- Begin page content -->
-    <div class="container">
+    {{--<div class="container">--}}
 
          @yield('content')
-    </div>
+    {{--</div>--}}
 
     <footer class="footer">
       <div class="container">

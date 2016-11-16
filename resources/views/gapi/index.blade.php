@@ -1,6 +1,7 @@
 @extends('layouts.master')
     @section('title', 'Google API Auth')
-    @section('content')
+@section('content')
+    <div class="container">
         <h4>Google Calendar Authentication</h4>
     @include('partials.feedback')
 
@@ -10,4 +11,5 @@
     @if(Session::has('access_token'))
         <br><a href="{{ URL::to('gapi/logout') }}">Logout</a>
     @endif
+    </div>
 @endsection

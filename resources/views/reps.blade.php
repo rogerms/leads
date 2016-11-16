@@ -3,6 +3,8 @@
 @section('title', 'Update Reps Info')
 
 @section('content')
+<div class="container">
+
     @include('partials.feedback')
 <div class="row">
     <div class="row">
@@ -53,5 +55,7 @@
             <button type="button" id="0" class="btn btn-info update-rep">Add</button>
         </div>
     </form>
+</div>
+
 </div>
 @endsection

@@ -4,7 +4,7 @@
 
 
 @section('content')
-
+    <div class="container">
     <div class="row row-sidebar row-offcanvas row-offcanvas-right">
         <div class="col-xs-12 col-sm-9">
             <p class="pull-right visible-xs">
@@ -28,6 +28,7 @@
             <div class="jobs-pagelinks"></div>
         </div>
 
+    </div>
     </div>
 @endsection
             <!-- #7D1935

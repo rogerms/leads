@@ -3,6 +3,7 @@
 @section('title', 'List of users')
 
 @section('content')
+    <div class="container">
     @include('partials.feedback')
     <h4>Users</h4>
             <table class="table table-striped" >
@@ -25,4 +26,5 @@
             </tr>
         @endforeach
             </table>
+    </div>
 @endsection

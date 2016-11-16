@@ -3,6 +3,7 @@
 @section('title', 'Update Reps Info')
 
 @section('content')
+<div class="container">
     @include('partials.feedback')
     <textarea>
       <p>
@@ -29,4 +30,5 @@
       </ol>
       <p>&nbsp;</p>
     </textarea>
+</div>
 @endsection

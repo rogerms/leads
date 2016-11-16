@@ -2,8 +2,9 @@
 
 @section('title', 'Create Lead')
 
-@section('content')
 
+@section('content')
+<div class="container">
     <div class="panel-group">
     <form action='/store' method="POST">
         {!! csrf_field() !!}
@@ -128,4 +129,5 @@
         </div>
     </form>
     </div>
+</div>
 @stop
