@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 
 use App\Phone;
+use App\Progress;
 use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Lead;
@@ -12,6 +13,7 @@ use App\Source;
 use App\Status;
 use App\SalesRep;
 use App\Note;
+use App\Label;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 //use Input; worked before adding upload function
@@ -61,7 +63,9 @@ class LeadController extends Controller
             'property_types' => DB::table('property_types')->get(),
             'customer_types' => DB::table('customer_types')->get(),
             'job_types' => DB::table('job_types')->Orderby('name', 'asc')->get(),
-            'features' => DB::table('features')->Orderby('name', 'asc')->get()
+            'features' => DB::table('features')->Orderby('name', 'asc')->get(),
+            'labels' => Label::orderBy('display_order')->get()
+
         ];
 
         if($request->fmt == 'json')
@@ -98,6 +102,13 @@ class LeadController extends Controller
             sales_reps.name as sales_rep_name,
             taken_by.name as taken_by_name,
             sources.name as source_name,
+            GROUP_CONCAT(DISTINCT labels.name ORDER BY labels.display_order SEPARATOR ', ') as job_labels,
+            GROUP_CONCAT(DISTINCT labels.name ORDER BY labels.display_order SEPARATOR ',') as job_labels2,
+			DATE_FORMAT(jobs.start_date, '%e-%b') as start_date,
+            GROUP_CONCAT(DISTINCT DATE_FORMAT(jobs.date_sold, '%e-%b') SEPARATOR ' ') as date_sold,
+            GROUP_CONCAT(DISTINCT jobs.size SEPARATOR ' ') as job_size,
+            GROUP_CONCAT(DISTINCT material_rb.qty, '' SEPARATOR ' ')  as rb_qty,
+            GROUP_CONCAT(DISTINCT material_sand.qty, '' SEPARATOR ' ') as sand_qty,
             GROUP_CONCAT(DISTINCT jobs.id ORDER BY jobs.id SEPARATOR ' ') as job_ids,
             IF(DATE(appointment) = DATE(NOW()),1,0) today,
             IF(DATE(appointment) = ADDDATE(DATE(NOW()),1),1,0) tomorrow,
@@ -110,6 +121,10 @@ class LeadController extends Controller
             LEFT JOIN sales_reps ON sales_reps.id = leads.sales_rep_id
             LEFT JOIN taken_by ON taken_by.id = leads.taken_by_id
             LEFT JOIN sources ON sources.id = leads.source_id
+            LEFT JOIN job_label ON job_label.job_id = jobs.id and job_label.deleted_at is null
+            LEFT JOIN labels ON labels.id = job_label.label_id
+            LEFT JOIN job_materials as material_rb ON material_rb.job_id = jobs.id and material_rb.name='rb'
+            LEFT JOIN job_materials as material_sand ON material_sand.job_id = jobs.id and material_sand.name='sand'
             WHERE 1";
 
             if($request->searchby == 'Tag')
@@ -150,6 +165,11 @@ class LeadController extends Controller
                 $query .= " AND sales_reps.name IN (".implode(",", $request->reps).")";
             }
 
+            if(count($request->labels) > 0)
+            {
+                $query .= " AND labels.name IN (".implode(",", $request->labels).")";
+            }
+
             if($request->week == '1')
             {
                 $query .= " AND appointment >= DATE(now()) AND appointment < ADDDATE(DATE(NOW()), INTERVAL 1 WEEK)";
@@ -188,6 +208,7 @@ class LeadController extends Controller
             $leads = DB::select($query);
             $status_count = [];
             $reps_count = [];
+            $labels_count = [];
             $today_count = 0;
             $tomorrow_count = 0;
             $week_count = 0;
@@ -197,8 +218,18 @@ class LeadController extends Controller
             {
                 if(!isset($status_count[$lead->status_name]))
                     $status_count[$lead->status_name] = 0;
+
                 if(!isset($reps_count[$lead->sales_rep_name]))
                     $reps_count[$lead->sales_rep_name] = 0;
+
+                $labels = explode(",", $lead->job_labels2);
+                foreach($labels as $label)
+                {
+                    if(!isset($labels_count[$label]))
+                        $labels_count[$label] = 0;
+
+                    $labels_count[$label]++;
+                }
 
                 $status_count[$lead->status_name]++;
                 $reps_count[$lead->sales_rep_name]++;
@@ -208,11 +239,11 @@ class LeadController extends Controller
                 $week_count += $lead->week;
             }
 
-            $perPage = 15;
+            $perPage = 30;
             $currentPage = $request->page?:1;
             $currentItems = array_slice($leads, $perPage * ($currentPage - 1), $perPage);
 
-            $leads = new LengthAwarePaginator($currentItems, $leads_count, 15, $currentPage);
+            $leads = new LengthAwarePaginator($currentItems, $leads_count, 30, $currentPage);
 
 //            dd($leads);\
 
@@ -226,6 +257,7 @@ class LeadController extends Controller
                 'links' => sprintf('<div>%s</div>', $leads->links()),
                 'status' => $status_count,
                 'reps' => $reps_count,
+                'labels' => $labels_count,
                 'today' => $today_count,
                 'tomorrow' => $tomorrow_count,
                 'week' => $week_count,
@@ -240,8 +272,15 @@ class LeadController extends Controller
         {
             $status = DB::select("SELECT name, 0 as count FROM status ORDER BY display_order");
             $reps = DB::select("SELECT name, 0 as count FROM sales_reps");
+            $labels = DB::select("SELECT name, 0 as count FROM labels ORDER BY display_order");
 
-            return view('lead.index', ['leads' => [], 'status_count' => $status, 'reps_count' => $reps]);
+            return view('lead.index',
+                [
+                    'leads' => [],
+                    'status_count' => $status,
+                    'reps_count' => $reps,
+                    'labels_count' => $labels
+                ]);
         }
 
 /*         $admins = DB::table('users')
@@ -267,6 +306,60 @@ class LeadController extends Controller
                     'sources' => Source::all()
                 ]);
     }
+
+    public function delete_label(Request $request)
+    {
+        $this->authorize('edit');
+		//todo: change db:: to joblabel model
+        //-- hard delete
+        //$deleted = DB::update('delete from job_progress where job_id=? and progress_id=?', [$request->jobid, $request->id]);
+        //soft delete
+        $deleted = DB::update('update job_label set deleted_at=? where id=?',
+            [
+                date('Y-m-d H:i:s'),
+                $request->id
+            ]);
+
+        return response()->json(['result' => $deleted]);
+    }
+
+    public function update_label(Request $request)
+    {
+        $this->authorize('edit');
+        $result = true;
+        $now = date('Y-m-d H:i:s');
+
+        if($request->add)
+        foreach($request->add as $id)
+        {
+            $affected = DB::table('job_label')->insert(
+                [
+                    'job_id' => $request->jobid,
+                    'label_id' => $id,
+                    'created_at' => $now
+                ]);
+            $result &= $affected > 0;
+        }
+
+        if($request->remove)
+        foreach ($request->remove as $id)
+        {
+            $deleted = DB::update('update job_label set deleted_at=? where label_id=? and job_id=?',
+                [
+                    $now,
+                    $id,
+                    $request->jobid
+                ]);
+            $result &= $deleted > 0;
+        }
+
+        $labels = DB::select('select j.id, j.label_id, j.job_id, p.name from job_label j join labels p on p.id=j.label_id where job_id=? and deleted_at is null',
+            [$request->jobid]);
+
+        return response()->json(['result' => $result, 'labels' => $labels]);
+    }
+
+
 
     public function api_create()
     {

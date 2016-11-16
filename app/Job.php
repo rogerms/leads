@@ -41,4 +41,9 @@ class Job extends Model
     {
         return $this->hasOne('App\Proposal');
     }
+
+    public function labels()
+    {
+        return $this->belongsToMany('App\Label')->withPivot('id')->wherePivot('deleted_at', null);
+    }
 }

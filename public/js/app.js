@@ -48,6 +48,12 @@ $(function () {
 
     $('.sketch-group').on('click', '.sketch-tbn', viewImage);
 
+    $('.job-labels').on('click', '.job-label-btn', deleteJobLabel);
+
+    $('.label-menu-apply').on('click', updateJobLabel);
+
+    $('.label-menu-item').on('click', labelMenuClicked);
+
 	$('#searchbt').on('click', searchLeads);
 
     $('#searchtx').keypress(seachLeadsEnter);
@@ -826,6 +832,115 @@ function viewImage(event){
     modal.modal('show');
 }
 
+function deleteJobLabel(){
+    var button =  $(this).parent('button');
+    var id = button.attr('id');
+
+    $.ajax({
+        url: "/label/delete",
+        data: { id: id},
+        type: 'POST'
+    }).done(function (msg) {
+        if (msg.result > 0) {
+            //showResult('label removed');
+            var label_id = button.data('label');
+            var menu_item = button.parents('form').find('.label-menu-item#'+label_id);
+            //uncheck it on the dropdown list
+            menu_item.prop('checked', false);
+            button.remove();
+        }
+    }).fail(function (){
+        console.log('Error trying to delete label');
+    });
+}
+
+function updateJobLabel(event) {
+
+    var applybtn = $(this);
+    var form = $(this).parents('form');
+    var menu = applybtn.parents('.label-menu');
+
+    //only sending changes
+    var changed = getChangedLabels(menu);
+
+    $.ajax({
+        url: "/label/update",
+        data: {add: changed.add, remove: changed.remove, jobid: applybtn.attr('id')},
+        type: 'POST'
+    }).done(function (msg) {
+        console.log(msg);
+        if (msg.result == true) {
+
+            var joblabels = form.find('.job-labels');
+            joblabels.find('button').remove();//empty list
+
+            $.each(msg.labels, function (index, label) {
+                joblabels.append(jobLabelButton(label.id, label.progress_id, label.name));
+            });
+            applybtn.addClass('disabled');
+        }
+    }).fail(function (){
+        console.log('Error trying to update job label!', true);
+    });
+}
+
+function getChangedLabels(menu)
+{
+    var add = [];
+    var remove = [];
+    var items = menu.find('.label-menu-item');
+    items.each(function(){ //loop all menu items
+        var checkbox = $(this);
+        var checked = checkbox.val() == 'checked';//original value
+
+        if(checked !== checkbox.prop('checked'))//original and now values
+        {
+            var id = checkbox.attr('id');
+            if(checked === true)//it was true before -- remove from db
+            {
+                remove.push(id);
+                checkbox.val(''); //update new value
+            }
+            else
+            {
+                add.push(id);//
+                checkbox.val('checked'); //update new value
+            }
+        }
+    });
+    return {add: add, remove: remove};
+}
+
+function jobLabelButton(id, labelid, name)
+{
+    return '<button type="button" style="margin-left:4px;" class="btn btn-info btn-xs" id="'+id+
+        '" data-label="'+labelid+'" >'+name+
+        '<span class="job-label-btn" aria-hidden="true">X</span></button>';
+}
+
+function labelMenuClicked(event) {
+    event.stopPropagation();
+
+    var menu = $(this).parents('.label-menu');
+    var haschanges = false;
+
+    menu.find('.label-menu-item').each(function(){ //loop all menu items
+        var checkbox = $(this);
+        var checked = checkbox.val() == 'checked';
+        if(checked !== checkbox.prop('checked'))
+        {
+            haschanges = true;
+            return false; //break out of the loop
+        }
+    });
+
+    var applybtn = menu.find('.label-menu-apply');
+    if(haschanges == true)
+        applybtn.removeClass('disabled');
+    else
+        applybtn.addClass('disabled');
+}
+
 function tableRowGoto () {
     window.location.href = "/lead/" + $(this).data('id');
     //open in a new tab
@@ -1371,6 +1486,7 @@ function searchLeads(event, url) {
                 statuses: getFilters('status_count'),
                 reps: getFilters('reps_count'),
                 appts: getFilters('appts_count'),
+                labels: getFilters('labels_count'),
                 today: $('input[name="today"]:checked').length,
                 tomorrow: $('input[name="tomorrow"]:checked').length,
                 week: $('input[name="week"]:checked').length,
@@ -1411,14 +1527,25 @@ function searchLeads(event, url) {
                 //console.log(result.status[value]);
             });
 
+            $('[name="labels_count"]').each(function () {
+                var value = $(this).val();
+                if(result.labels[value] == undefined)
+                {
+                    $(this).siblings('.badge').text(0);
+                }
+                else {
+                    $(this).siblings('.badge').text(result.labels[value]);
+                }
+            });
+
             $('input[name="today"]').siblings('.badge').text(result.today);
             $('input[name="tomorrow"]').siblings('.badge').text(result.tomorrow);
             $('input[name="week"]').siblings('.badge').text(result.week);
 
             if(!hasUrl)
             showResult('Total: ' + result.count + ' leads found');
-            console.log(result.status);
-            console.log(result.reps);
+            // console.log(result.status);
+            // console.log(result.reps);
             processingSearch = false;
         })
         .fail(function () {

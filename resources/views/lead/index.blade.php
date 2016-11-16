@@ -17,7 +17,7 @@
     {{--</div>--}}
 
   <div class="row row-sidebar row-offcanvas row-offcanvas-right">
-      <div class="col-xs-12 col-sm-9">
+      <div class="col-sm-9">
           <p class="pull-right visible-xs">
               <button type="button" class="btn btn-primary btn-xs" data-toggle="offcanvas">Toggle nav</button>
           </p>
@@ -25,13 +25,22 @@
               <table  class="table table-striped table-hover table-bordered" id="leadstb">
                   <thead>
                   <tr>
-                      <th>Customer Name</th>
-                      <th>Phone</th>
-                      <th>Street</th>
-                      <th>City</th>
-                      <th>Appointment</th>
-                      <th>Sales Rep</th>
                       <th>Status</th>
+                      <th>Customer Name</th>
+                      <th>City</th>
+                      <th>Address</th>
+                      <th>Phone</th>
+                      <th>Appointment</th>
+                      <th>Rep</th>
+
+                      <th>S/F</th>
+                      <th>Pavers</th>
+                      <th>RB</th>
+                      <th>Sand</th>
+                      <th>Date Sold</th>
+                      <th>Start Date</th>
+                      <th>Skid</th>
+                      <th>Notes</th>
                   </tr>
                   </thead>
                   <tbody>
@@ -41,7 +50,7 @@
           </div>
           <div class="pagelinks"></div>
       </div>
-      <div class="col-xs-6 col-sm-3 sidebar-offcanvas" style="" id="sidebar">
+      <div class="col-sm-3 sidebar-offcanvas" style="" id="sidebar">
           <div class="list-group">
               <a href="#" id="statusa" class="list-group-item list-header">Status</a>
               @foreach($status_count as $sta)
@@ -77,6 +86,16 @@
                   Seven Days
                   <span class="badge">0</span>
               </a>
+
+              {{--jobs progress--}}
+              <a href="#" class="list-group-item list-header">Jobs Progress</a>
+              @foreach($labels_count as $label)
+                  <a  class="list-group-item thin-item">
+                      <input class="tbfilter" type="checkbox" name="labels_count" value="{{ $label->name  }}" aria-label="labels">
+                      {{ $label->name }}
+                      <span class="badge">{{ $label->count }}</span>
+                  </a>
+              @endforeach
 
           </div>
       </div><!--/.sidebar-offcanvas-->

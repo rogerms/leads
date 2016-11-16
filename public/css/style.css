@@ -757,6 +757,11 @@ font-family: FontAwesome;
 .update-row{
     padding-bottom: 5px;
 }
+
+.update-div{
+    padding-bottom: 15px;
+}
+
 .input-btn-margin{
     margin-top: 25px;
 }

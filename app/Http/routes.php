@@ -83,6 +83,7 @@ Route::group(['prefix' => 'api', 'middleware' => 'auth:api'], function()
     Route::get('proposal/{id}', 'JobController@show_proposal');
 
     Route::get( 'print/job/{id}', 'JobController@print_preview');
+
 });
 
 
@@ -131,6 +132,10 @@ Route::group(['middleware' => 'web'], function () {
     Route::post('list/update/{id}', 'HomeController@update_list');
 
     Route::get('sqlt', 'HomeController@sqltest');
+
+    Route::post( 'label/delete', 'LeadController@delete_label');
+
+    Route::post( 'label/update', 'LeadController@update_label');
 
     
 //----------------------------------------------------

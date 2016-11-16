@@ -8,6 +8,7 @@ use App\Http\Requests;
 use App\Lead;
 use App\Source;
 use App\Status;
+use App\Label;
 use App\TakenBy;
 use Illuminate\Http\Request;
 use App\SalesRep;
@@ -69,6 +70,7 @@ class HomeController extends Controller
         $this->authorize('edit-user');
         $takers = TakenBy::all();
         $statuses = Status::OrderBy('display_order')->get();
+        $labels = Label::OrderBy('display_order')->get();
         $sources = Source::all();
         $features = Feature::all();
 
@@ -76,7 +78,7 @@ class HomeController extends Controller
         $customer_types = DB::table('customer_types')->get();
         $job_types = DB::table('job_types')->get();
 
-        return view('lists', compact('takers', 'statuses', 'sources', 'property_types', 'customer_types', 'job_types', 'features'));
+        return view('lists', compact('takers', 'statuses', 'sources', 'property_types', 'customer_types', 'job_types', 'features', 'labels'));
     }
 
     public  function update_list(Request $request, $id)
@@ -86,12 +88,16 @@ class HomeController extends Controller
         $obj = null;
         $table_name =  null;
         $result = false;
+        $action = "Updated";
         if(empty($request->name)) return false;
 
         switch ($request->type)
         {
             case 'status':
                 $obj = Status::findOrNew($id);
+                break;
+            case 'label':
+                $obj = Label::findOrNew($id);
                 break;
             case 'takenby':
                 $obj = TakenBy::findOrNew($id);
@@ -109,7 +115,7 @@ class HomeController extends Controller
         if($obj != null)
         {
             $obj->name = $request->name;
-            if($request->type == 'status')
+            if($request->order != null)
                 $obj->display_order = $request->order;
 
             $result = $obj->save();
@@ -119,14 +125,15 @@ class HomeController extends Controller
                 $result = DB::table($table_name)->insert(
                     ['name' => $request->name, 'updated_at' => date("Y-m-d H:i:s")]
                 );
+                $action = "Created";
             } else {
                 $result = DB::table($table_name)
                     ->where('id', $id)
                     ->update(['name' => $request->name, 'updated_at' => date("Y-m-d H:i:s")]);
             }
         }
-        
-        $message = 'Item Created/Updated successfully';
+
+        $message = sprintf('Item %s successfully', $action);
         Helper::flash_message($message, $result);
         return response()->json($message);
     }

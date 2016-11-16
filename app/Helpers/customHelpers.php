@@ -200,14 +200,38 @@
     }
 
     if(!function_exists('isChecked'))
-	{
-		function isChecked($value)
+    {
+        function isChecked($value)
         {
             if($value == null) return '';
-			if($value) 
-				return 'checked';
-			return '';
-		}
+            if($value)
+                return 'checked';
+            return '';
+        }
+    }
+
+    if(!function_exists('isLabelChecked'))
+    {
+        function isLabelChecked($label_id, $ids)
+        {
+            if(in_array($label_id, $ids)) return 'checked';
+            return '';
+        }
+    }
+
+    if(!function_exists('labelIds'))
+    {
+        function labelIds($job_progress)
+        {
+            if(count($job_progress) == 0) return [];
+
+            $result = [];
+            foreach ($job_progress as $item)
+            {
+                $result[] = $item['id'];
+            }
+            return $result;
+        }
     }
 
     if(!function_exists('isSelected'))

@@ -1,9 +1,16 @@
 <div class="panel-group">
     <form id="{{$job->id}}">
         <div class="row row-extra-pad">
-            <h2 id="job-num"> {{ \app\Helpers\Helper::show_job_num($job) }} </h2>
-            <div class="last-update" id="{{ $job->id }}">
-                <span>Last Updated: </span><span>{{ format_datetime($job->updated_at) }}</span>
+            <div class="col-sm-3"><h2 id="job-num"> {{ \app\Helpers\Helper::show_job_num($job) }} </h2></div>
+            <div class="col-sm-9" >
+                <div class="pull-right job-labels">
+                @foreach($job->labels as $label)
+                    <!-- id = job_labels.id  data-label=job_labels.label_id  -->
+                    <button type="button" class="btn btn-info btn-xs" id="{{ $label->pivot->id }}" data-label="{{ $label->id }}" >{{ $label->name}}
+                        <span class="job-label-btn" aria-hidden="true">X</span>
+                    </button>
+                @endforeach
+                </div>
             </div>
         </div>
         <div class="row">
@@ -272,8 +279,35 @@
                 </ul>
             </div>
             @endcan
-        </div>
 
+            {{-- job progress --}}
+            @can('edit-job')
+                    <!-- Split button -->
+                <div class="btn-group dropup">
+                    <a role="button" @can('edit-job', $job) href="/print/job/{{$job->id}}" @endcan class="btn btn-default" id="print-job">Job Progress</a>
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span class="caret"></span>
+                        <span class="sr-only">Toggle Button</span>
+                    </button>
+                    <ul class="dropdown-menu label-menu">
+                        <?php $job_labels_ids = labelIds($job->labels) ?>
+                        @foreach($labels as $label)
+                            <li>
+                                <div class="checkbox">
+                                      <label><input type="checkbox" class="label-menu-item" id="{{$label->id }}" value="{{ isLabelChecked($label->id, $job_labels_ids) }}" {{ isLabelChecked($label->id, $job_labels_ids) }} >{{ $label->name }}</label>
+                                </div>
+                            </li>
+                        @endforeach
+                        <li role="separator" class="divider"></li>
+                        <li><a id="{{$job->id}}" class="btn label-menu-apply disabled" >Apply</a></li>
+                    </ul>
+                </div>
+                @endcan
+{{--               {{ dd($job->progress[0]->pivot->id ) }}--}}
+        </div>
+        <div class="last-update" id="{{ $job->id }}">
+                <span>Last Updated: </span><span>{{ format_datetime($job->updated_at) }}</span>
+        </div>
     </form>
     <div id="pdfviewer"></div>
 </div>
