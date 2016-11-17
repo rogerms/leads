@@ -210,11 +210,11 @@ class LeadController extends Controller
             $leads = DB::select($query);
             $counters = $this->process_counters($leads);
 
-            $perPage = 30;
+            $perPage = 20;
             $currentPage = $request->page?:1;
             $currentItems = array_slice($leads, $perPage * ($currentPage - 1), $perPage);
 
-            $leads = new LengthAwarePaginator($currentItems, $counters['leads'], 30, $currentPage);
+            $leads = new LengthAwarePaginator($currentItems, $counters['leads'], $perPage, $currentPage);
 
             //** notes */
             $this->process_job_notes($leads);

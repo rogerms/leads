@@ -19,8 +19,8 @@
     {{--</div>--}}
 
   <div class="fullscreen-container">
-  <div class="row row-sidebar row-offcanvas row-offcanvas-right">
-      <div class="col-sm-10" style="overflow: auto;" >
+  <div class="row row-sidebar row-offcanvas row-offcanvas-right" style="min-height:100vh;">
+      <div class="col-xs-10" style="overflow-x: auto; min-height: 90vh" >
           <p class="pull-right visible-xs">
               <button type="button" class="btn btn-primary btn-xs" data-toggle="offcanvas">Toggle bar</button>
           </p>
@@ -53,7 +53,7 @@
           </div>
           <div class="pagelinks"></div>
       </div>
-      <div class="col-sm-2 sidebar-offcanvas" style="" id="sidebar">
+      <div class="col-xs-2 sidebar-offcanvas" id="sidebar">
           <div class="list-group">
               <a href="#" id="statusa" class="list-group-item list-header">Status</a>
               @foreach($status_count as $sta)
