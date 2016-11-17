@@ -107,6 +107,7 @@ class LeadController extends Controller
 			DATE_FORMAT(jobs.start_date, '%e-%b') as start_date,
             GROUP_CONCAT(DISTINCT DATE_FORMAT(jobs.date_sold, '%e-%b') SEPARATOR ' ') as date_sold,
             GROUP_CONCAT(DISTINCT jobs.size SEPARATOR ' ') as job_size,
+            GROUP_CONCAT(DISTINCT j_notes.note SEPARATOR '||') as job_notes,
             GROUP_CONCAT(DISTINCT material_rb.qty, '' SEPARATOR ' ')  as rb_qty,
             GROUP_CONCAT(DISTINCT material_sand.qty, '' SEPARATOR ' ') as sand_qty,
             GROUP_CONCAT(DISTINCT jobs.id ORDER BY jobs.id SEPARATOR ' ') as job_ids,
@@ -116,7 +117,7 @@ class LeadController extends Controller
             FROM leads
             LEFT JOIN notes ON notes.lead_id = leads.id
             LEFT JOIN jobs ON jobs.lead_id=leads.id
-            LEFT JOIN notes j_notes ON j_notes.job_id = jobs.id
+            LEFT JOIN notes j_notes ON j_notes.job_id = jobs.id AND j_notes.deleted_at is null
             LEFT JOIN status ON status.id = leads.status_id
             LEFT JOIN sales_reps ON sales_reps.id = leads.sales_rep_id
             LEFT JOIN taken_by ON taken_by.id = leads.taken_by_id
@@ -191,60 +192,32 @@ class LeadController extends Controller
             if($request->sortby)
             {
                 $sortby = str_replace(
-                    ['customer name', 'sales rep', 'status'],
-                    ['customer_name', 'sales_reps.name', 'status.name'],
+                    ['customer name', 'rep', 'status', 'address', 's/f','pavers','rb','sand','date sold','start date','skid','notes'],
+                    ['customer_name', 'sales_reps.name', 'labels.display_order', 'street','size', '','material_rb.qty','material_sand.qty', 'jobs.date_sold','start_date','',''],
                     strtolower($request->sortby)
                 );
 
-                $direction = ($request->sortdirection == 1)? 'ASC': 'DESC';
-                $sort = "$sortby $direction";
+                if(!empty($sortby))
+                {
+                    $direction = ($request->sortdirection == 1)? 'ASC': 'DESC';
+                    $sort = "$sortby $direction";
+                }
             }
 
             $query .= " GROUP BY leads.id ORDER BY $sort";
 
-
             //return $query;
-
             $leads = DB::select($query);
-            $status_count = [];
-            $reps_count = [];
-            $labels_count = [];
-            $today_count = 0;
-            $tomorrow_count = 0;
-            $week_count = 0;
-            $leads_count = count($leads);
-
-            foreach($leads as $lead)
-            {
-                if(!isset($status_count[$lead->status_name]))
-                    $status_count[$lead->status_name] = 0;
-
-                if(!isset($reps_count[$lead->sales_rep_name]))
-                    $reps_count[$lead->sales_rep_name] = 0;
-
-                $labels = explode(",", $lead->job_labels2);
-                foreach($labels as $label)
-                {
-                    if(!isset($labels_count[$label]))
-                        $labels_count[$label] = 0;
-
-                    $labels_count[$label]++;
-                }
-
-                $status_count[$lead->status_name]++;
-                $reps_count[$lead->sales_rep_name]++;
-
-                $today_count += $lead->today;
-                $tomorrow_count += $lead->tomorrow;
-                $week_count += $lead->week;
-            }
+            $counters = $this->process_counters($leads);
 
             $perPage = 30;
             $currentPage = $request->page?:1;
             $currentItems = array_slice($leads, $perPage * ($currentPage - 1), $perPage);
 
-            $leads = new LengthAwarePaginator($currentItems, $leads_count, 30, $currentPage);
+            $leads = new LengthAwarePaginator($currentItems, $counters['leads'], 30, $currentPage);
 
+            //** notes */
+            $this->process_job_notes($leads);
 //            dd($leads);\
 
             if($request->fmt == 'json')
@@ -255,15 +228,13 @@ class LeadController extends Controller
             return response()->json([
                 'leads' => view('partials.leads', ['leads' => $leads])->render(),
                 'links' => sprintf('<div>%s</div>', $leads->links()),
-                'status' => $status_count,
-                'reps' => $reps_count,
-                'labels' => $labels_count,
-                'today' => $today_count,
-                'tomorrow' => $tomorrow_count,
-                'week' => $week_count,
-                'count' => $leads_count,
-                'next_page' => 0,
-                'prev_page' => 1,
+                'status' => $counters['status'],
+                'reps' => $counters['reps'],
+                'labels' => $counters['labels'],
+                'today' => $counters['today'],
+                'tomorrow' => $counters['tomorrow'],
+                'week' => $counters['week'],
+                'count' => $counters['leads'],
                 'q' => $query
             ]);
 
@@ -290,6 +261,73 @@ class LeadController extends Controller
         ->paginate($this->perpage);*/
     }
 
+    private function process_job_notes($leads)
+    {
+        foreach($leads as &$lead)
+        {
+            $notes = explode('||', $lead->job_notes);
+            $paver_notes = [];
+            $other_notes = [];
+            foreach ($notes as $note) {
+                if(!$this->startsWith($note, '#'))
+                {
+                    $other_notes[] = $note;
+                }
+                else if ($this->startsWith(strtolower($note), '#paver'))
+                {
+                    $paver_notes[] = str_replace('#paver', '', $note);
+                }
+            }
+
+            $paver = implode($paver_notes, ',');
+            $note = implode($other_notes, ',');
+            $lead->job_notes = compact('paver', 'note');
+        }
+    }
+
+    private function process_counters($leads)
+    {
+        $status_count = [];
+        $reps_count = [];
+        $labels_count = [];
+        $today_count = 0;
+        $tomorrow_count = 0;
+        $week_count = 0;
+
+        foreach($leads as $lead)
+        {
+            if(!isset($status_count[$lead->status_name]))
+                $status_count[$lead->status_name] = 0;
+
+            if(!isset($reps_count[$lead->sales_rep_name]))
+                $reps_count[$lead->sales_rep_name] = 0;
+
+            $labels = explode(",", $lead->job_labels2);
+            foreach($labels as $label)
+            {
+                if(!isset($labels_count[$label]))
+                    $labels_count[$label] = 0;
+
+                $labels_count[$label]++;
+            }
+
+            $status_count[$lead->status_name]++;
+            $reps_count[$lead->sales_rep_name]++;
+
+            $today_count += $lead->today;
+            $tomorrow_count += $lead->tomorrow;
+            $week_count += $lead->week;
+        }
+        return [
+            'leads' => count($leads),
+            'status' => $status_count,
+            'labels' => $labels_count,
+            'today' => $today_count,
+            'tomorrow' => $tomorrow_count,
+            'week' => $week_count,
+            'reps' => $reps_count
+        ];
+    }
 
     /**
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
@@ -566,6 +604,10 @@ class LeadController extends Controller
          ]);
     }
 
+    private function startsWith($haystack, $needle)
+    {
+        return (0 === strpos($haystack, $needle));
+    }
 
     public function services()
     {

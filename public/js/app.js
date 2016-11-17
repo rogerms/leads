@@ -1397,6 +1397,8 @@ function updateLists()
 function sortLeads()
 {
     var title = $(this).text();
+    if(title == 'Pavers' || title == 'Skid' || title == 'Notes')
+        return;
     // if the same heading is click twice change sort direction
     sortdirection = (sortby == title)? sortdirection*-1: 1;
     sortby = title;
