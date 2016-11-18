@@ -44,6 +44,9 @@ class Job extends Model
 
     public function labels()
     {
-        return $this->belongsToMany('App\Label')->withPivot('id')->wherePivot('deleted_at', null);
+        return $this->belongsToMany('App\Label')
+            ->withPivot('id')
+            ->wherePivot('deleted_at', null)
+            ->withTimestamps();
     }
 }

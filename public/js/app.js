@@ -915,7 +915,7 @@ function jobLabelButton(id, labelid, name)
 {
     return '<button type="button" style="margin-left:4px;" class="btn btn-info btn-xs" id="'+id+
         '" data-label="'+labelid+'" >'+name+
-        '<span class="job-label-btn" aria-hidden="true">X</span></button>';
+        '<span class="job-label-btn" style="margin-left:5px;" aria-hidden="true">X</span></button>';
 }
 
 function labelMenuClicked(event) {

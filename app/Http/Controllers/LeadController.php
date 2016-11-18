@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 
+use App\Job;
 use App\Phone;
 use App\Progress;
 use Illuminate\Http\Request;
@@ -348,9 +349,8 @@ class LeadController extends Controller
     public function delete_label(Request $request)
     {
         $this->authorize('edit');
-		//todo: change db:: to joblabel model
         //-- hard delete
-        //$deleted = DB::update('delete from job_progress where job_id=? and progress_id=?', [$request->jobid, $request->id]);
+        //$deleted = DB::delete('delete from job_progress where job_id=? and progress_id=?', [$request->jobid, $request->id]);
         //soft delete
         $deleted = DB::update('update job_label set deleted_at=? where id=?',
             [
@@ -365,39 +365,25 @@ class LeadController extends Controller
     {
         $this->authorize('edit');
         $result = true;
-        $now = date('Y-m-d H:i:s');
+        $job = Job::find($request->jobid);
+
 
         if($request->add)
-        foreach($request->add as $id)
         {
-            $affected = DB::table('job_label')->insert(
-                [
-                    'job_id' => $request->jobid,
-                    'label_id' => $id,
-                    'created_at' => $now
-                ]);
-            $result &= $affected > 0;
+            $job->labels()->attach($request->add);
         }
 
-        if($request->remove)
-        foreach ($request->remove as $id)
-        {
-            $deleted = DB::update('update job_label set deleted_at=? where label_id=? and job_id=?',
-                [
-                    $now,
-                    $id,
-                    $request->jobid
-                ]);
-            $result &= $deleted > 0;
+        if($request->remove) {
+            $result &= DB::table('job_label')
+                ->where('job_id', $request->jobid)
+                ->whereIn('label_id', $request->remove)
+                ->update(['deleted_at' => DB::raw('NOW()')]);
         }
 
-        $labels = DB::select('select j.id, j.label_id, j.job_id, p.name from job_label j join labels p on p.id=j.label_id where job_id=? and deleted_at is null',
-            [$request->jobid]);
+        $labels = $job->labels()->get();
 
         return response()->json(['result' => $result, 'labels' => $labels]);
     }
-
-
 
     public function api_create()
     {
