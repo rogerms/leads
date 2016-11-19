@@ -185,15 +185,14 @@ class DrawingController extends Controller
             case 'png':
                 return 'image/png' ;
             case 'jpeg':
-                return 'image/jpeg';
             case 'jpg':
                 return 'image/jpeg';
             case 'bmp':
                 return 'image/bmp';
             case 'pdf':
-                return 'image/pdf';
+                return 'application/pdf';
             default:
-                return 'multipart/form-data';
+                return 'application/octet-stream';
         }
     }
 }

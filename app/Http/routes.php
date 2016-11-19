@@ -84,6 +84,8 @@ Route::group(['prefix' => 'api', 'middleware' => 'auth:api'], function()
 
     Route::get( 'print/job/{id}', 'JobController@print_preview');
 
+    Route::get('drawing/{filename}', 'DrawingController@show');
+
 });
 
 
