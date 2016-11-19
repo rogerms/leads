@@ -5,8 +5,8 @@
             <div class="thumbnail tbn-item visibility-{{ $drawing->selected }}"  id="dw-{{ $drawing->id }}">
                 <div class="caption ">
                     <p id="label">{{ $drawing->label }}</p>
-                    <a href="/drawings/{{$drawing->path}}" class="sketch-tbn"><i class="glyphicon glyphicon-picture"></i></a>
-                    <a href="/drawings/{{$drawing->path}}"><i class="glyphicon glyphicon-resize-full"></i></a>
+                    <a href="/drawing/{{$drawing->path}}" class="sketch-tbn"><i class="glyphicon glyphicon-picture"></i></a>
+                    <a href="/drawing/{{$drawing->path}}"><i class="glyphicon glyphicon-resize-full"></i></a>
                     <a href="#" class="context-menu-button"><span class="glyphicon glyphicon-option-horizontal" aria-hidden="true"></span></a>
                 </div>
             </div>

@@ -1,8 +1,9 @@
 <IfModule mod_rewrite.c>
     <IfModule mod_negotiation.c>
         Options -MultiViews
-    </IfModule>	
-	
+        Options -Indexes
+    </IfModule>
+
     RewriteEngine On
 
     DirectoryIndex index.php

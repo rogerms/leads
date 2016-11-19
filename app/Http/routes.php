@@ -136,7 +136,6 @@ Route::group(['middleware' => 'web'], function () {
     Route::post( 'label/delete', 'LeadController@delete_label');
 
     Route::post( 'label/update', 'LeadController@update_label');
-
     
 //----------------------------------------------------
 // note
@@ -163,6 +162,8 @@ Route::group(['middleware' => 'web'], function () {
     Route::post('drawing/edit/{id}', 'DrawingController@edit');
 
     Route::post('drawing/add/{leadid}', 'DrawingController@create');
+
+    Route::get('drawing/{filename}', 'DrawingController@show');
 
 
 //----------------------------------------------------

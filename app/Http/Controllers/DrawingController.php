@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Style;
 use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
@@ -11,7 +10,9 @@ use Illuminate\Support\Facades\DB;
 //use Input; worked before adding upload function
 use Auth;
 use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\File;
 use Cache;
+use Illuminate\Support\Facades\Storage;
 
 
 class DrawingController extends Controller
@@ -27,9 +28,22 @@ class DrawingController extends Controller
      * @param $id
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function show($id)
+    public function show($file_name)
     {
+        $this->authorize('read');
 
+        if ($file_name)
+        {
+            // Ensure no funny business names to prevent directory transversal etc.
+            $file_name = str_replace (['..', '/'], '', $file_name);
+
+            // readfile($this->destinationPath.$file_name);
+            $file_path = $this->destinationPath.$file_name;
+            $contents = Storage::get($file_path);
+            header("Content-Type: ".$this->mime_type($file_name));
+            header("Content-Length: ".(string)(Storage::size($file_path)));
+            echo $contents;
+        }
     }
 
     public function delete($id)
@@ -49,12 +63,11 @@ class DrawingController extends Controller
     public function create(Request $request, $lead_id)
     {
         //$this->authorize('edit-job');
-
-        $file = Input::file('image');
-        //dd($file);
+        $file = $request->file('image');
         $filename = md5(microtime() . $file->getClientOriginalName()) . "." . $file->getClientOriginalExtension();
-        Input::file('image')->move($this->destinationPath, $filename);
-
+        //Input::file('image')->move($this->destinationPath, $filename); // public folder
+        Storage::put($this->destinationPath.$filename, File::get($file)); // can use to upload to ftp, amazons3..
+        //$path = $request->file('image')->store('drawings');
         if($lead_id < 1) abort(500);
 
         $d = new Drawing();
@@ -158,5 +171,29 @@ class DrawingController extends Controller
         if(Auth::user()->role->name == 'User' && $item->selected == 1) return true;
         //dd(Auth::user()->role);
         return false;
+    }
+
+    private function mime_type($filename)
+    {
+        //find extension
+        $arr = explode('.', $filename);
+        $extension = end($arr);
+        switch($extension)
+        {
+            case 'gif':
+                return 'image/gif';
+            case 'png':
+                return 'image/png' ;
+            case 'jpeg':
+                return 'image/jpeg';
+            case 'jpg':
+                return 'image/jpeg';
+            case 'bmp':
+                return 'image/bmp';
+            case 'pdf':
+                return 'image/pdf';
+            default:
+                return 'multipart/form-data';
+        }
     }
 }

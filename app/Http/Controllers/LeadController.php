@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 
 use App\Job;
 use App\Phone;
-use App\Progress;
 use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Lead;
@@ -21,6 +20,7 @@ use Illuminate\Support\Facades\DB;
 use Auth;
 use Cache;
 use app\Helpers\Helper;
+
 //use App\Person\Hello;
 
 
