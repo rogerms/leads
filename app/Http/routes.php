@@ -84,7 +84,7 @@ Route::group(['prefix' => 'api', 'middleware' => 'auth:api'], function()
 
     Route::get( 'print/job/{id}', 'JobController@print_preview');
 
-    Route::get('drawing/{filename}', 'DrawingController@show');
+    Route::get('drawing/{id}', 'DrawingController@show');
 
 });
 
@@ -165,7 +165,7 @@ Route::group(['middleware' => 'web'], function () {
 
     Route::post('drawing/add/{leadid}', 'DrawingController@create');
 
-    Route::get('drawing/{filename}', 'DrawingController@show');
+    Route::get('drawing/{id}', 'DrawingController@show');
 
 
 //----------------------------------------------------

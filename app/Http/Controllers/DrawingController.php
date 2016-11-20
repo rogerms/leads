@@ -9,6 +9,7 @@ use App\Drawing;
 use Illuminate\Support\Facades\DB;
 //use Input; worked before adding upload function
 use Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\File;
 use Cache;
@@ -28,21 +29,22 @@ class DrawingController extends Controller
      * @param $id
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function show($file_name)
+    public function show($id)
     {
-        $this->authorize('read');
+        $drawing = Drawing::findOrFail($id);
 
-        if ($file_name)
+        if(self::can_see($drawing))
         {
-            // Ensure no funny business names to prevent directory transversal etc.
-            $file_name = str_replace (['..', '/'], '', $file_name);
-
+            $file_name = $drawing->path;
             // readfile($this->destinationPath.$file_name);
-            $file_path = $this->destinationPath.$file_name;
+            $file_path = $this->destinationPath . $file_name;
             $contents = Storage::get($file_path);
-            header("Content-Type: ".$this->mime_type($file_name));
-            header("Content-Length: ".(string)(Storage::size($file_path)));
+            header("Content-Type: " . $this->mime_type($file_name));
+            header("Content-Length: " . (string)(Storage::size($file_path)));
             echo $contents;
+        }
+        else{
+            abort(403);
         }
     }
 
@@ -53,7 +55,7 @@ class DrawingController extends Controller
         $drawing = Drawing::find($id);
         $lead = $drawing->lead;
         $result = $drawing->delete();
-        $drawings = $this->filter($lead->drawings, $lead);
+        $drawings = $this->filter($lead->drawings);
         
         return response()->json(['result' => $result,
             'cards' => view('partials.drawing', ['drawings' => $drawings])->render(),
@@ -163,6 +165,8 @@ class DrawingController extends Controller
     
     private static function can_see($item)
     {
+        ///superuser at least
+        if(Gate::allows('delete-job')) return true;
         //public
         if($item->selected == 2) return true;
         //createdd by user
@@ -178,7 +182,7 @@ class DrawingController extends Controller
         //find extension
         $arr = explode('.', $filename);
         $extension = end($arr);
-        switch($extension)
+        switch(strtolower($extension))
         {
             case 'gif':
                 return 'image/gif';

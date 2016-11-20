@@ -23,7 +23,7 @@
             .container {
                 text-align: center;
                 display: table-cell;
-                vertical-align: middle;
+                vertical-align: top;
             }
 
             .content {
@@ -32,8 +32,9 @@
             }
 
             .title {
-                font-size: 72px;
+                font-size: 42px;
                 margin-bottom: 40px;
+                margin-top: 40px;
             }
         </style>
     </head>
@@ -41,7 +42,7 @@
         <div class="container">
             <div class="content">
                 <div class="title">Access Denied.</div>
-                <h3>You are not authorized for this content.</h3>
+                <h3>You are not authorized to access content.</h3>
                 <h4><a href="/logout">Sign in</a> as a different user or contact Admin.</h4>
                 {{--<h4>Your user name is: {{ $exception->getMessage() }}</h4>--}}
             </div>
