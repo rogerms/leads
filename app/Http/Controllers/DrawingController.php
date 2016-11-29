@@ -42,10 +42,31 @@ class DrawingController extends Controller
             header("Content-Type: " . $this->mime_type($file_name));
             header("Content-Length: " . (string)(Storage::size($file_path)));
             echo $contents;
+
         }
         else{
             abort(403);
         }
+    }
+
+    public function get_image_data($id)
+    {
+        $drawing = Drawing::findOrFail($id);
+
+        if(self::can_see($drawing))
+        {
+            $file_name = $drawing->path;
+            // readfile($this->destinationPath.$file_name);
+            $file_path = $this->destinationPath . $file_name;
+            $contents = Storage::get($file_path);
+            // convert to base64 encoding
+            $imageData = base64_encode($contents);
+            // Format the image SRC:  data:{mime};base64,{data};
+            $src = 'data: '.$this->mime_type($file_name).';base64,'.$imageData;
+
+            return $src;
+        }
+        return "";
     }
 
     public function delete(Request $request, $id)

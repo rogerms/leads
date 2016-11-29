@@ -6,13 +6,14 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="format-detection" content="telephone=no"/>
-    <title>Style Print</title>
+    <title>Installer Sheet</title>
 <!--    <link href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css' rel="stylesheet"> -->
     <style>
         /*@import url('http://fonts.googleapis.com/css?family=Open+Sans');*/
         body{
             padding-top: 0;
             /*background-color: #eee;*/
+            max-width: 8.27in;
             font-family: sans-serif;
             font-size: 10pt;
         }
@@ -182,7 +183,7 @@
            @endif
        </div>
         <div class="drawing">
-            <img class="img-holder" src="{{ url("drawings/$path") }}" alt="">
+            <img class="img-holder" src="{{  $img_data }}" >
         </div>
     </div>
 </body>

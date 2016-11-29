@@ -462,15 +462,22 @@ class JobController extends Controller
     {
         $job = Job::find($id);
         $draw = Drawing::where('lead_id',  $job->lead_id)->where('label', 'installer')->first();
+        $img_data = "";
 
+        if(isset($draw->path))
+        {
+            $_draw = new DrawingController();
+            $img_data = $_draw->get_image_data($draw->id);
+        }
 
-        $path = isset($draw->path)? $draw->path: '';
         $job->name = $this->get_job_name($job);
         $job->style_summary = $this->get_style_summary($job);
 
-        $pdf = \PDF::loadView('pdf.installer', compact('job', 'path', 'descs'));
-        $pdf->setPaper('letter', 'portrait');
-        return $pdf->stream();
+        return view('pdf.installer', compact('job', 'descs', 'img_data'));
+
+        //$pdf = \PDF::loadView('pdf.installer', compact('job', 'descs', 'img_data'));
+        //$pdf->setPaper('letter', 'portrait');
+        //return $pdf->stream();
     }
 
     private function get_job_pdf(Job $job, $output=false)
