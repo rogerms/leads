@@ -48,7 +48,7 @@ class DrawingController extends Controller
         }
     }
 
-    public function delete($id)
+    public function delete(Request $request, $id)
     {
         $this->authorize('edit-job');
 
@@ -56,6 +56,11 @@ class DrawingController extends Controller
         $lead = $drawing->lead;
         $result = $drawing->delete();
         $drawings = $this->filter($lead->drawings);
+
+        if($request->fmt == 'json')
+        {
+            return response()->json(['result' => $result]);
+        }
         
         return response()->json(['result' => $result,
             'cards' => view('partials.drawing', ['drawings' => $drawings])->render(),
@@ -121,11 +126,17 @@ class DrawingController extends Controller
 
         $drawing = Drawing::find($id);
         $drawing->label = $request->label;
+        if($request->protection >= 0)
+        {
+            $drawing->selected = $request->protection;
+        }
+
         $drawing->save();
 
         return response()->json([
             'success' => true,
-            'label' => $drawing->label
+            'label' => $drawing->label,
+            'drawing' =>  $drawing
         ]);
     }
 

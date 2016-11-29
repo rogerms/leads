@@ -76,6 +76,12 @@ Route::group(['prefix' => 'api', 'middleware' => 'auth:api'], function()
 
     Route::post('drawing/add/{leadid}', 'DrawingController@create');
 
+    Route::post('drawing/delete/{id}', 'DrawingController@delete');
+
+    Route::post('drawing/edit/{id}', 'DrawingController@edit');
+
+    Route::get('drawing/{id}', 'DrawingController@show');
+
     Route::get('style/update', 'StyleController@update');
 
     Route::post('proposal/edit/{id}', 'JobController@edit_proposal');
@@ -84,7 +90,6 @@ Route::group(['prefix' => 'api', 'middleware' => 'auth:api'], function()
 
     Route::get( 'print/job/{id}', 'JobController@print_preview');
 
-    Route::get('drawing/{id}', 'DrawingController@show');
 
 });
 
