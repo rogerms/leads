@@ -81,12 +81,12 @@
             height: .5cm;
         }
         .second {
-            height: 2.5cm;
+            height: 2.1cm;
             /*padding: 0.2cm;*/
         }
         .drawing{
            
-            height: 8.1cm;
+            height: 8.5cm;
             /*background-color: !*#fbfbfb;*!*/
             border: thin grey solid;
             margin: .2cm 0;
@@ -98,9 +98,10 @@
         .total-box{
             position: absolute;
             font-size: 11pt;
-            top: 7.2cm;
-            left:14.35cm;
-            border: thin black solid;
+            top: 7.64cm;
+            left:14.43cm;
+            border-top: thin black solid;
+            border-left: thin black solid;
             height: 1.1cm;
             width: 4.5cm;
             padding: .15cm 0 0 .2cm;
@@ -300,10 +301,7 @@
                 {{--@endforeach--}}
             {{--</div>--}}
 
-            <div id='style'>
-                <span class="label">Pavers: </span>
-                <span class="value">{{ $job->style_summary }}</span>
-            </div>
+
         </div>
         
         <div class="drawing">

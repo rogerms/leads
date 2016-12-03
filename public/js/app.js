@@ -133,7 +133,7 @@ function tinymceInit () {
     tinymce.init({
         selector: 'textarea.proposal-note',
         width: 835,
-        height: 300,
+        height: 360,
         max_height: 270,
         browser_spellcheck: true,
         contextmenu: false,
