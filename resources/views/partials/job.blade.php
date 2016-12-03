@@ -102,7 +102,7 @@
         @can('edit-job', $job)
         <div class="row">
             <div style="padding: 10px;">
-                <label>Proposal Notes:</label>
+                <label>Proposal Notes:<span style="color:grey"> @if(count($job->proposals) > 0 ){{ '#'.count($job->proposals) }} @endif</span></label>
                 <div class="proposal-box" >
                     <textarea class="proposal-note" data-id="{{ $job->proposal['id'] }}">{{ $job->proposal['text'] }}</textarea>
                 </div>
@@ -282,7 +282,7 @@
                     <span class="sr-only">Toggle Button</span>
                 </button>
                 <ul class="dropdown-menu">
-                    <li><a href="/email/job/{{$job->id}}">Email PDF</a></li>
+                    {{--<li><a href="/email/job/{{$job->id}}">Email PDF</a></li>--}}
                     <li><a id="emailtocustomer" href="/email/customer/{{$job->id}}">Email Customer</a></li>
                     <li><a href="/report/job/{{$job->id}}">Export Excel</a></li>
                     <li><a href="/print/installer/{{$job->id}}">Installer Sheet</a></li>

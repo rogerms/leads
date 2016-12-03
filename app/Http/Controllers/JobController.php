@@ -421,7 +421,7 @@ class JobController extends Controller
     {
         $this->authorize('edit-job');
 
-        $props = Proposal::withTrashed()->where('job_id', $id)->orderby('updated_at', 'desc')->get();
+        $props = Job::find($id)->proposals()->get();
 
         return view('job.proposals', compact('props'));
     }

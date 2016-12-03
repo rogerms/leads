@@ -39,7 +39,12 @@ class Job extends Model
 
     public function proposal()
     {
-        return $this->hasOne('App\Proposal');
+        return $this->hasOne('App\Proposal')->orderBy('created_at', 'desc');
+    }
+
+    public function proposals()
+    {
+        return $this->hasMany('App\Proposal')->withTrashed()->orderBy('created_at', 'desc');
     }
 
     public function labels()

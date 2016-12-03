@@ -7,12 +7,12 @@
 
     @foreach($props as $prop)
     <div class="panel panel-default">
-        <div class="panel-body">
+        <div class="panel-body" >
            {!!  $prop->text !!}
         </div>
         <div class="panel-footer">
-            <span>Created: {{ toFormatted($prop->created_at) }}.</span>
-            <span>   Modified: {{ toFormatted($prop->updated_at) }}.</span>
+            <span> Created: {{ toFormatted($prop->created_at) }}.</span>
+            <span> Modified: {{ toFormatted($prop->updated_at) }}.</span>
         </div>
     </div>
     @endforeach

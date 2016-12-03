@@ -46,7 +46,7 @@ class LeadController extends Controller
         
         $lead->load('jobs', 'notes', 'drawings');
 
-        $lead->jobs->load('features', 'removals', 'materials', 'proposal');
+        $lead->jobs->load('features', 'removals', 'materials', 'proposal', 'proposals');
 
         if($request->fmt == 'json')
             $lead->_drawings = DrawingController::filter($lead->drawings);
@@ -107,7 +107,7 @@ class LeadController extends Controller
 			GROUP_CONCAT(DISTINCT DATE_FORMAT(jobs.start_date, '%e-%b') ORDER BY jobs.id SEPARATOR '<br>') as start_date,
             GROUP_CONCAT(DISTINCT DATE_FORMAT(jobs.date_sold, '%e-%b') ORDER BY jobs.id SEPARATOR '<br>') as date_sold,
             GROUP_CONCAT(DISTINCT jobs.size ORDER BY jobs.id SEPARATOR '<br>') as job_size,
-            GROUP_CONCAT(DISTINCT j_notes.note ORDER BY jobs.id SEPARATOR '||') as job_notes,
+            GROUP_CONCAT(DISTINCT j_notes.note ORDER BY j_notes.job_id SEPARATOR '||') as job_notes,
             GROUP_CONCAT(DISTINCT CONCAT(DATE_FORMAT(style_groups.delivery_at, '%c/%e'), if(style_groups.delivered is null, '', ' &#x2714;'))  ORDER BY style_groups.job_id,style_groups.id SEPARATOR '<br>') as pavers_delivery,
             GROUP_CONCAT(DISTINCT concat(material_rb.qty, 'x', material_rb.delivered) ORDER BY material_rb.job_id SEPARATOR '<br>')  as rb_qty,
             GROUP_CONCAT(DISTINCT concat(material_sand.qty, 'x', material_sand.delivered) ORDER BY material_sand.job_id  SEPARATOR '<br>') as sand_qty,
