@@ -306,7 +306,7 @@ class LeadController extends Controller
             if(!isset($reps_count[$lead->sales_rep_name]))
                 $reps_count[$lead->sales_rep_name] = 0;
 
-            $labels = explode(",", $lead->job_labels);
+            $labels = explode("<br>", $lead->job_labels);
             foreach($labels as $label)
             {
                 if(!isset($labels_count[$label]))

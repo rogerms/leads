@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Drawing;
 use app\Helpers\Helper;
+use App\Label;
 use App\Material;
 use App\Note;
 use App\Proposal;
@@ -165,6 +166,7 @@ class JobController extends Controller
     	$job = Job::findOrFail($id);
 
         $job = $this->update_job($job, $request);
+        $labels = null;
 
         $result = ($job != null);
 
@@ -176,6 +178,8 @@ class JobController extends Controller
             $ld->save();
             //send email
             $this->emailJobSold($job);
+            //add just_sold label
+            $labels = $this->add_label($job, 'just sold');
         }
 
 
@@ -234,8 +238,21 @@ class JobController extends Controller
             'updated' => $updated, //job data last updated
             'note' => $note, //if a new note was created return it to be added to the list
             'sold'=> $request->startdate, //test
-            'jobnum' => Helper::show_job_num($job) //update jobnumber on job title
+            'jobnum' => Helper::show_job_num($job), //update jobnumber on job title
+            'labels' => $labels
         ]);
+    }
+
+    private function add_label($job, $name)
+    {
+        $label = Label::where('name', $name)->first();
+        if(!empty($label))
+        {
+            $job->labels()->attach($label->id);
+
+            return $job->labels()->get();
+        }
+        return null;
     }
 
     private function update_styles($stylegroups, $job_id)

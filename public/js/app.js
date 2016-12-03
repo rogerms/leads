@@ -872,16 +872,21 @@ function updateJobLabel(event) {
         console.log(msg);
         if (msg.result == true) {
 
-            var joblabels = form.find('.job-labels');
-            joblabels.find('button').remove();//empty list
-
-            $.each(msg.labels, function (index, label) {
-                joblabels.append(jobLabelButton(label.id, label.progress_id, label.name));
-            });
+            resetLabelTrail(form, msg.labels);
             applybtn.addClass('disabled');
         }
     }).fail(function (){
         console.log('Error trying to update job label!', true);
+    });
+}
+
+function resetLabelTrail(form, labels)
+{
+    var joblabels = form.find('.job-labels');
+    joblabels.find('button').remove();//empty list
+
+    $.each(labels, function (index, label) {
+        joblabels.append(jobLabelButton(label.id, label.progress_id, label.name));
     });
 }
 
@@ -986,6 +991,11 @@ function updateJob () {
             form.find('.last-update>span:last-child').text(msg.updated);
             showResult('Job info updated!');
             updateNoteList(msg.note, form);
+            if(msg.labels)
+            {
+                console.log('new label called');
+                resetLabelTrail(form, msg.labels);
+            }
         }
     }).fail(function (){
         showResult('Error trying to update job info!', true);
