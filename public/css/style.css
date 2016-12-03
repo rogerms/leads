@@ -817,3 +817,8 @@ font-family: FontAwesome;
     margin-right: 15px;
     margin-top: -30px;
 }
+.material-checkbox
+{
+    margin-top: 9px;
+    margin-left: 2px;
+}

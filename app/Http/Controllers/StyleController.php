@@ -70,7 +70,9 @@ class StyleController extends Controller
             $group->delivery_at = Helper::db_date($sgroup['delivery']);
             $group->note = $sgroup['note'];
             $group->order_date =  Helper::db_date($sgroup['orderdate']);
+            $group->delivered = Helper::db_date($sgroup['delivered']);
             $group->delivery_addr = $sgroup['addr'];
+
 
             $group->job_id = $job_id;
             $result &= $group->save();

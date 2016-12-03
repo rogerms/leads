@@ -185,6 +185,17 @@
         <div class="drawing">
             <img class="img-holder" src="{{  $img_data }}" >
         </div>
+           <div>
+               <?php
+
+                   $text = $job->proposal['text'];
+                   $pattern = '/-?\$\s?\d+(,\d+)*(\.\d+)?/i'; //$500.50 -$ 400
+                   $replacement = '';
+                   $new_text = preg_replace($pattern, $replacement, $text);
+
+               ?>
+               {!!  $new_text  !!}
+           </div>
     </div>
 </body>
 </html>

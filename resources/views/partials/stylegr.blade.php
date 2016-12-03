@@ -85,7 +85,7 @@
             <input type="text" class="form-control" name="handledby"  id="handledby" value="{{ $stylegroup->handledby }}" placeholder="Name">
         </div>
         <div class="form-group col-md-2">
-            <label for="delivery">Delivery Date</label>
+            <label for="delivery">Date to Deliver</label>
             <input type="text" class="form-control date" name="delivery"  id="delivery" value="{{ format_date($stylegroup->delivery_at) }}" placeholder="mm/dd/yyyy">
         </div>
     </div>
@@ -101,6 +101,10 @@
         <div class="form-group col-md-2">
             <label for="orderdate">Order Date</label>
             <input type="text" class="form-control date" id="orderdate" value="{{ format_date($stylegroup->order_date) }}" placeholder="mm/dd/yyyy" >
+        </div>
+        <div class="form-group col-md-2">
+            <label for="delivered">Delivered</label>
+            <input type="text" class="form-control date" id="delivered" value="{{ format_date($stylegroup->delivered) }}" placeholder="mm/dd/yyyy" >
         </div>
     </div>
     <div class="print-btns">

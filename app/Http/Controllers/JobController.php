@@ -316,6 +316,7 @@ class JobController extends Controller
             $mat->qty = $material['qty'];
             $mat->qty_unit= $material['unit'];
             $mat->vendor = $material['vendor'];
+            $mat->delivered = $material['delivered'];
 
             $result &= $mat->save();
         }
@@ -347,6 +348,7 @@ class JobController extends Controller
         $job->prelien = ($request->prelien == 'true');
         $job->bluestakes = ($request->bluestakes == 'true');
         $job->noadd_fee = ($request->noaddfee == 'true');
+        $job->needs_skid = ($request->skid == 'true');
         $job->property_type = $request->propertytype;
         $job->crew = $request->crew;
         $job->downpayment = $request->downpayment;

@@ -76,7 +76,7 @@
             <input type="text" class="form-control" name="handledby"  id="handledby" value="" placeholder="Name">
         </div>
         <div class="form-group col-md-2">
-            <label for="delivery">Delivery Date</label>
+            <label for="delivery">Date to Deliver</label>
             <input type="text" class="form-control date" name="delivery"  id="delivery" value="" placeholder="mm/dd/yyyy">
         </div>
     </div>
@@ -93,6 +93,12 @@
             <label for="orderdate">Order Date</label>
             <input type="text" class="form-control date" id="orderdate" value="" >
         </div>
+        <div class="form-group col-md-2">
+            <label for="delivered">Delivered</label>
+            <input type="text" class="form-control date" id="delivered" placeholder="mm/dd/yyyy" >
+        </div>
+    </div>
+    <div class="print-btns">
         <div >
             <a href="" class="btn btn-primary update-group">Update Group</a>
         </div>
@@ -112,6 +118,11 @@
             </span>
             <span class="input-group-addon material-value">
                 <input type="text" class="form-control" id="vendor" placeholder="from">
+            </span>
+            <span class="input-group-addon material-value-sm">
+                 <label class="material-checkbox">
+                     <input id="delivered" type="checkbox"  value="delivered">
+                 </label>
             </span>
         </div>
 </div><!-- /.col-lg-6 -->

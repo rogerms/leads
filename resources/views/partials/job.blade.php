@@ -127,9 +127,14 @@
                     <span class="input-group-addon" id="basic-addon2">%</span>
                 </div>
             </div>
-            <div class="form-group col-md-4 cbox-valign">
+            <div class="form-group col-md-2 cbox-valign">
                 <label class="checkbox-inline">
                     <input type="checkbox" id="noaddfee"  {{ isChecked($job->noadd_fee) }} value="additionalfee">No additional fees
+                </label>
+            </div>
+            <div class="form-group col-md-2 cbox-valign">
+                <label class="checkbox-inline">
+                    <input type="checkbox" id="skid"  {{ isChecked($job->needs_skid) }} value="skid">Skid
                 </label>
             </div>
         </div> <!--  -->
@@ -152,7 +157,7 @@
                 <label>Materials </label>
                 <div class="list-group" id="materials" name="materials">
                     @foreach($job->materials as $material)
-                        <div class="col-sm-5">
+                        <div class="col-sm-5 ">
                             <div class="input-group material" id="{{ $material->id}}">
                                 <span class="input-group-addon material-name">
                                     <input type="text" class="form-control" id="name" placeholder="name" value="{{ $material->name }}" >
@@ -165,6 +170,11 @@
                                 </span>
                                 <span class="input-group-addon material-value">
                                     <input type="text" class="form-control" id="vendor" placeholder="from" value="{{ $material->vendor }}">
+                                </span>
+                                <span class="input-group-addon material-value-sm">
+                                     <label class="material-checkbox">
+                                         <input type="checkbox" id="delivered"  {{ isChecked($material->delivered) }} value="delivered">
+                                     </label>
                                 </span>
                             </div><!-- /input-group -->
                         </div><!-- /.col-lg-6 -->

@@ -98,20 +98,22 @@ class LeadController extends Controller
 
             $query = "SELECT ".
                 "leads.*,
-            DATE_FORMAT(leads.appointment, '%b %e, %Y at %h:%i%p') appointmentfmt,
+            DATE_FORMAT(leads.appointment, '%b %e at %h:%i%p') appointmentfmt,
             status.name as status_name,
             sales_reps.name as sales_rep_name,
             taken_by.name as taken_by_name,
             sources.name as source_name,
-            GROUP_CONCAT(DISTINCT labels.name ORDER BY labels.display_order SEPARATOR ', ') as job_labels,
-            GROUP_CONCAT(DISTINCT labels.name ORDER BY labels.display_order SEPARATOR ',') as job_labels2,
-			DATE_FORMAT(jobs.start_date, '%e-%b') as start_date,
-            GROUP_CONCAT(DISTINCT DATE_FORMAT(jobs.date_sold, '%e-%b') SEPARATOR ' ') as date_sold,
-            GROUP_CONCAT(DISTINCT jobs.size SEPARATOR ' ') as job_size,
-            GROUP_CONCAT(DISTINCT j_notes.note SEPARATOR '||') as job_notes,
-            GROUP_CONCAT(DISTINCT material_rb.qty, '' SEPARATOR ' ')  as rb_qty,
-            GROUP_CONCAT(DISTINCT material_sand.qty, '' SEPARATOR ' ') as sand_qty,
+            GROUP_CONCAT(DISTINCT labels.name ORDER BY labels.display_order SEPARATOR '<br>') as job_labels,
+			GROUP_CONCAT(DISTINCT DATE_FORMAT(jobs.start_date, '%e-%b') ORDER BY jobs.id SEPARATOR '<br>') as start_date,
+            GROUP_CONCAT(DISTINCT DATE_FORMAT(jobs.date_sold, '%e-%b') ORDER BY jobs.id SEPARATOR '<br>') as date_sold,
+            GROUP_CONCAT(DISTINCT jobs.size ORDER BY jobs.id SEPARATOR '<br>') as job_size,
+            GROUP_CONCAT(DISTINCT j_notes.note ORDER BY jobs.id SEPARATOR '||') as job_notes,
+            GROUP_CONCAT(DISTINCT CONCAT(DATE_FORMAT(style_groups.delivery_at, '%c/%e'), if(style_groups.delivered is null, '', ' &#x2714;'))  ORDER BY style_groups.job_id,style_groups.id SEPARATOR '<br>') as pavers_delivery,
+            GROUP_CONCAT(DISTINCT concat(material_rb.qty, 'x', material_rb.delivered) ORDER BY material_rb.job_id SEPARATOR '<br>')  as rb_qty,
+            GROUP_CONCAT(DISTINCT concat(material_sand.qty, 'x', material_sand.delivered) ORDER BY material_sand.job_id  SEPARATOR '<br>') as sand_qty,
             GROUP_CONCAT(DISTINCT jobs.id ORDER BY jobs.id SEPARATOR ' ') as job_ids,
+            GROUP_CONCAT(DISTINCT if(jobs.needs_skid=1,'&#x2714;', '') ORDER BY jobs.id SEPARATOR ' ') as skid,
+            GROUP_CONCAT(DISTINCT jobs.crew ORDER BY jobs.id SEPARATOR ' ') as crew,
             IF(DATE(appointment) = DATE(NOW()),1,0) today,
             IF(DATE(appointment) = ADDDATE(DATE(NOW()),1),1,0) tomorrow,
             IF(appointment >= DATE(now()) AND appointment < ADDDATE(DATE(NOW()), INTERVAL 1 WEEK),1,0) week
@@ -126,7 +128,8 @@ class LeadController extends Controller
             LEFT JOIN job_label ON job_label.job_id = jobs.id and job_label.deleted_at is null
             LEFT JOIN labels ON labels.id = job_label.label_id
             LEFT JOIN job_materials as material_rb ON material_rb.job_id = jobs.id and material_rb.name='rb'
-            LEFT JOIN job_materials as material_sand ON material_sand.job_id = jobs.id and material_sand.name='sand'
+            LEFT JOIN job_materials as material_sand ON material_sand.job_id = jobs.id and material_sand.name='sand' 
+            LEFT JOIN style_groups ON style_groups.job_id = jobs.id
             WHERE 1";
 
             if($request->searchby == 'Tag')
@@ -303,7 +306,7 @@ class LeadController extends Controller
             if(!isset($reps_count[$lead->sales_rep_name]))
                 $reps_count[$lead->sales_rep_name] = 0;
 
-            $labels = explode(",", $lead->job_labels2);
+            $labels = explode(",", $lead->job_labels);
             foreach($labels as $label)
             {
                 if(!isset($labels_count[$label]))

@@ -672,6 +672,7 @@ function jobFormData(form)
         prelien: form.find('#prelien').prop('checked'),
         bluestakes: form.find('#bluestakes').prop('checked'),
         noaddfee: form.find('#noaddfee').prop('checked'),
+        skid: form.find('#skid').prop('checked'),
         crew: form.find('#crew').val(),
         downpayment: form.find('#downpayment').val(),
         materials: getMaterials(form),
@@ -1078,7 +1079,8 @@ function getMaterials(form)
             name: material.find('#name').val(),
             qty: material.find('#qty').val(),
             unit: material.find('#unit').val(),
-            vendor: material.find('#vendor').val()
+            vendor: material.find('#vendor').val(),
+            delivered: material.find('#delivered:checked').length
         };
         if(!empty(item)) list.push(item);
     });
@@ -1101,7 +1103,8 @@ function getStyleGroups(form, selected)
                 delivery: $(this).find('#delivery').val(),
                 note: $(this).find('#note').val(),
                 orderdate: $(this).find('#orderdate').val(),
-                addr: $(this).find('#deliveryaddr').val()
+                addr: $(this).find('#deliveryaddr').val(),
+                delivered: $(this).find('#delivered').val()
             };
 
             $(this).find('.style-row').each(function () {
@@ -1143,6 +1146,7 @@ function getStyleGroup(group)
         note: group.find('#note').val(),
         orderdate: group.find('#orderdate').val(),
         addr: group.find('#deliveryaddr').val(),
+        delivered: group.find('#delivered').val()
     };
 
     group.find('.style-row').each(function () {
@@ -1219,6 +1223,7 @@ function updateLead () {
     });
 
 }
+
 function updateNoteList(note, form)
 {
     if(note.created == true)

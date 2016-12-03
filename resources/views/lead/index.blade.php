@@ -28,22 +28,22 @@
               <table  class="table table-striped table-hover table-bordered" id="leadstb">
                   <thead>
                   <tr>
-                      <th>Status</th>
-                      <th>Customer Name</th>
-                      <th>City</th>
-                      <th>Address</th>
-                      <th>Phone</th>
-                      <th>Appointment</th>
-                      <th>Rep</th>
-
-                      <th>S/F</th>
-                      <th>Pavers</th>
-                      <th>RB</th>
-                      <th>Sand</th>
-                      <th>Date Sold</th>
-                      <th>Start Date</th>
-                      <th>Skid</th>
-                      <th>Notes</th>
+                      <th style="min-width:100px">Status</th>
+                      <th style="min-width:280px">Customer Name</th>
+                      <th style="min-width:120px">City</th>
+                      <th style="min-width:250px">Address</th>
+                      <th style="min-width:130px">Phone</th>
+                      <th style="min-width:150px">Appointment</th>
+                      <th style="min-width:70px">Rep</th>
+                      <th style="min-width:50px">S/F</th>
+                      <th style="min-width:100px">Pavers</th>
+                      <th style="min-width:70px">RB</th>
+                      <th style="min-width:70px">Sand</th>
+                      <th style="min-width:70px">Date Sold</th>
+                      <th style="min-width:70px">Start Date</th>
+                      <th style="min-width:70px">Skid</th>
+                      <th style="min-width:70px">Crew</th>
+                      <th style="min-width:400px">Notes</th>
                   </tr>
                   </thead>
                   <tbody>
