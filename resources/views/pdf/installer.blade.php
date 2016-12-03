@@ -182,20 +182,25 @@
                <b>Note: </b>{{ $note }}
            @endif
        </div>
+
         <div class="drawing">
+            @foreach($imgs_data as $img_data)
             <img class="img-holder" src="{{  $img_data }}" >
+            @endforeach
         </div>
-           <div>
-               <?php
 
-                   $text = $job->proposal['text'];
-                   $pattern = '/-?\$\s?\d+(,\d+)*(\.\d+)?/i'; //$500.50 -$ 400
-                   $replacement = '';
-                   $new_text = preg_replace($pattern, $replacement, $text);
+       <div>
+           <?php
 
-               ?>
-               {!!  $new_text  !!}
-           </div>
+           $text = $job->proposal['text'];
+           $pattern = '/-?\$\s?\d+(,\d+)*(\.\d+)?/i'; //$500.50 -$ 400
+           $replacement = '';
+           $new_text = preg_replace($pattern, $replacement, $text);
+
+           ?>
+           {!!  $new_text  !!}
+       </div>
+
     </div>
 </body>
 </html>

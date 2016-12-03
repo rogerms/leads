@@ -463,19 +463,22 @@ class JobController extends Controller
     public function print_installer($id)
     {
         $job = Job::find($id);
-        $draw = Drawing::where('lead_id',  $job->lead_id)->where('label', 'installer')->first();
-        $img_data = "";
+        $draws = Drawing::where('lead_id',  $job->lead_id)->where('label', 'like', 'installer%')->get();
+        $imgs_data = [];
 
-        if(isset($draw->path))
+        foreach ($draws as $draw)
         {
-            $_draw = new DrawingController();
-            $img_data = $_draw->get_image_data($draw->id);
+            if(isset($draw->path))
+            {
+                $_draw = new DrawingController();
+                $imgs_data[] = $_draw->get_image_data($draw->id);
+            }
         }
 
         $job->name = $this->get_job_name($job);
         $job->style_summary = $this->get_style_summary($job);
 
-        return view('pdf.installer', compact('job', 'descs', 'img_data'));
+        return view('pdf.installer', compact('job', 'descs', 'imgs_data'));
 
         //$pdf = \PDF::loadView('pdf.installer', compact('job', 'descs', 'img_data'));
         //$pdf->setPaper('letter', 'portrait');
