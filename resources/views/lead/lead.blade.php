@@ -35,9 +35,11 @@
                     <button type="button" class="btn btn-default disabled badge-btn">main</button>
                     <a class="btn btn-default" role="button" href="tel:{{ $lead->phone }}"><span class="glyphicon glyphicon-earphone"></span></a>
                     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>
+                    @can('edit')
                     <ul class="dropdown-menu dropdown-menu-right">
                         <li><a href="#" class="icon" id="addphone"><span class="glyphicon glyphicon-plus"></span>Add Phone#</a></li>
                     </ul>
+                    @endcan
                 </div><!-- /btn-group -->
             </div><!-- /input-group -->
 
@@ -94,6 +96,7 @@
         </div>
     </div>
         <div class="row">
+            @can('edit')
         <div class="col-md-3">
         <div class="form-group">
             <label for="takenby">Taken by</label>
@@ -104,6 +107,7 @@
                 </select>
         </div>
         </div>
+
         <div class="col-md-3">
         <div class="form-group">
             <label for="source">Source</label>
@@ -114,6 +118,7 @@
             </select>
         </div>
         </div>
+            @endcan
         <div class="col-md-3">
         <div class="form-group">
             <label for="salesrep">Sales Rep</label>
@@ -124,6 +129,7 @@
             </select>
         </div>
         </div>
+            @can('edit')
         <div class="col-md-3">
         <div class="form-group">
             <label for="status">Status</label>
@@ -134,8 +140,11 @@
             </select>
         </div>
         </div>
+            @endcan
     </div>
+
         <div class="row">
+            @can('edit')
         <div class="col-md-2">
             <div class="form-group">
                 <label for="appointment">Appointment Date </label>
@@ -165,11 +174,14 @@
                 </div>
             </div>
         </div>
+            @endcan
         </div>
 
 
         <div class="row">
+
             <div class="col-md-6 col-lg-6">
+                @can('edit')
                 <div class="form-group note-form">
                     <label>Notes</label>
                     <div style="display: inline-block; margin: 2px 20px;">
@@ -198,7 +210,9 @@
                         @endforeach
         <!--  diffForHumans() -->
                     </div>
+
                 </div>
+                @endcan
 
                 @can('edit')
                 <div class="row row-extra-bm-pad">

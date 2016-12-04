@@ -351,7 +351,7 @@ class LeadController extends Controller
 
     public function delete_label(Request $request)
     {
-        $this->authorize('edit');
+        $this->authorize('read');
         //-- hard delete
         //$deleted = DB::delete('delete from job_progress where job_id=? and progress_id=?', [$request->jobid, $request->id]);
         //soft delete
@@ -366,7 +366,7 @@ class LeadController extends Controller
 
     public function update_label(Request $request)
     {
-        $this->authorize('edit');
+        $this->authorize('read');
         $result = true;
         $job = Job::find($request->jobid);
 

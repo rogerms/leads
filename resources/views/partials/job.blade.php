@@ -42,16 +42,18 @@
                     @endforeach
                 </select>
             </div>
+            @can('edit-job')
             @if(!empty($job->id))
             <div class="form-group col-md-3">
                 <label for="datesold">Date Sold</label>
                 <input type="text" class="form-control date" id="datesold" value="{{ format_date($job->date_sold) }}">
             </div>
             @endif
+            @endcan
         </div>
 
-        @can('read-job')
         <div class="row">
+            @can('edit-job')
             <div class="form-group col-md-2">
                 <label for="size">Size</label>
                 <input type="text" class="form-control" id="size" value="{{$job->size}}" placeholder="Size">
@@ -75,12 +77,12 @@
                     <input type="text" class="form-control"  id="invoicedamount" value="{{$job->invoiced_amount}}" aria-label="Amount">
                 </div>
             </div>
+            @endcan
             <div class="form-group col-md-2">
                 <label for="startdate">Start Date</label>
                 <input type="text" class="form-control date" id="startdate" value="{{  format_date($job->start_date) }}">
             </div>
         </div>
-        @endcan
 
         <?php $count = 0; ?>
 
@@ -120,6 +122,7 @@
                 <label for="crew">Crew</label>
                 <input type="text" class="form-control" name="crew"  id="crew" value="{{ $job->crew }}" placeholder="Name">
             </div>
+            @can('edit-job')
             <div class="form-group col-md-2">
                 <label for="downpayment">Down payment</label>
                 <div class="input-group">
@@ -132,6 +135,7 @@
                     <input type="checkbox" id="noaddfee"  {{ isChecked($job->noadd_fee) }} value="additionalfee">No additional fees
                 </label>
             </div>
+            @endcan
             <div class="form-group col-md-2 cbox-valign">
                 <label class="checkbox-inline">
                     <input type="checkbox" id="skid"  {{ isChecked($job->needs_skid) }} value="skid">Skid
@@ -185,8 +189,10 @@
                 </div>
         </div>
 
+
         <div class="row">
             <div class="col-md-6">
+                @can('edit-job')
                 <div class="row">
                     <div class="form-group">
                         <label>Todo list</label>
@@ -210,6 +216,7 @@
                     </div>
 
                 </div>
+                @endcan
                 @if($job->id > 0)
                 <div class="row">
                     <div class="form-group col-md-12 note-form">
@@ -245,22 +252,22 @@
 
                 <div class="row row-extra-bm-pad">
                     <div class="col-md-12">
-                        @can('edit-job')
                         <div class="input-group">
                             <span class="input-group-addon" id="jobnotelb">+</span>
                             <input type="text" id="jobnote" class="form-control jobnote" data-job-id="{{ $job->id }}"  placeholder="Add a note" aria-describedby="jobnotelb">
                         </div>
-                        @endcan
                     </div>
                 </div><!-- /.row -->
                 @endif
             </div>
+            @can('edit-job')
             <div class="col-md-6">
                 <div class="form-group col-md-3">
                     <label for="signedat">Signature Date</label>
                     <input type="text" class="form-control date" id="signedat" value="{{  format_date( $job->signed_at) }}" placeholder="mm/dd/yyyy">
                 </div>
             </div>
+            @endcan
         </div>
         <div class="row row-extra-pad">
             <input type="hidden" id="jobid" value="{{$job->id}}" />
@@ -273,7 +280,7 @@
                 @endif
 
 
-
+            @endcan
             <!-- Split button -->
             <div class="btn-group dropup">
                 <a role="button" @can('edit-job', $job) href="/print/job/{{$job->id}}" @endcan class="btn btn-default" id="print-job">View PDF</a>
@@ -283,18 +290,21 @@
                 </button>
                 <ul class="dropdown-menu">
                     {{--<li><a href="/email/job/{{$job->id}}">Email PDF</a></li>--}}
+                    @can('edit-job')
                     <li><a id="emailtocustomer" href="/email/customer/{{$job->id}}">Email Customer</a></li>
                     <li><a href="/report/job/{{$job->id}}">Export Excel</a></li>
+                    @endcan
+                    @can('read')
                     <li><a href="/print/installer/{{$job->id}}">Installer Sheet</a></li>
+                    @endcan
                 </ul>
             </div>
-            @endcan
 
             {{-- job progress --}}
-            @can('edit-job')
+            @can('read')
                     <!-- Split button -->
                 <div class="btn-group dropup">
-                    <a role="button" @can('edit-job', $job) href="/print/job/{{$job->id}}" @endcan class="btn btn-default" id="print-job">Job Progress</a>
+                    <a role="button" class="btn btn-default" id="job-progress">Job Progress</a>
                     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <span class="caret"></span>
                         <span class="sr-only">Toggle Button</span>

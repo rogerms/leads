@@ -848,6 +848,7 @@ function deleteJobLabel(){
             var menu_item = button.parents('form').find('.label-menu-item#'+label_id);
             //uncheck it on the dropdown list
             menu_item.prop('checked', false);
+            menu_item.val('');
             button.remove();
         }
     }).fail(function (){
@@ -886,7 +887,7 @@ function resetLabelTrail(form, labels)
     joblabels.find('button').remove();//empty list
 
     $.each(labels, function (index, label) {
-        joblabels.append(jobLabelButton(label.id, label.progress_id, label.name));
+        joblabels.append(jobLabelButton(label.pivot.id, label.id, label.name));
     });
 }
 
