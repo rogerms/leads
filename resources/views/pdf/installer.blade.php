@@ -189,7 +189,7 @@
             @endforeach
         </div>
 
-       <div> <!-- style="font-size: 12pt" -->{{-- making all the text 12--}}
+       <div style="font-size: 12pt"> <!-- style="font-size: 12pt" -->{{-- making all the text 12--}}
            <?php
 
                $text = $job->proposal['text'];
@@ -198,8 +198,8 @@
                $new_text = preg_replace($pattern, $replacement, $text);
 
 //** in case we want to make all text the same size
-//               $pattern = '/font-size:\s*\d+\w+;*//**/i';
-//               $new_text = preg_replace($pattern, '', $new_text);
+               $pattern = '/font-size:\s*\d+\w+;?/i';
+               $new_text = preg_replace($pattern, '', $new_text);
            ?>
            {!!  $new_text  !!}
        </div>
