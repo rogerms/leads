@@ -165,6 +165,8 @@ class JobController extends Controller
         $id = $request->id;
     	$job = Job::findOrFail($id);
 
+        $materials = null;
+        $removals = null;
         $job = $this->update_job($job, $request);
         $labels = null;
 
@@ -210,12 +212,12 @@ class JobController extends Controller
 
 		if (count($request->removals) > 0)//doesn't break if removal is empty
 		{
-            $result &= $this->update_removals($request->removals, $job);
+            $removals = $this->update_removals($request->removals, $job);
 		}
 
         if($request->materials  != null)
         {
-            $result &= $this->update_materials($request->materials, $job->id);
+            $materials = $this->update_materials($request->materials, $job);
         }
 
         $note = new Note();
@@ -239,7 +241,9 @@ class JobController extends Controller
             'note' => $note, //if a new note was created return it to be added to the list
             'sold'=> $request->startdate, //test
             'jobnum' => Helper::show_job_num($job), //update jobnumber on job title
-            'labels' => $labels
+            'labels' => $labels,
+            'materials' => $materials,
+            'removals' => $removals
         ]);
     }
 
@@ -305,7 +309,7 @@ class JobController extends Controller
     private function update_removals($removals, $job)
     {
         //return var_dump($request->styles);
-        $result = true;
+        $new = false;
         foreach($removals as $r)
         {
             $id = $r['id'];
@@ -314,30 +318,41 @@ class JobController extends Controller
             {
                 $removal = $job->removals->find($id);
             }
+            else
+            {
+               $new = true;
+            }
             $removal->job_id = $job->id;
             $removal->name = $r['name'];
 
-            $result &= $removal->save();
+            $removal->save();
         }
-        return $result;
+        if($new === true) return $job->removals()->get();
+
+        return null;
     }
 
-    private function update_materials($materials, $job_id)
+    private function update_materials($materials, $job)
     {
-        $result = true;
+        $new = false;
         foreach($materials as $material)
         {
+            if($material['id'] == 0)
+                $new = true;
+
             $mat = Material::findOrNew($material['id']);
-            $mat->job_id = $job_id;
+            $mat->job_id = $job->id;
             $mat->name = $material['name'];
             $mat->qty = $material['qty'];
             $mat->qty_unit= $material['unit'];
             $mat->vendor = $material['vendor'];
             $mat->delivered = $material['delivered'];
-
-            $result &= $mat->save();
+            $mat->save();
         }
-        return $result;
+
+        if($new === true) return $job->materials()->get();
+
+        return null;
     }
 
     private function update_job(Job $job, Request $request)

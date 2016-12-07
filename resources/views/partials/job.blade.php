@@ -146,7 +146,7 @@
         <div class="row">
             <div class="form-group col-md-12 note-form">
                 <label>Removals </label>
-                <div class="list-group" id="removals" name="removals">
+                <div class="list-group" id="removals" >
                     @foreach($job->removals as $removal)
                         <input type="text" class="form-control inline-control" name="removal"  data-removalid="{{ $removal->id  }}"
                                value="{{ $removal->name }}" placeholder="removal..."
@@ -223,13 +223,14 @@
                         <label>Notes</label>
                         <div style="display: inline-block; margin: 2px 20px;">
                             <select class="form-control  tags-select" >
-                                @foreach(all_tags($job->notes) as $key => $tag)
+                                <?php $job_notes = \Auth::user()->can('edit-job')? $job->notes: $job->personal_notes;  ?>
+                                @foreach(all_tags($job_notes) as $key => $tag)
                                 <option value="{{ $key }}"> {{ $tag }}</option>
                                 @endforeach
                             </select>
                         </div>
                         <div class="list-group" id="notes" name="notes">
-                            @foreach($job->notes as $note)
+                            @foreach($job_notes as $note)
                                 <?php
                                 $deleted = !empty($note->deleted_at);
                                 $tagall = ($deleted)? ' disabled tag-deleted': ' active tag-all';
@@ -241,9 +242,11 @@
                                     @endif
                                     <h4 class="list-group-item-heading">{{ $note->note }}</h4>
                                     <p class="list-group-item-text">Created on: {{ toFormatted($note->created_at) }}</p>
-                                    @if($deleted)
-                                        <p class="list-group-item-text item-text-deletedat" >Deleted on: {{ toFormatted($note->deleted_at) }}</p>
-                                    @endif
+                                        <p class="list-group-item-text item-text-deletedat"
+                                             style="display: @if($deleted) block @else none  @endif">
+                                            Deleted on: {{ toFormatted($note->deleted_at) }}
+                                        </p>
+
                                 </a>
                             @endforeach
                         </div>

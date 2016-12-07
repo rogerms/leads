@@ -3,6 +3,7 @@
 namespace App;
 use DB;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class Job extends Model
 {
@@ -14,7 +15,18 @@ class Job extends Model
 
   	public function notes()
     {
-        return $this->hasMany('App\Note')->withTrashed()->orderBy('created_at', 'desc');
+        return $this->hasMany('App\Note')
+            ->where('is_personal', false)
+            ->withTrashed()
+            ->orderBy('created_at', 'desc');
+    }
+
+    public function personal_notes()
+    {
+        return $this->hasMany('App\Note')
+            ->where('user_id', Auth::user()->id)
+            ->withTrashed()
+            ->orderBy('created_at', 'desc');
     }
 
     public function features()

@@ -8,6 +8,7 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Note;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class NoteController extends Controller
 {
@@ -34,11 +35,14 @@ class NoteController extends Controller
 
     public function add(Request $request)
     {
+        
         $note = new Note;
         $note->job_id = $request->jobid;
         $note->lead_id = $request->leadid;
-        $note->user_id = Auth::user()->id;
+        $user = Auth::user();
+        $note->user_id = $user->id;
         $note->note = $request->note;
+        $note->is_personal = $user->cant('edit-job'); //true if user == type(viewer)
         $result = $note->save();
 
         if($result == true)
@@ -55,11 +59,12 @@ class NoteController extends Controller
 
     public function delete($note_id)
     {
-        $this->authorize('edit');
-
-//        $note = Note::find($note_id);
-        $result = Note::destroy($note_id);
-
-        return response()->json(['result' => $result]);
+        $note = Note::find($note_id);
+        if(Gate::allows('delete-note', $note))
+        {
+            $result = $note->delete();
+            return response()->json(['result' => $result]);
+        }
+        return response()->json(['result' => false]);
     }
 }

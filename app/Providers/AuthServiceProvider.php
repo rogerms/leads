@@ -41,6 +41,11 @@ class AuthServiceProvider extends ServiceProvider
             return  $user->role_id == 3  || $job->proposal_author == $user->id || empty($job->proposal_author);
         });
 
+        $gate->define('delete-note', function($user, $note)
+        {
+            return $user->can('edit-job') || $note->user_id == $user->id;
+        });
+
         foreach($permissions as $permission)
         {
             $gate->define($permission->slug, function($user) use($permission)

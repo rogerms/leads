@@ -426,13 +426,32 @@ function deletenote (event)
             .done(function(data){
                 // console.log(data);
                 if(data.result) {
-                    tag.remove();
+                    hideDeletedNote(tag);
                     showResult('Note deleted');
                 }
             });
     });
 
     dialog.modal('show');
+}
+function hideDeletedNote(tag)
+{
+    var classNames = tag.attr('class').split(' ');
+    for(var i = 0, size = classNames.length; i < size; i++)
+    {
+        if(classNames[i].startsWith('tag-'))
+        {
+            tag.removeClass(classNames[i]);
+        }
+    }
+    tag.removeClass('active');
+    tag.removeClass('tag-all');
+    tag.addClass('disabled tag-deleted');
+    tag.hide();
+    tag.find('.delete-note').remove();//the delete button 'x'
+    var dp = tag.find('.item-text-deletedat');
+    dp.text("Deleted on: 1 sec ago");
+    dp.css('display', 'block');
 }
 
 function addStyle()
@@ -996,6 +1015,14 @@ function updateJob () {
             {
                 console.log('new label called');
                 resetLabelTrail(form, msg.labels);
+            }
+            if(msg.removals)
+            {
+                refreshRemovalList(form, msg.removals);
+            }
+            if(msg.materials)
+            {
+                refreshMaterialList(form, msg.materials);
             }
         }
     }).fail(function (){
@@ -1871,6 +1898,34 @@ function emailToCustomer(e)
                 callback: function () {}
             }
         }
+    });
+}
+function refreshMaterialList(form, materials)
+{
+    var list = form.find('#materials');
+    list.find('.col-sm-5').remove();//empty list
+    $.each(materials, function (index, material) {
+
+        var tmp = $('#templates').find('#material').clone();
+        tmp.find('#name').val(material.name);
+        tmp.find('#qty').val(material.qty);
+        tmp.find('#unit').val(material.qty_unit);
+        tmp.find('#vendor').val(material.vendor);
+        tmp.find('div.material').attr('id', material.id);
+        tmp.find('#delivered').prop('checked', (material.delivered == 1));
+
+        list.append(tmp);
+    });
+}
+
+function refreshRemovalList(form, removals)
+{
+    var list = form.find('#removals');
+    list.find('[name=removal]').remove();//empty list
+
+    $.each(removals, function (index, removal) {
+        var elem = '<input type="text" class="form-control inline-control" name="removal"  data-removalid="'+removal.id+'" value="'+removal.name+'">';
+        list.find('.addremoval').before(elem);
     });
 }
 

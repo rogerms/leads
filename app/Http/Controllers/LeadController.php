@@ -46,7 +46,7 @@ class LeadController extends Controller
         
         $lead->load('jobs', 'notes', 'drawings');
 
-        $lead->jobs->load('features', 'removals', 'materials', 'proposal', 'proposals');
+        $lead->jobs->load('features', 'removals', 'materials', 'proposal', 'proposals', 'notes');
 
         if($request->fmt == 'json')
             $lead->_drawings = DrawingController::filter($lead->drawings);
