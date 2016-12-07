@@ -101,16 +101,23 @@
             @endforeach
         </div> <!-- END FEATURES 2-->
         <input type="hidden" id="proposal-author" value="{{ $job->proposal_author }}">
-        @can('edit-job', $job)
+        {{--@can('edit-job', $job)--}}
         <div class="row">
             <div style="padding: 10px;">
                 <label>Proposal Notes:<span style="color:grey"> @if(count($job->proposals) > 0 ){{ '#'.count($job->proposals) }} @endif</span></label>
                 <div class="proposal-box" >
-                    <textarea class="proposal-note" data-id="{{ $job->proposal['id'] }}">{{ $job->proposal['text'] }}</textarea>
+                    <?php $proposal_text = $job->proposal['text'];
+                        if(Auth::user()->cant('edit-job'))
+                        {
+                            $pattern = '/-?\$\s?\d+(,\d+)*(\.\d+)?/i'; //$500.50 -$ 400
+                            $proposal_text  = preg_replace($pattern, '', $proposal_text);
+                        }
+                    ?>
+                    <textarea class="proposal-note" data-id="{{ $job->proposal['id'] }}">{{ $proposal_text }}</textarea>
                 </div>
             </div>
         </div>
-        @endcan
+        {{--@endcan--}}
 
         @can('edit-job')
         <div class="row row-extra-pad">
