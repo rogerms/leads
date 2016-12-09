@@ -84,9 +84,9 @@ Route::group(['prefix' => 'api', 'middleware' => 'auth:api'], function()
 
     Route::get('style/update', 'StyleController@update');
 
-    Route::post('proposal/edit/{id}', 'JobController@edit_proposal');
+    Route::post('proposal/edit/{id}', 'ProposalController@edit');
 
-    Route::get('proposal/{id}', 'JobController@show_proposal');
+    Route::get('proposal/{id}', 'ProposalController@show');
 
     Route::get( 'print/job/{id}', 'JobController@print_preview');
 
@@ -204,11 +204,16 @@ Route::group(['middleware' => 'web'], function () {
 
     Route::post('style/{id}/delete', 'StyleController@delete');
 
-    Route::post('proposal/edit/{id}', 'JobController@edit_proposal');
 
-    Route::post('proposal/new/{id}', 'JobController@new_proposal');
+//----------------------------------------------------------------
+// Proposal
+//----------------------------------------------------------------
 
-    Route::get('/proposal/index/{jobid}', 'JobController@index_proposal');
+    Route::post('proposal/edit/{id}', 'ProposalController@edit');
+
+    Route::post('proposal/new/{id}', 'ProposalController@create');
+
+    Route::get('/proposal/index/{jobid}', 'ProposalController@index');
 
 
 

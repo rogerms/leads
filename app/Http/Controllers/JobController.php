@@ -394,53 +394,6 @@ class JobController extends Controller
         return $job;
     }
 
-    public function edit_proposal(Request $request, $id)
-    {
-        $this->authorize('edit-job');
-        $job_id = $request->jobid;
-        $job = Job::find($job_id);
-        $_id = $job->proposal['id'];
-        $proposal = Proposal::find($_id);
-        $user_id = Auth::user()->id;
-
-
-        if($proposal == null)
-        {
-            $version = count(Proposal::withTrashed()->where('job_id', $job_id)->get()) + 1;
-            $proposal = new Proposal();
-            $proposal->job_id  = $job_id;
-            $proposal->version  = $version;
-        }
-
-        $proposal->text = $request->text;
-
-        if($proposal->created_by == null)
-            $proposal->created_by = $user_id;
-        $proposal->updated_by = $user_id;
-
-        $result = $proposal->save();
-
-        return response()->json(['result' => $result, 'author' => $proposal->created_by, 'id' =>  $proposal->id]);
-    }
-
-    public function new_proposal(Request $request, $id)
-    {
-        $this->authorize('edit-job');
-
-        $result = Proposal::where('job_id', $id)->delete();
-
-        return response()->json(['result' => $result]);
-    }
-
-    public function index_proposal(Request $request, $id)
-    {
-        $this->authorize('edit-job');
-
-        $props = Job::find($id)->proposals()->get();
-
-        return view('job.proposals', compact('props'));
-    }
-
     public  function style_pdf($id)
     {
         $stylegroup = StyleGroup::find($id);
@@ -647,17 +600,6 @@ class JobController extends Controller
     public function save_note()
     {
         return 'done';
-    }
-
-    public function show_proposal(Request $request, $id)
-    {
-        $job = Job::find($id);
-        $job->load('proposal');
-        $proposal = $job->proposal ? $job->proposal: new Proposal();
-        $proposal->job_id = $id;
-        $url = URL::to('/');
-        $token = $request->api_token;
-        return view('proposal', compact('proposal', 'url', 'token'));
     }
 
 //    public function upload($lead_id)

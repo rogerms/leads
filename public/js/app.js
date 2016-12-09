@@ -4,8 +4,10 @@ var processingSearch = false;
 var autocompleteLists = [];
 var sortby = '';
 var sortdirection = 1; // 1=asc -1=desc
+var versionbuttons = {};
 
 $(function () {
+
     processingSearch = false;
     setupAjaxHeader();
     setAutoComplete();
@@ -109,6 +111,7 @@ $(function () {
     $('#emailtocustomer').on('click', emailToCustomer);
 
     tinymceInit();
+
 });
 
 function toggleData()
@@ -132,6 +135,8 @@ function initPrototype()
 function tinymceInit () {
     tinymce.init({
         selector: 'textarea.proposal-note',
+        //content_css: '/css/style.css?'+new Date().getMilliseconds(),
+        //font_formats:"Default='myFontFace', Arial, Helvetica, Tahoma, Verdana, sans-serif;Arial=arial,helvetica,sans-serif",
         width: 835,
         height: 360,
         max_height: 270,
@@ -184,6 +189,10 @@ function validateTime(){
 }
 
 function customRTEButtons (editor) {
+    // editor.on('init', function(args) {
+    //
+    // });
+
     editor.addButton('autosum', {
         icon: 'sigma',
         title: 'Add numbers',
@@ -215,8 +224,6 @@ function customRTEButtons (editor) {
         title: 'View PDF',
         image: '/images/icons/480-file-pdf.png',
         onclick: function (event) {
-            // var targetid = editor.id;
-            // console.log('target '+targetid);
             var jobid = $(event.target).parents('form').attr('id');
             // console.log('job'+ jobid);
             window.location.href = '/print/job/'+jobid;
@@ -230,6 +237,16 @@ function customRTEButtons (editor) {
         onclick: function (event) {
             var jobid = $(event.target).parents('form').attr('id');
             window.location.href = '/proposal/index/'+jobid;
+        },
+
+        onpostrender: function(event){
+            var id =  $(this).attr('_id');
+            var form = $('#'+id).parents('form');
+            var jobid = form.attr('id');
+            var count = parseInt(form.find('.proposals-count').data('count'));
+            this.disabled(!(count > 1));
+            versionbuttons[jobid] = this;
+
         }
     });
 
@@ -338,8 +355,13 @@ function newProposalNote(editor, form){
         .done(function(data){
             if(data.result) {
                 showResult('new doc created');
-                form.find('.proposal-note').data('id', "");
+                form.find('.proposal-note').data('id', data.id);
                 editor.setContent("");
+                var pc = form.find('.proposals-count');
+                var counter = data.counter;
+                pc.data('count', counter);
+                pc.text('#'+counter);
+                versionbuttons[jobid].disabled(!counter > 1);
             }
             else{
                 showResult('new doc created');
