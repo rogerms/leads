@@ -4,11 +4,11 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class StyleGroup extends Model
+class PaverGroup extends Model
 {
-    public function styles()
+    public function pavers()
     {
-        return $this->hasMany('App\Style', 'group_id');
+        return $this->hasMany('App\Paver', 'group_id');
     }
 
     public function job()

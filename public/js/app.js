@@ -30,9 +30,9 @@ $(function () {
 
     $('div[name=notes]').on('click', '.delete-note', deletenote);
 
-	$('.stylesgroups').on('click', '.add-style',addStyle);
+	$('.paversgroups').on('click', '.add-paver', addPaver);
 
-    $('.add-style-group').click(addStyleGroup);
+    $('.add-paver-group').click(addPaverGroup);
 
 	$("#savebt").on("click", saveLead);
 
@@ -80,7 +80,7 @@ $(function () {
 
     $('.add-material').on('click', addmaterial);
 
-    $('.toggle-box').on('click', toggleStyles);
+    $('.toggle-box').on('click', togglePavers);
 
     $('.add-rep').on('click', addReps);
 
@@ -90,7 +90,7 @@ $(function () {
 
     $('.update-group,#update-all-groups').on('click', updateGroup);
 
-    $('.delete-style').on('click', deleteStyle);
+    $('.delete-paver').on('click', deletePaver);
 
     $('.tags-select').on('change', selectNotes);
 
@@ -369,7 +369,7 @@ function newProposalNote(editor, form){
         });
 }
 
-function toggleStyles()
+function togglePavers()
 {
     var id = $(this).attr('id');
     var name = '[name=ss'+id+']';
@@ -476,23 +476,24 @@ function hideDeletedNote(tag)
     dp.css('display', 'block');
 }
 
-function addStyle()
+function addPaver()
 {
-    var slist = $(this).parents('.style-sheet').find('.style-rows');
-    var tag = $('#templates').find('.style-row').first().clone();
+    console.log('call addPaver');
+    var slist = $(this).parents('.paver-sheet').find('.paver-rows');
+    var tag = $('#templates').find('.paver-row').first().clone();
     slist.append(tag);
     //add autocomplete to new ones
-    tag.find('#paverstyle').autocomplete({source: autocompleteLists['styles']});
+    tag.find('#paver').autocomplete({source: autocompleteLists['pavers']});
     tag.find('#manufacturer').autocomplete({source: autocompleteLists['manus']});
     tag.find('#pavercolor').autocomplete({source: autocompleteLists['colors']});
     tag.find('#paversize').autocomplete({source: autocompleteLists['sizes']});
-    $('.delete-style').on('click', deleteStyle);
+    $('.delete-paver').on('click', deletePaver);
 }
 
-function addStyleGroup()
+function addPaverGroup()
 {
-    var slist = $(this).parents('.stylesgroups').find('.style-sheets');
-    var tag = $('#templates').find('.style-sheet').first().clone();
+    var slist = $(this).parents('.paversgroups').find('.paver-sheets');
+    var tag = $('#templates').find('.paver-sheet').first().clone();
     tag.find('.group-count').text(slist.find('.group-count').length + 1 + '*');
 
     //tag.attr('id', 0);
@@ -500,10 +501,10 @@ function addStyleGroup()
     //tag.find('#tumbled ').prop('checked', false);
     slist.append(tag);
     //add autocomplete to new ones
-    //add listener to add style button
+    //add listener to add paver button
     datePickerInit();
     $('.update-group').on('click', updateGroup);
-    tag.find('#paverstyle').autocomplete({source: autocompleteLists['styles']});
+    tag.find('#paver').autocomplete({source: autocompleteLists['pavers']});
     tag.find('#manu').autocomplete({source: autocompleteLists['manus']});
     tag.find('#pavercolor').autocomplete({source: autocompleteLists['colors']});
     tag.find('#paversize').autocomplete({source: autocompleteLists['sizes']});
@@ -633,8 +634,8 @@ function setAutoComplete () {
                 minLength: 1
             });
 
-            $('input[name=paverstyle]').autocomplete({
-                source: data['styles'],
+            $('input[name=paver]').autocomplete({
+                source: data['pavers'],
                 minLength: 1
             });
 
@@ -1052,24 +1053,24 @@ function updateJob () {
     });
 }
 
-function deleteStyle () {
+function deletePaver () {
     event.preventDefault();
-    var tag = $(this).parents('.style-row');
+    var tag = $(this).parents('.paver-row');
     var id = tag.attr('id');
-    var result = window.confirm("Are you sure you want to delete this style?");
+    var result = window.confirm("Are you sure you want to delete this paver?");
     if(result === false) return;
 
     $.ajax({
-        url: "/style/"+id+"/delete",
+        url: "/paver/"+id+"/delete",
         type: 'POST'
     }).done(function (msg) {
         console.log(msg);
         if (msg.result == 'success') {
             tag.remove();
-            showResult('Style deleted');
+            showResult('Paver deleted');
         }
     }).fail(function (){
-        showResult('Error trying to delete style', true);
+        showResult('Error trying to delete paver', true);
     });
 }
 
@@ -1078,27 +1079,27 @@ function updateGroup () {
 
     var form  = $('form');
     var group = false;
-    var _stylegroups = null;
+    var _pavergroups = null;
 
     if ($(this).hasClass('update-group'))
     {
         var group = true;
-        _stylegroups = getStyleGroup($(this).parents('.style-sheet'));
+        _pavergroups = getPaverGroup($(this).parents('.paver-sheet'));
     }
     else{
-        _stylegroups = getStyleGroups(form);
+        _pavergroups = getPaverGroups(form);
     }
 
     var id = $('#jobid').val();
     var fdata = {
-            stylegroups: _stylegroups,
+            pavergroups: _pavergroups,
             jobid: id
         };
 
-    console.log($(this).parents('.style-sheet2').length);
+    console.log($(this).parents('.paver-sheet2').length);
 
     $.ajax({
-        url: "/style/update",
+        url: "/paver/update",
         data: fdata,
         type: 'POST'
     }).done(function (msg) {
@@ -1147,13 +1148,13 @@ function getMaterials(form)
     return list;
 }
 
-function getStyleGroups(form, selected)
+function getPaverGroups(form, selected)
 {
     //groups
-    var stylegroups = [];
+    var pavergroups = [];
 
-    form.find('.style-sheet').each(function() {
-            var styles = [];
+    form.find('.paver-sheet').each(function() {
+            var pavers = [];
             var gr = {
                 id: $(this).attr('id'),
                 manu: $(this).find('#manu').val(),
@@ -1167,10 +1168,10 @@ function getStyleGroups(form, selected)
                 delivered: $(this).find('#delivered').val()
             };
 
-            $(this).find('.style-row').each(function () {
+            $(this).find('.paver-row').each(function () {
                 var row = {
                     id: $(this).attr('id'),
-                    style: $(this).find('#paverstyle').val(),
+                    paver: $(this).find('#paver').val(),
                     //manu: $(this).find('#manufacturer').val(),
                     color: $(this).find('#pavercolor').val(),
                     size: $(this).find('#paversize').val(),
@@ -1181,21 +1182,21 @@ function getStyleGroups(form, selected)
                     qty_unit: $(this).find('#qty_unit').val(),
                     tumbled: $(this).find('#tumbled:checked').length
                 };
-                if (!empty(row)) styles.push(row);
+                if (!empty(row)) pavers.push(row);
             });
-            if (!empty(gr) || !empty(styles)) {
-                gr['styles'] = styles;
-                stylegroups.push(gr);
+            if (!empty(gr) || !empty(pavers)) {
+                gr['pavers'] = pavers;
+                pavergroups.push(gr);
             }
     });
-    return stylegroups;
+    return pavergroups;
 }
 
-function getStyleGroup(group)
+function getPaverGroup(group)
 {
     //groups
-    var stylegroups = [];
-    var styles = [];
+    var pavergroups = [];
+    var pavers = [];
     var gr = {
         id: group.attr('id'),
         manu: group.find('#manu').val(),
@@ -1209,10 +1210,10 @@ function getStyleGroup(group)
         delivered: group.find('#delivered').val()
     };
 
-    group.find('.style-row').each(function () {
+    group.find('.paver-row').each(function () {
         var row = {
             id: $(this).attr('id'),
-            style: $(this).find('#paverstyle').val(),
+            paver: $(this).find('#paver').val(),
             //manu: $(this).find('#manufacturer').val(),
             color: $(this).find('#pavercolor').val(),
             size: $(this).find('#paversize').val(),
@@ -1223,14 +1224,14 @@ function getStyleGroup(group)
             qty: $(this).find('#qty').val(),
             tumbled: $(this).find('#tumbled:checked').length
         };
-        if (!empty(row)) styles.push(row);
+        if (!empty(row)) pavers.push(row);
     });
-    if (!empty(gr) || !empty(styles))
+    if (!empty(gr) || !empty(pavers))
     {
-        gr['styles'] = styles;
-        stylegroups.push(gr);
+        gr['pavers'] = pavers;
+        pavergroups.push(gr);
     }
-    return stylegroups;
+    return pavergroups;
 }
 
 function updateLead () {

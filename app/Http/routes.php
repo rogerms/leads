@@ -64,7 +64,7 @@ Route::group(['prefix' => 'api', 'middleware' => 'auth:api'], function()
 
     Route::any('job/create/{leadid}', 'JobController@create');
 
-    Route::get('job/{id}/style', 'StyleController@show');
+    Route::get('job/{id}/paver', 'PaverController@show');
 
     Route::get('job/{id}', 'JobController@show');
 
@@ -82,7 +82,7 @@ Route::group(['prefix' => 'api', 'middleware' => 'auth:api'], function()
 
     Route::get('drawing/{id}', 'DrawingController@show');
 
-    Route::get('style/update', 'StyleController@update');
+    Route::get('paver/update', 'PaverController@update');
 
     Route::post('proposal/edit/{id}', 'ProposalController@edit');
 
@@ -184,13 +184,13 @@ Route::group(['middleware' => 'web'], function () {
 
     Route::get('job/note', 'JobController@show_note');
 
-    Route::get('job/{id}/style', 'StyleController@show');
+    Route::get('job/{id}/paver', 'PaverController@show');
 
     Route::any('jobs', 'JobController@index');
 
-    Route::any('style/pdf/{id}', 'JobController@style_pdf');
+    Route::any('paver/pdf/{id}', 'PaverController@pdf');
 
-    Route::any('style/html/{id}', 'JobController@style_html');
+    Route::any('paver/html/{id}', 'PaverController@html');
 
     Route::any('print/job/{id}', 'JobController@print_preview');
 
@@ -200,9 +200,9 @@ Route::group(['middleware' => 'web'], function () {
 
     Route::any('email/customer/{id}', 'JobController@email_pdf_customer');
 
-    Route::post('style/update', 'StyleController@update');
+    Route::post('paver/update', 'PaverController@update');
 
-    Route::post('style/{id}/delete', 'StyleController@delete');
+    Route::post('paver/{id}/delete', 'PaverController@delete');
 
 
 //----------------------------------------------------------------

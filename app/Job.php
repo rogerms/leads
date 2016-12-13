@@ -34,9 +34,9 @@ class Job extends Model
         return $this->belongsToMany('App\Feature')->withPivot('feature_id', 'active');
     }
 
-    public function stylegroups()
+    public function pavergroups()
     {
-        return $this->hasMany('App\StyleGroup');
+        return $this->hasMany('App\PaverGroup');
     }
 
     public function removals()

@@ -3,7 +3,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     {{--<link href="/css/bootstrap.min.css" rel="stylesheet">--}}
-    <title>Style Print PDF</title>
+    <title>Paver Print PDF</title>
     <style>
         /*@import url('https://fonts.googleapis.com/css?family=Averia+Gruesa+Libre');*/
         body{
@@ -123,8 +123,8 @@
 </head>
 <body id="print">
 <?php
-$sg = $stylegroup;
-$info = $stylegroup->job->lead;
+$pg = $pavergroup;
+$info = $pavergroup->job->lead;
 $footage_sum = 0;
 $weight_sum = 0;
 $price_sum = 0;
@@ -133,7 +133,7 @@ $palets_sum = 0;
 ?>
     <div id="page">
         <div class="to-div">
-            <h4>TO: <b>{{ $sg->manufacturer }}</b> </h4>
+            <h4>TO: <b>{{ $pg->manufacturer }}</b> </h4>
         </div>
         <div class="head-div">
             <h3>Strong Rock Pavers</h3>
@@ -142,15 +142,15 @@ $palets_sum = 0;
             <div class="ship-to">
                 <div class="ship-to-title"><h5>DELIVERY ADDRESS</h5></div>
                 <div class="ship-to-body">
-                    {{ $stylegroup->addr }}
+                    {{ $pavergroup->delivery_addr }}
                 </div>
             </div>
 
             <div class="order-info">
-                <b>Date:</b> {{ format_date( $stylegroup->order_date ) }} <br>
+                <b>Date:</b> {{ format_date( $pavergroup->order_date ) }} <br>
                 <b>Job Name:</b> {{ $jobname }} <br>
-                <b>Delivery Date:</b> {{ format_date($stylegroup->delivery_at) }} <br>
-                <b>Portlands:</b> {{ $sg->portlands }} <br>
+                <b>Delivery Date:</b> {{ format_date($pavergroup->delivery_at) }} <br>
+                <b>Portlands:</b> {{ $pg->portlands }} <br>
             </div>
         </div>
 
@@ -170,23 +170,23 @@ $palets_sum = 0;
                 </tr>
                 </thead>
                 <tbody>
-                @foreach($stylegroup->styles as $style)
+                @foreach($pavergroup->pavers as $paver)
                     <tr>
-                        <td>{{ $style->qty }}</td>
-                        <td>{{ ucfirst ($style->qty_unit) }}</td>
-                        <td>{{ $style->sqft }}</td>
-                        <td>{{ $style->style }}</td>
-                        <td>{{ $style->size }}</td>
-                        <td>{{ $style->color }}</td>
-                        <td>{{ ($style->tumbled == true)? 'YES': 'NO' }}</td>
-                        <td>{{ number_or_blank($style->weight) }}</td>
-                        <td>{{ $style->price }}</td>
+                        <td>{{ $paver->qty }}</td>
+                        <td>{{ ucfirst ($paver->qty_unit) }}</td>
+                        <td>{{ $paver->sqft }}</td>
+                        <td>{{ $paver->paver }}</td>
+                        <td>{{ $paver->size }}</td>
+                        <td>{{ $paver->color }}</td>
+                        <td>{{ ($paver->tumbled == true)? 'YES': 'NO' }}</td>
+                        <td>{{ number_or_blank($paver->weight) }}</td>
+                        <td>{{ $paver->price }}</td>
                     </tr>
                     <?php
-                    $footage_sum += $style->sqft;
-                    $weight_sum += $style->weight;
-                    $price_sum += $style->price;
-                    $palets_sum += $style->qty;
+                    $footage_sum += $paver->sqft;
+                    $weight_sum += $paver->weight;
+                    $price_sum += $paver->price;
+                    $palets_sum += $paver->qty;
                     ?>
                 @endforeach
 
@@ -220,9 +220,9 @@ $palets_sum = 0;
         </div>
 
         <div  class="bottom-div">
-            <b>Order placed by:</b> {{ $sg->orderedby }}<br>
-            <b>Delivery handled by:</b> {{ $sg->handledby }}<br>
-            <b>Notes:</b> {{ $sg->note }}<br>
+            <b>Order placed by:</b> {{ $pg->orderedby }}<br>
+            <b>Delivery handled by:</b> {{ $pg->handledby }}<br>
+            <b>Notes:</b> {{ $pg->note }}<br>
         </div>
         <div class="footer-text">
             Contact office for questions or confirmation at <b>(801) 815-5704</b><br>

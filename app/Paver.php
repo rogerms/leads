@@ -4,8 +4,8 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Style extends Model
+class Paver extends Model
 {
-    protected $table = 'job_style';
+    protected $table = 'job_pavers';
     public $timestamps = false;
 }

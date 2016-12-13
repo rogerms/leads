@@ -3,14 +3,15 @@
 namespace App\Http\Controllers;
 
 
-use App\StyleGroup;
+use App\PaverGroup;
 use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Job;
-use App\Style;
+use App\Paver;
 use app\Helpers\Helper;
+use PDF;
 
-class StyleController extends Controller
+class PaverController extends Controller
 {
 
     public function __construct()
@@ -21,14 +22,14 @@ class StyleController extends Controller
     public function show(Request $request, $job_id)
     {
         $job = Job::find($job_id);
-        $job->load('stylegroups');
-        $job->stylegroups->load('styles');
+        $job->load('pavergroups');
+        $job->pavergroups->load('pavers');
 
         if($request->fmt == 'json')
         {
-            return response()->json(['stylegroups' =>  $job->stylegroups]);
+            return response()->json(['pavergroups' =>  $job->pavergroups]);
         }
-        return view('job.style', compact('job'));
+        return view('job.paver', compact('job'));
     }
 
     public function update(Request $request)
@@ -36,9 +37,9 @@ class StyleController extends Controller
         $this->authorize('edit-job');
         $result = true;
         if($request->jobid == null) return 'false';
-		if (count($request->stylegroups) > 0)//doesn't break if style is empty
+		if (count($request->pavergroups) > 0)//doesn't break if paver is empty
 		{
-            $result &= $this->update_styles($request->stylegroups, $request->jobid);
+            $result &= $this->update_pavers($request->pavergroups, $request->jobid);
         }
 
         $result = ($result == true)? 'success': 'failed';
@@ -48,20 +49,20 @@ class StyleController extends Controller
     public function delete($id)
     {
         $this->authorize('edit-job');
-        $style = Style::find($id);
-        $style->delete();
+        $paver = Paver::find($id);
+        $paver->delete();
         return response()->json(['result' => 'success']);
     }
 
-    private function update_styles($stylegroups, $job_id)
+    private function update_pavers($pavergroups, $job_id)
     {
-        //return var_dump($request->styles);
+        //return var_dump($request->pavers);
         $result = true;
-        foreach($stylegroups as $sgroup)
+        foreach($pavergroups as $sgroup)
         {
             //update group
             $id = $sgroup['id'];
-            $group = StyleGroup::findOrNew($id);
+            $group = PaverGroup::findOrNew($id);
 
             $group->manufacturer = $sgroup['manu'];
             $group->portlands = $sgroup['portland'];
@@ -77,26 +78,26 @@ class StyleController extends Controller
             $group->job_id = $job_id;
             $result &= $group->save();
 
-        if(isset($sgroup['styles']))
-            foreach($sgroup['styles'] as $s)
+        if(isset($sgroup['pavers']))
+            foreach($sgroup['pavers'] as $s)
             {
                 $sid = $s['id'];
-                $style = new Style;
+                $paver = new Paver;
                 if($sid != 0)
                 {
-                    $style = Style::find($sid);
+                    $paver = Paver::find($sid);
                 }
-                $style->group_id = $group->id;
-                $style->style = $s['style'];
-                $style->color = $s['color'];
-                $style->size = $s['size'];
-                $style->sqft = $s['sqft'];
-                $style->weight = $s['weight'];
-                $style->price = $s['price'];
-                $style->qty = $s['qty'];
-                $style->qty_unit = $s['qty_unit'];
-                $style->tumbled = $s['tumbled'];
-                $result &= $style->save();
+                $paver->group_id = $group->id;
+                $paver->paver = $s['paver'];
+                $paver->color = $s['color'];
+                $paver->size = $s['size'];
+                $paver->sqft = $s['sqft'];
+                $paver->weight = $s['weight'];
+                $paver->price = $s['price'];
+                $paver->qty = $s['qty'];
+                $paver->qty_unit = $s['qty_unit'];
+                $paver->tumbled = $s['tumbled'];
+                $result &= $paver->save();
             }
         }
         return $result;
@@ -108,24 +109,23 @@ class StyleController extends Controller
         return date('Y-m-d H:i:s', $date);
     }
 
-    public  function style_pdf($id)
+    public  function pdf($id)
     {
-        $stylegroup = StyleGroup::find($id);
+        $pavergroup = PaverGroup::find($id);
 
-        $jobname = $this->job_name($stylegroup);
-        $pdf = PDF::loadView('pdf.style', compact('stylegroup', 'jobname'));
+        $jobname = $this->job_name($pavergroup);
+        $pdf = PDF::loadView('pdf.paver', compact('pavergroup', 'jobname'));
         $pdf->setPaper('letter', 'portrait');
-        return $pdf->inline();
 
-//      return view('pdf.style', compact('stylegroup', 'jobname'));
+        return $pdf->stream();
     }
 
-    public  function style_html($id)
+    public  function html($id)
     {
-        $stylegroup = StyleGroup::find($id);
-        $jobname = $this->job_name($stylegroup);
+        $pavergroup = PaverGroup::find($id);
+        $jobname = $this->job_name($pavergroup);
 
-        return view('pdf.stylehtml', compact('stylegroup', 'jobname'));
+        return view('pdf.paverhtml', compact('pavergroup', 'jobname'));
     }
 
     private function job_name($sgroup)

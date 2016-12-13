@@ -108,7 +108,7 @@ class LeadController extends Controller
             GROUP_CONCAT(DISTINCT DATE_FORMAT(jobs.date_sold, '%e-%b') ORDER BY jobs.id SEPARATOR '<br>') as date_sold,
             GROUP_CONCAT(DISTINCT jobs.size ORDER BY jobs.id SEPARATOR '<br>') as job_size,
             GROUP_CONCAT(DISTINCT j_notes.note ORDER BY j_notes.job_id SEPARATOR '||') as job_notes,
-            GROUP_CONCAT(DISTINCT CONCAT(DATE_FORMAT(style_groups.delivery_at, '%c/%e'), if(style_groups.delivered is null, '', ' &#x2714;'))  ORDER BY style_groups.job_id,style_groups.id SEPARATOR '<br>') as pavers_delivery,
+            GROUP_CONCAT(DISTINCT CONCAT(DATE_FORMAT(paver_groups.delivery_at, '%c/%e'), if(paver_groups.delivered is null, '', ' &#x2714;'))  ORDER BY paver_groups.job_id,paver_groups.id SEPARATOR '<br>') as pavers_delivery,
             GROUP_CONCAT(DISTINCT concat(material_rb.qty, 'x', material_rb.delivered) ORDER BY material_rb.job_id SEPARATOR '<br>')  as rb_qty,
             GROUP_CONCAT(DISTINCT concat(material_sand.qty, 'x', material_sand.delivered) ORDER BY material_sand.job_id  SEPARATOR '<br>') as sand_qty,
             GROUP_CONCAT(DISTINCT jobs.id ORDER BY jobs.id SEPARATOR ' ') as job_ids,
@@ -129,7 +129,7 @@ class LeadController extends Controller
             LEFT JOIN labels ON labels.id = job_label.label_id
             LEFT JOIN job_materials as material_rb ON material_rb.job_id = jobs.id and material_rb.name='rb'
             LEFT JOIN job_materials as material_sand ON material_sand.job_id = jobs.id and material_sand.name='sand' 
-            LEFT JOIN style_groups ON style_groups.job_id = jobs.id
+            LEFT JOIN paver_groups ON paver_groups.job_id = jobs.id
             WHERE 1";
 
             if($request->searchby == 'Tag')
@@ -519,7 +519,7 @@ class LeadController extends Controller
         /*   @var Request $request */
         /*   @var DB  */
         //cities
-        $style_arr = [];
+        $paver_arr = [];
         $color_arr = [];
         $size_arr = [];
         $manu_arr = [];
@@ -534,18 +534,18 @@ class LeadController extends Controller
             return $tmp;
         });
 
-        //style
-        $styles = DB::table('job_style')->select(DB::raw('distinct style'))
-                                        ->where('style', '<>', '')
-                                        ->where('style', '<>', 'n/a')
+        //paver
+        $pavers = DB::table('job_pavers')->select(DB::raw('distinct paver'))
+                                        ->where('paver', '<>', '')
+                                        ->where('paver', '<>', 'n/a')
                                         ->get();
 
-        foreach ($styles as $style) {
-            $style_arr[] = $style->style;
+        foreach ($pavers as $paver) {
+            $paver_arr[] = $paver->paver;
         }
 
         //manufacturer
-        $manus = DB::table('job_style')->select(DB::raw('distinct manufacturer'))
+        $manus = DB::table('job_pavers')->select(DB::raw('distinct manufacturer'))
                                         ->where('manufacturer', '<>', '')
                                         ->where('manufacturer', '<>', 'n/a')
                                         ->get();
@@ -555,7 +555,7 @@ class LeadController extends Controller
         }
 
         //color
-        $colors = DB::table('job_style')->select(DB::raw('distinct color'))
+        $colors = DB::table('job_pavers')->select(DB::raw('distinct color'))
                                         ->where('color', '<>', '')
                                         ->where('color', '<>', 'n\a')
                                         ->get();
@@ -565,7 +565,7 @@ class LeadController extends Controller
         }
 
         //size
-        $sizes = DB::table('job_style')->select(DB::raw('distinct size'))
+        $sizes = DB::table('job_pavers')->select(DB::raw('distinct size'))
                                         ->where('size', '<>', '')
                                         ->where('size', '<>', 'n/a')
                                         ->get();
@@ -585,7 +585,7 @@ class LeadController extends Controller
 
          return response()->json([
              'cities' => $city_arr,
-             'styles' => $style_arr,
+             'pavers' => $paver_arr,
              'manus' => $manu_arr,
              'colors' => $color_arr,
              'sizes' => $size_arr,
@@ -637,30 +637,30 @@ class LeadController extends Controller
 
 
         //capitalize word
-//        $styles = DB::table('job_style')->get();
-//        foreach($styles as $style1)
+//        $pavers = DB::table('job_pavers')->get();
+//        foreach($pavers as $paver1)
 //        {
-//            //print($style->id.'<br>');
-//            $style = Style::find($style1->id);
-//            $style->style =ucwords($style->style);
-//            $style->color =ucwords($style->color);
-//            $style->size = ucwords($style->size);
-//            $style->manufacturer=ucwords($style->manufacturer);
-//            $style->save();
-//            print($style->style.'<br>');
+//            //print($paver->id.'<br>');
+//            $paver = paver::find($paver1->id);
+//            $paver->paver =ucwords($paver->paver);
+//            $paver->color =ucwords($paver->color);
+//            $paver->size = ucwords($paver->size);
+//            $paver->manufacturer=ucwords($paver->manufacturer);
+//            $paver->save();
+//            print($paver->paver.'<br>');
 //
 //        }
 
-//        $styles = DB::table('job_style')->get();
-//        foreach($styles as $style1)
+//        $pavers = DB::table('job_pavers')->get();
+//        foreach($pavers as $paver1)
 //        {
-//            //print($style->id.'<br>');
-//            $style = Style::find($style1->id);
-//            $sizes = explode(',', $style->size);
-//            //print("<b>($style->job_id, $style->style, $style->color,$style->manufacturer,$style->size)</b><br>");
+//            //print($paver->id.'<br>');
+//            $paver = paver::find($paver1->id);
+//            $sizes = explode(',', $paver->size);
+//            //print("<b>($paver->job_id, $paver->paver, $paver->color,$paver->manufacturer,$paver->size)</b><br>");
 //            foreach($sizes as $size) {
 //                $size = trim($size);
-//                print("($style->job_id, '$style->style',  '$style->color' ,'$style->manufacturer','$size'),<br>");
+//                print("($paver->job_id, '$paver->paver',  '$paver->color' ,'$paver->manufacturer','$size'),<br>");
 //            }
 //        }
 

@@ -1,14 +1,14 @@
 <div id="templates" class="hidden">
-<div class="style-sheet" id="0" >
-    <div class="row style-group-title">
-        <h5>Paver Style Group <span class="group-count">*</span></h5>
+<div class="paver-sheet" id="0" >
+    <div class="row paver-group-title">
+        <h5>Paver Group <span class="group-count">*</span></h5>
     </div>
-    <div class="style-rows">
-            <div class="style-row" id="0">
+    <div class="paver-rows">
+            <div class="paver-row" id="0">
                 <div class="row" >
                     <div class="form-group col-md-3">
-                        <label for="paverstyle">Paver Style</label>
-                        <input type="text" class="form-control" name="paverstyle" id="paverstyle" value="" placeholder="Paver Style">
+                        <label for="paver">Paver </label>
+                        <input type="text" class="form-control" name="paver" id="paver" value="" placeholder="Paver">
                     </div>
                     <div class="form-group col-md-3">
                         <label for="pavercolor">Paver Color</label>
@@ -52,10 +52,10 @@
                 </div>
                 @endcan
             </div>
-    </div><!-- / styles -->
+    </div><!-- / pavers -->
     @can('edit-job')
     <div class="row row-extra-pad">
-        <button type="button" class="btn btn-primary btn-xs add-style" name="add-style">Add Style</button>
+        <button type="button" class="btn btn-primary btn-xs add-paver" name="add-paver">Add Paver</button>
     </div>
     @endcan
     <div class="row">

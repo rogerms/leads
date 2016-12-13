@@ -432,22 +432,22 @@ small{
     background-color: transparent;
 }
 
-.style-sheets {
+.paver-sheets {
 
     /*border: thin solid #101010;*/
     margin: 10px -14px;
 }
 
-.style-row {
+.paver-row {
     border-bottom-color: lightgrey;
     border-bottom-style: solid;
     border-bottom-width: thin;
 }
 
-.style-sheet{
+.paver-sheet{
     background-color: #eee;
 }
-.style-group-title{
+.paver-group-title{
     margin: 0;
     padding-left: 17px;
     padding-top: 8px;
@@ -456,12 +456,12 @@ small{
 
 }
 
-.style-group-title h5{
+.paver-group-title h5{
     font-weight: bold;
     color: grey;
 }
 
-.style-row {
+.paver-row {
     /*border-bottom: solid thin #000;*/
     /*background-color: rgba(100, 100, 100, 0.2);*/
     /*background-color: #eee;*/

@@ -7,12 +7,9 @@ use app\Helpers\Helper;
 use App\Label;
 use App\Material;
 use App\Note;
-use App\Proposal;
-use App\StyleGroup;
 use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Job;
-use App\Style;
 use App\Removal;
 use DB;
 use Illuminate\Support\Facades\URL;
@@ -392,36 +389,6 @@ class JobController extends Controller
         $job->just_sold = $just_sold;
 
         return $job;
-    }
-
-    public  function style_pdf($id)
-    {
-        $stylegroup = StyleGroup::find($id);
-        $jobname = $this->job_name($stylegroup);
-        $stylegroup->addr = $stylegroup->delivery_addr;
-        if ($stylegroup->delivery_addr == "")
-        {
-            $info = $stylegroup->job->lead;
-            $stylegroup->addr = "$info->street\n$info->city, UT $info->zip";
-        }
-
-        $pdf = \PDF::loadView('pdf.style', compact('stylegroup', 'jobname'));
-        $pdf->setPaper('letter', 'portrait');
-        return $pdf->stream();
-    }
-
-    public  function style_html($id)
-    {
-        $stylegroup = StyleGroup::find($id);
-        $jobname = $this->job_name($stylegroup);
-        $stylegroup->addr = $stylegroup->delivery_addr;
-        if ($stylegroup->delivery_addr == "")
-        {
-            $info = $stylegroup->job->lead;
-            $stylegroup->addr = "$info->street\n$info->city, UT $info->zip";
-        }
-
-        return view('pdf.stylehtml', compact('stylegroup', 'jobname'));
     }
     
     public function print_preview_html($id)
