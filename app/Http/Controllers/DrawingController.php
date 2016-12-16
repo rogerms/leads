@@ -102,7 +102,7 @@ class DrawingController extends Controller
         $d->lead_id = $lead_id;
         $d->path = $filename;
         $d->label = Input::get('label');
-        $d->selected = Input::get('protection');
+        $d->visibility = Input::get('visibility');
         $d->created_by = Auth::user()->id;
         $d->save();
 
@@ -122,14 +122,14 @@ class DrawingController extends Controller
 
     }
 
-    public function change_protection(Request $request, $id)
+    public function change_visibility(Request $request, $id)
     {
         $this->authorize('edit-job');
         $drw = Drawing::find($id);
-        $drw->selected = $request->protection; //switch
+        $drw->visibility = $request->visibility; //switch
         $result = $drw->save();
         return response()->json(['success' => $result]);
-       // Drawing::where('id', $id)->update(['selected' => true]);
+       // Drawing::where('id', $id)->update(['visibility' => true]);
     }
 
     public function printr($arr)
@@ -147,9 +147,9 @@ class DrawingController extends Controller
 
         $drawing = Drawing::find($id);
         $drawing->label = $request->label;
-        if($request->protection >= 0)
+        if($request->visibility >= 0)
         {
-            $drawing->selected = $request->protection;
+            $drawing->visibility = $request->visibility;
         }
 
         $drawing->save();
@@ -200,11 +200,11 @@ class DrawingController extends Controller
         ///superuser at least
         if(Gate::allows('delete-job')) return true;
         //public
-        if($item->selected == 2) return true;
+        if($item->visibility == 2) return true;
         //createdd by user
         if($item->created_by == Auth::user()->id) return true;
-        //role = user and  protection = protected
-        if(Auth::user()->role->name == 'User' && $item->selected == 1) return true;
+        //role = user and  visibility = protected
+        if(Auth::user()->role->name == 'User' && $item->visibility == 1) return true;
         //dd(Auth::user()->role);
         return false;
     }

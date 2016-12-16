@@ -164,7 +164,7 @@ Route::group(['middleware' => 'web'], function () {
 //----------------------------------------------------
     Route::post('drawing/delete/{id}', 'DrawingController@delete');
 
-    Route::post('drawing/protection/{id}', 'DrawingController@change_protection');
+    Route::post('drawing/visibility/{id}', 'DrawingController@change_visibility');
 
     Route::post('drawing/edit/{id}', 'DrawingController@edit');
 

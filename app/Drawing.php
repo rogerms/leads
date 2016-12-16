@@ -17,8 +17,8 @@ class Drawing extends Model
         return $this->belongsTo('App\Lead');
     }
 
-    public function scopeSelected($query)
+    public function scopePublic($query)
     {
-        return $query->where('selected', '=', 2);
+        return $query->where('visibility', '=', 2);
     }
 }

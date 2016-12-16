@@ -2,7 +2,7 @@
 <div class="row" xmlns="http://www.w3.org/1999/html">
     @foreach($drawings as $drawing)
         <div class="col-md-3 sketch-nail" id="{{ $drawing->id }}" data-drawingid="{{ $drawing->id }}" data-label="{{ $drawing->label }}">
-            <div class="thumbnail tbn-item visibility-{{ $drawing->selected }}"  id="dw-{{ $drawing->id }}">
+            <div class="thumbnail tbn-item visibility-{{ $drawing->visibility }}"  id="dw-{{ $drawing->id }}">
                 <div class="caption ">
                     <p id="label">{{ $drawing->label }}</p>
                     <a href="/drawing/{{$drawing->id}}" class="sketch-tbn"><i class="glyphicon glyphicon-picture"></i></a>
@@ -17,7 +17,7 @@
 
     {{--<a href="/drawings/{{$drawing->path}}" class="sketch-tbn" >--}}
         {{--<img src="/drawings/placeholder.png"  alt="sketch" id="drawing-{{ $drawing->id }}"--}}
-             {{--class="img-rounded sketch-nail {{ ($drawing->selected)? 'active': '' }}"--}}
+             {{--class="img-rounded sketch-nail {{ ($drawing->visibility)? 'active': '' }}"--}}
              {{--data-drawingid="{{ $drawing->id }}">--}}
         {{--<h5>Label Head</h5>--}}
     {{--</a>--}}

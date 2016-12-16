@@ -14,9 +14,9 @@
             </div>
         </div>
         <div class="form-group">
-            <label for="protection" class="col-sm-2 control-label">Protection</label>
+            <label for="visibility" class="col-sm-2 control-label">Visibility</label>
             <div class="col-sm-8">
-                <select class="form-control col-sm-6" id="protection">
+                <select class="form-control col-sm-6" id="visibility">
                     <option value="0">Private</option>
                     <option value="1" selected>Protected</option>
                     <option value="2">Public</option>

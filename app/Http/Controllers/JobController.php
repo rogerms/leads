@@ -395,7 +395,7 @@ class JobController extends Controller
     {
         $job = Job::find($id);
         $job->load('lead');
-        $draw = Drawing::where('lead_id',  $job->lead_id)->where('selected', true)->get();
+        $draw = Drawing::where('lead_id',  $job->lead_id)->where('visibility', 2)->get();
 
         $path = count($draw) > 0? $draw[0]->path: '';
         $job->name = $this->get_job_name($job);
@@ -439,10 +439,10 @@ class JobController extends Controller
 
     private function get_job_pdf(Job $job, $output=false)
     {
-        $draw = Drawing::where('lead_id',  $job->lead_id)->selected()->first();
+        $draw = Drawing::where('lead_id',  $job->lead_id)->public()->first();
         $job->descs = Note::where('job_id', $job->id)->where('note', 'like', '#description %')->get();
 //        $draw = $job->lead->drawings->first(function ($key, $value) {
-//            return $value->selected == true;
+//            return $value->visibility == 2;
 //        });
         $path = isset($draw->path)? $draw->path: '';
         $job->name = $this->get_job_name($job);

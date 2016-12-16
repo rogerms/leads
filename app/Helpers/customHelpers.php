@@ -147,12 +147,12 @@
         }
     }
 
-    if(!function_exists('get_selected_drawing'))
+    if(!function_exists('get_public_drawing'))
     {
-        function get_selected_drawing($drawings)
+        function get_public_drawing($drawings)
         {
             foreach($drawings as $drawing){
-                if($drawing->selected) return $drawing->path;
+                if($drawing->visibility == 2) return $drawing->path;
             }
             return "";
         }

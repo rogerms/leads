@@ -528,24 +528,24 @@ function addremovals()
     });
 }
 
-function changeDrawingProtection(id, level)
+function changeDrawingVisibility(id, level)
 {
     var dcard = $('#dw-'+id);
 
     $.ajax({
-            url: '/drawing/protection/'+id,
-            data: {leadid: $('#leadid').val(), protection: level },
+            url: '/drawing/visibility/'+id,
+            data: {leadid: $('#leadid').val(), visibility: level },
             type: 'POST'
         })
         .fail(function (){
-            showResult('Error trying to change protection', true);
+            showResult('Error trying to change visibility', true);
         })
         .done(function(data){
             if(data.success) {
 
                 removeVClass(dcard);
                 dcard.addClass('visibility-'+level);
-                showResult('Sketch protection changed');
+                showResult('Sketch visibility changed');
             }
         });
 }
@@ -787,15 +787,15 @@ function runContextMenuAction() {
     }
     if(select == 'Private')
     {
-        changeDrawingProtection($contextMenu.data('id'), 0);
+        changeDrawingVisibility($contextMenu.data('id'), 0);
     }
     if(select == 'Protected')
     {
-        changeDrawingProtection($contextMenu.data('id'), 1);
+        changeDrawingVisibility($contextMenu.data('id'), 1);
     }
     if(select == 'Public')
     {
-        changeDrawingProtection($contextMenu.data('id'), 2);
+        changeDrawingVisibility($contextMenu.data('id'), 2);
     }
     if(select == 'Change Label')
     {
@@ -819,9 +819,9 @@ function addImage(event) {
                 {
                     var files = $(this).find('#inputfile').prop('files');
                     var label = $(this).find('#label').val();
-                    var protection = $(this).find('#protection').val();
+                    var visibility = $(this).find('#visibility').val();
                     if(files.length > 0) {
-                        uploadFile(event, files[0], leadid, label, protection);
+                        uploadFile(event, files[0], leadid, label, visibility);
                     }
                 }
             },
@@ -1337,7 +1337,7 @@ function deleteDrawing(target, drawingid)
 }
 
 // Catch the form submit and upload the files
-function uploadFile(event, file, leadid, label, protection)
+function uploadFile(event, file, leadid, label, visibility)
 {
     event.stopPropagation(); // Stop stuff happening
     event.preventDefault(); // Totally stop stuff happening
@@ -1348,7 +1348,7 @@ function uploadFile(event, file, leadid, label, protection)
 
     data.append("image", file);
     data.append('label', label);
-    data.append('protection', protection);
+    data.append('visibility', visibility);
 
     $.ajax({
         url: '/drawing/add/'+leadid,
