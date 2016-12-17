@@ -122,7 +122,7 @@ class JobController extends Controller
 		{
 			$feat_arr[] = ['job_id' => $job->id, 'feature_id' => $key, 'active' => ($value == 'true')];
 		}
-		DB::table('feature_job')->insert($feat_arr);
+		DB::table('job_features')->insert($feat_arr);
 
         if (count($request->stylegroups) > 0)//doesn't break if style is empty
         {
@@ -185,10 +185,10 @@ class JobController extends Controller
         if($request->features)
 		foreach($request->features as $k => $v)
 		{
-            $id = DB::table('feature_job')->where(['job_id' => $job->id, 'feature_id' => $k])->value('feature_id');
+            $id = DB::table('job_features')->where(['job_id' => $job->id, 'feature_id' => $k])->value('feature_id');
             if(empty($id))
             {
-                DB::table('feature_job')->insert([
+                DB::table('job_features')->insert([
                         'job_id' => $job->id,
                         'feature_id' => $k,
                         'active' => ($v == 'true')
@@ -196,7 +196,7 @@ class JobController extends Controller
             }
             else
             {
-                DB::table('feature_job')
+                DB::table('job_features')
                     ->where(['job_id' => $job->id, 'feature_id' => $k])
                     ->update(['active' => ($v == 'true')]);
             }

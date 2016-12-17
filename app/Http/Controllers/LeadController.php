@@ -743,7 +743,7 @@ class LeadController extends Controller
 
 
   /*      foreach ($jobs as $job) {
-            $features = DB::table('feature_job')->select('feature_id')->where('job_id', $job->id)->get();
+            $features = DB::table('job_features')->select('feature_id')->where('job_id', $job->id)->get();
             $feat_arr = array();
 
             foreach ($features as $feat) {
@@ -754,7 +754,7 @@ class LeadController extends Controller
             {
                 if(!in_array($i, $feat_arr))
                 {
-                    DB::table('feature_job')->insert(['feature_id' => $i, 'job_id' => $job->id, 'active' => 0]);
+                    DB::table('job_features')->insert(['feature_id' => $i, 'job_id' => $job->id, 'active' => 0]);
                 }
             }
         }*/

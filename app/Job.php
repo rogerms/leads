@@ -31,7 +31,9 @@ class Job extends Model
 
     public function features()
     {
-        return $this->belongsToMany('App\Feature')->withPivot('feature_id', 'active');
+        return $this->belongsToMany('App\Feature', 'job_features')
+            ->withPivot('feature_id', 'active')
+            ->orderBy('id');
     }
 
     public function pavergroups()
