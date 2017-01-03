@@ -82,8 +82,12 @@ Route::group(['prefix' => 'api', 'middleware' => 'auth:api'], function()
 
     Route::get('drawing/{id}', 'DrawingController@show');
 
+    Route::any('paver/pdf/{id}', 'PaverController@pdf');
+
     Route::get('paver/update', 'PaverController@update');
 
+    Route::post('paver/{id}/delete', 'PaverController@delete');
+    
     Route::post('proposal/edit/{id}', 'ProposalController@edit');
 
     Route::get('proposal/{id}', 'ProposalController@show');
