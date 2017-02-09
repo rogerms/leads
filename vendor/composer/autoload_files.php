@@ -17,4 +17,6 @@ return array(
     '58571171fd5812e6e447dce228f52f4d' => $vendorDir . '/laravel/framework/src/Illuminate/Support/helpers.php',
     '8888550b7f4f362de71216b5c05259a6' => $baseDir . '/app/Helpers/customHelpers.php',
     'ef157334f1067da991ff8953983afdb3' => $baseDir . '/app/Helpers/helper.php',
+    'f2d5586bc87beefedab2648b9640d6b0' => $baseDir . '/app/Helpers/NotificationHub.php',
+    'c8e519c6abb7362d170206d0f9363574' => $baseDir . '/app/Helpers/Notification.php',
 );

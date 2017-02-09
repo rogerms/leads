@@ -28,7 +28,9 @@
         },
         "files":[
             "app/Helpers/customHelpers.php",
-            "app/Helpers/helper.php"
+            "app/Helpers/helper.php",
+            "app/Helpers/NotificationHub.php",
+            "app/Helpers/Notification.php"
         ]
     },
     "autoload-dev": {

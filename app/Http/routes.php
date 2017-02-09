@@ -124,7 +124,7 @@ Route::group(['middleware' => 'web'], function () {
         return view('pdf');
     });
 
-
+    Route::any('gcm', 'JobController@sendNotification');
 //--------------------------------------------------
 // independent
 //---------------------------------------------------

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Drawing;
 use app\Helpers\Helper;
+use app\Helpers\Notification;
+use app\Helpers\NotificationHub;
 use App\Label;
 use App\Material;
 use App\Note;
@@ -179,6 +181,8 @@ class JobController extends Controller
             $this->emailJobSold($job);
             //add just_sold label
             $labels = $this->add_label($job, 'just sold');
+            //job sold notification
+            $this->sendNotification($job);
         }
 
 
@@ -556,6 +560,26 @@ class JobController extends Controller
             $message->to('office@strongrockpavers.com');
             $message->subject("Job Sold");
         });
+        return true;
+    }
+
+    public function sendNotification(Job $job)
+    {
+        $connectionString = 'Endpoint=sb://srp-notification.servicebus.windows.net/;SharedAccessKeyName=DefaultFullSharedAccessSignature;SharedAccessKey=nXoAUATnM/GMkKGpOkK6FUf3Xk014pV9nBdqJR0hYVM=';
+        $hubPath = "leads";
+        $hub = new NotificationHub($connectionString, $hubPath);
+
+        $message = json_encode(['data' => [
+            'name' => $this->get_job_name($job),
+            'jobid' => $job->id,
+            'leadurl' => url("lead/$job->lead_id")
+            ]
+        ]);
+
+
+        $notification = new Notification("gcm", $message);
+        $hub->sendNotification($notification, ""); //param: notification, tag
+
         return true;
     }
 
