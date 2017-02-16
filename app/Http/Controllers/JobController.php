@@ -567,18 +567,45 @@ class JobController extends Controller
     {
         $connectionString = 'Endpoint=sb://srp-notification.servicebus.windows.net/;SharedAccessKeyName=DefaultFullSharedAccessSignature;SharedAccessKey=nXoAUATnM/GMkKGpOkK6FUf3Xk014pV9nBdqJR0hYVM=';
         $hubPath = "leads";
+
+        //---- chrome extensions notification
         $hub = new NotificationHub($connectionString, $hubPath);
+        $leadurl = url("lead/$job->lead_id");
+        $jobname = $this->get_job_name($job);
+        $jobid = $job->id;
+        $leadid = $job->lead_id;
 
         $message = json_encode(['data' => [
-            'name' => $this->get_job_name($job),
-            'jobid' => $job->id,
-            'leadurl' => url("lead/$job->lead_id")
+            'name' => $jobname,
+            'jobid' => $jobid,
+            'leadurl' => $leadurl
             ]
         ]);
 
 
         $notification = new Notification("gcm", $message);
         $hub->sendNotification($notification, ""); //param: notification, tag
+
+        //---- windows store app notification
+        $toast = "<toast activationType='protocol' launch='$leadurl'>
+                   <visual>
+                    <binding  template='ToastGeneric'>
+                      <text>Job Just Sold</text>
+                      <text>Name: $jobname</text>
+                      <text>ID: $jobid</text>
+                      <image placement='AppLogoOverride' src='ms-appx:///Assets\BadgeLogo.scale-200.png' />
+                    </binding>
+                  </visual>
+                  <audio src='ms-winsoundevent:Notification.Reminder'/>
+                 <actions>
+                    <action activationType='foreground' content='Show' arguments='$leadid' />
+                    <action activationType='protocol' content='Show on Browser' arguments='$leadurl' />
+                  </actions>
+                </toast>";
+
+        $notification = new Notification("windows", $toast);
+        $notification->headers[] = 'X-WNS-Type: wns/toast';
+        $hub->sendNotification($notification, null);
 
         return true;
     }
