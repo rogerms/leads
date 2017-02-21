@@ -74,6 +74,18 @@ class PaverController extends Controller
             $group->delivered = Helper::db_date($sgroup['delivered']);
             $group->delivery_addr = $sgroup['addr'];
 
+            if(empty($sgroup['addr']))
+            {
+                $job = Job::find($job_id);
+                $lead = $job->lead;
+                //steet, city, state zip
+                $group->delivery_addr = sprintf("%s, %s, %s %s",
+                    $lead->street,
+                    $lead->city,
+                    $lead->state,
+                    $lead->zip
+                );
+            }
 
             $group->job_id = $job_id;
             $result &= $group->save();
