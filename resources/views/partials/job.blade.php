@@ -122,7 +122,7 @@
 
         @can('edit-job')
         <div class="row row-extra-pad">
-            <a role="button" class="btn btn-primary" href="/job/{{$job->id}}/paver">Pavers</a>
+            <a role="button" class="btn btn-primary" href="/job/{{$job->id}}/paver">Pavers <span class="badge">{{count($job->pavergroups)}}</span></a>
         </div>
         @endcan
         <div class="row">

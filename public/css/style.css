@@ -822,3 +822,7 @@ font-family: FontAwesome;
     margin-top: 9px;
     margin-left: 2px;
 }
+.btn-primary .badge
+{
+    color: #688f63;
+}

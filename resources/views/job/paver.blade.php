@@ -9,7 +9,7 @@
 <div class="panel-group">
     <form id="{{$job->id}}">
         <div class="row row-extra-pad">
-            <h3>Pavers for Job: {{$job->id}} @if(count($job->code > 0)) ({{ $job->code }}) @endif</h3>
+            <h3>Pavers for Job: {{$job->id}} @if(count($job->code) > 0) ({{ $job->code }}) @endif</h3>
         </div>
         <div class="paversgroups">
             @if($count = 1) @endif
