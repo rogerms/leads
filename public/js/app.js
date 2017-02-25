@@ -1551,7 +1551,7 @@ function populateJobsTable()
 {
     if(location.pathname == '/jobs')
     {
-        showResult('Loading items...');
+        showResult('Loading items...***');
         sortJobs();
     }
 }
