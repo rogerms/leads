@@ -35,6 +35,7 @@
                       <th style="min-width:130px">Phone</th>
                       <th style="min-width:150px">Appointment</th>
                       <th style="min-width:70px">Rep</th>
+                      <!--
                       <th style="min-width:50px">S/F</th>
                       <th style="min-width:100px">Pavers</th>
                       <th style="min-width:70px">RB</th>
@@ -44,6 +45,7 @@
                       <th style="min-width:70px">Skid</th>
                       <th style="min-width:70px">Crew</th>
                       <th style="min-width:400px">Notes</th>
+                      -->
                   </tr>
                   </thead>
                   <tbody>
@@ -90,15 +92,15 @@
                   <span class="badge">0</span>
               </a>
 
-              {{--jobs progress--}}
-              <a href="#" class="list-group-item list-header">Jobs Progress</a>
-              @foreach($labels_count as $label)
-                  <a  class="list-group-item thin-item">
-                      <input class="tbfilter" type="checkbox" name="labels_count" value="{{ $label->name  }}" aria-label="labels">
-                      {{ $label->name }}
-                      <span class="badge">{{ $label->count }}</span>
-                  </a>
-              @endforeach
+              {{--jobs progress  move to jobs page--}}
+              {{--<a href="#" class="list-group-item list-header">Jobs Progress</a>--}}
+              {{--@foreach($labels_count as $label)--}}
+                  {{--<a  class="list-group-item thin-item">--}}
+                      {{--<input class="tbfilter" type="checkbox" name="labels_count" value="{{ $label->name  }}" aria-label="labels">--}}
+                      {{--{{ $label->name }}--}}
+                      {{--<span class="badge">{{ $label->count }}</span>--}}
+                  {{--</a>--}}
+              {{--@endforeach--}}
 
           </div>
       </div><!--/.sidebar-offcanvas-->

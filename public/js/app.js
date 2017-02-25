@@ -66,6 +66,8 @@ $(function () {
 
     $('.tbfilter').on('change', searchLeads);
 
+    $('.jobtbfilter').on('change', sortJobs);
+
     $('.searchby').on('click', changeSearchBy);
 
     $('body').on('click', hideContextMenu);
@@ -1474,6 +1476,7 @@ function sortLeads()
 
 function nextJobsPage(e)
 {
+
     e.preventDefault();
     var url = $(this).attr('href');
 
@@ -1493,6 +1496,9 @@ function nextJobsPage(e)
 
 function sortJobs()
 {
+    if (processingSearch == true) return;
+    processingSearch = true;
+
     var title = $(this).text();
     // if the same heading is click twice change sort direction
     sortdirection = (sortby == title)? sortdirection*-1: 1;
@@ -1501,8 +1507,9 @@ function sortJobs()
    // alert(sortby);
 
     $.ajax({
-            url: '/jobs',
+            url: '/jobs?page=1',
             data: {
+                labels: getFilters('labels_count'),
                 sortby: sortby,
                 sortdirection: sortdirection
             },
@@ -1513,9 +1520,22 @@ function sortJobs()
             var jobs = result.jobs;
             tbody.html(jobs);
             $('.jobs-pagelinks').html(result.links);
+
+            $('[name="labels_count"]').each(function () {
+                var value = $(this).val();
+                if(result.labels[value] == undefined)
+                {
+                    $(this).siblings('.badge').text(0);
+                }
+                else {
+                    $(this).siblings('.badge').text(result.labels[value]);
+                }
+            });
+            $('#labels_count_total').text(result.count);
+            processingSearch = false;
         })
         .fail(function () {
-            showResult('Error trying to get jobs', true);
+            showResult('Error trying to get jobs!', true);
         });
 }
 

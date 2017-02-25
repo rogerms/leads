@@ -14,6 +14,7 @@ use App\Http\Requests;
 use App\Job;
 use App\Removal;
 use DB;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Validator;
 use PDF;
@@ -61,33 +62,142 @@ class JobController extends Controller
     {
         if ($request->ajax())
         {
-            $sortby = ($request->sortby) ? $request->sortby : 'jobs.updated_at';
-            $sortby = str_replace(
-                ['ID', 'Job#', 'Customer Name', 'Date Sold', 'City', 'Sales Rep'],
-                ['jobs.id', 'code', 'customer_name', 'date_sold', 'city', 'sales_reps.name'],
-                $sortby
-            );
-
+//
+//            $sortby = ($request->sortby) ? $request->sortby : 'jobs.updated_at';
+//            $sortby = str_replace(
+//                ['ID', 'Job#', 'Customer Name', 'Date Sold', 'City', 'Sales Rep'],
+//                ['jobs.id', 'code', 'customer_name', 'date_sold', 'city', 'sales_reps.name'],
+//                $sortby
+//            );
+/*
             $direction = ($request->sortdirection == 1) ? 'ASC' : 'DESC';
 
             $jobs = Job::join('leads', 'jobs.lead_id', '=', 'leads.id')
                 ->join('sales_reps', 'sales_reps.id', '=', 'leads.sales_rep_id')
+                ->leftJoin('paver_groups', 'paver_groups.job_id', '=', 'jobs.id')
+                ->leftJoin('notes', function($join){
+                    $join->on('notes.job_id', '=', 'jobs.id')
+                        ->whereNull('notes.deleted_at')
+                        ->where('notes.note',  'not like',  '#%');
+                })
+
                 ->orderBy($sortby, $direction)
-                ->select('jobs.id', 'code', 'leads.id as lead_id', 'customer_name', 'date_sold', 'city', 'sales_reps.name as sales_rep')
+                ->select('jobs.id', 'code', 'leads.id as lead_id', 'customer_name', 'date_sold', 'city',
+                    'sales_reps.name as sales_rep',
+                    'crew',
+                    'needs_skid as skid',
+                    'jobs.start_date',
+                    'jobs.size as job_size',
+                     DB::raw("GROUP_CONCAT(DISTINCT notes.note ORDER BY notes.job_id SEPARATOR ', ') as job_notes")
+// GROUP_CONCAT(DISTINCT CONCAT(DATE_FORMAT(paver_groups.delivery_at, '%c/%e'), if(paver_groups.delivered is null, '', ' &#x2714;'))  ORDER BY paver_groups.job_id,paver_groups.id SEPARATOR '<br>') as pavers_delivery,")
+                    )
+                ->groupBy('notes.job_id')
                 ->where('jobs.date_sold', '<>', '')
                 ->paginate(15);
 
             $jobs->appends(['sortby' => $sortby, 'sortdirection' => $request->sortdirection]);
+            */
+
+            $search = str_replace(["'", '"', 'delete', 'update'], ["\\'", "\\\"", ''], $request->searchtx);
+
+            $query = "SELECT ".
+                "leads.customer_name,
+            leads.city,
+            DATE_FORMAT(leads.appointment, '%b %e at %h:%i%p') appointmentfmt,
+            status.name as status_name,
+            sales_reps.name as sales_rep,
+            taken_by.name as taken_by_name,
+            sources.name as source_name,
+            jobs.lead_id as lead_id,
+            jobs.code,
+            jobs.id,
+            GROUP_CONCAT(DISTINCT labels.name ORDER BY labels.display_order SEPARATOR '<br>') as job_labels,
+			GROUP_CONCAT(DISTINCT DATE_FORMAT(jobs.start_date, '%e-%b') ORDER BY jobs.id SEPARATOR '<br>') as start_date,
+            GROUP_CONCAT(DISTINCT DATE_FORMAT(jobs.date_sold, '%e-%b') ORDER BY jobs.id SEPARATOR '<br>') as date_sold,
+            GROUP_CONCAT(DISTINCT jobs.size ORDER BY jobs.id SEPARATOR '<br>') as job_size,
+            GROUP_CONCAT(DISTINCT j_notes.note ORDER BY j_notes.job_id SEPARATOR '. ') as job_notes,
+            GROUP_CONCAT(DISTINCT CONCAT(DATE_FORMAT(paver_groups.delivery_at, '%c/%e'), if(paver_groups.delivered is null, '', ' &#x2714;'))  ORDER BY paver_groups.job_id,paver_groups.id SEPARATOR '<br>') as pavers_delivery,
+            GROUP_CONCAT(DISTINCT concat(material_rb.qty, 'x', material_rb.delivered) ORDER BY material_rb.job_id SEPARATOR '<br>')  as rb_qty,
+            GROUP_CONCAT(DISTINCT concat(material_sand.qty, 'x', material_sand.delivered) ORDER BY material_sand.job_id  SEPARATOR '<br>') as sand_qty,
+            GROUP_CONCAT(DISTINCT jobs.id ORDER BY jobs.id SEPARATOR ' ') as job_ids,
+            GROUP_CONCAT(DISTINCT if(jobs.needs_skid=1,'&#x2714;', '') ORDER BY jobs.id SEPARATOR ' ') as skid,
+            GROUP_CONCAT(DISTINCT jobs.crew ORDER BY jobs.id SEPARATOR ' ') as crew,
+            IF(DATE(appointment) = DATE(NOW()),1,0) today,
+            IF(DATE(appointment) = ADDDATE(DATE(NOW()),1),1,0) tomorrow,
+            IF(appointment >= DATE(now()) AND appointment < ADDDATE(DATE(NOW()), INTERVAL 1 WEEK),1,0) week
+            FROM leads
+            LEFT JOIN notes ON notes.lead_id = leads.id
+            LEFT JOIN jobs ON jobs.lead_id=leads.id
+            LEFT JOIN notes j_notes ON j_notes.job_id = jobs.id AND j_notes.deleted_at is null AND j_notes.note not like '#%'
+            LEFT JOIN status ON status.id = leads.status_id
+            LEFT JOIN sales_reps ON sales_reps.id = leads.sales_rep_id
+            LEFT JOIN taken_by ON taken_by.id = leads.taken_by_id
+            LEFT JOIN sources ON sources.id = leads.source_id
+            LEFT JOIN job_label ON job_label.job_id = jobs.id and job_label.deleted_at is null
+            LEFT JOIN labels ON labels.id = job_label.label_id AND labels.type = 'job-progress'
+            LEFT JOIN job_materials as material_rb ON material_rb.job_id = jobs.id and material_rb.name='rb'
+            LEFT JOIN job_materials as material_sand ON material_sand.job_id = jobs.id and material_sand.name='sand' 
+            LEFT JOIN paver_groups ON paver_groups.job_id = jobs.id
+            WHERE jobs.date_sold is not null";
+
+            if(count($request->labels) > 0)
+            {
+                $query .= " AND labels.name IN (".implode(",", $request->labels).")";
+            }
+
+            $sort = "jobs.updated_at desc";
+            if($request->sortby)
+            {
+                $sortby = str_replace(
+                    ['id', 'job#', 'customer name', 'date sold', 'city', 'sales rep', 's/f','pavers','rb','sand','date sold','start date','skid','notes'],
+                    ['jobs.id', 'jobs.code', 'customer_name', 'jobs.date_sold', 'city', 'sales_reps.name', 'size', '','material_rb.qty','material_sand.qty', 'jobs.date_sold','start_date','',''],
+                    strtolower($request->sortby)
+                );
+
+                if(!empty($sortby))
+                {
+                    $direction = ($request->sortdirection == 1)? 'ASC': 'DESC';
+                    $sort = "$sortby $direction";
+                }
+            }
+
+            $query .= " GROUP BY jobs.id ORDER BY $sort";
+
+            //return $query;
+            $jobs = DB::select($query);
+            $counters = $this->process_counters($jobs);
+            $perPage = 20;
+            $currentPage = $request->page?:1;
+            $currentItems = array_slice($jobs, $perPage * ($currentPage - 1), $perPage);
+
+            $jobs = new LengthAwarePaginator($currentItems, $counters['jobs'], $perPage, $currentPage);
+            $jobs->setPath('jobs');
+
+            //** notes */
+            //LeadController::process_job_notes($leads);
+//            dd($leads);\
+
+            if($request->fmt == 'json')
+            {
+                return response()->json(compact('jobs'));
+            }
 
             return response()->json([
                 'jobs' => view('partials.jobs', ['jobs' => $jobs])->render(),
-                'sortby' => $sortby,
-                'links' => sprintf('<div>%s</div>', $jobs->links())
+                'sortby' => $sort,
+                'links' => sprintf('<div>%s</div>', $jobs->links()),
+                'labels' => $counters['labels'],
+                'count' => $counters['jobs'],
             ]);
         }
         else
         {
-            return view('job.index');
+            $labels = DB::select("SELECT name, 0 as count FROM labels ORDER BY display_order");
+            return view('job.index',
+                [
+                    'jobs' => [],
+                    'labels_count' => $labels
+                ]);
         }
     }
 
@@ -618,6 +728,27 @@ class JobController extends Controller
     public function save_note()
     {
         return 'done';
+    }
+
+    private function process_counters($jobs)
+    {
+        $labels_count = [];
+
+        foreach($jobs as $job)
+        {
+            $labels = explode("<br>", $job->job_labels);
+            foreach($labels as $label)
+            {
+                if(!isset($labels_count[$label]))
+                    $labels_count[$label] = 0;
+
+                $labels_count[$label]++;
+            }
+        }
+        return [
+            'jobs' => count($jobs),
+            'labels' => $labels_count,
+        ];
     }
 
 //    public function upload($lead_id)

@@ -126,7 +126,7 @@ class LeadController extends Controller
             LEFT JOIN taken_by ON taken_by.id = leads.taken_by_id
             LEFT JOIN sources ON sources.id = leads.source_id
             LEFT JOIN job_label ON job_label.job_id = jobs.id and job_label.deleted_at is null
-            LEFT JOIN labels ON labels.id = job_label.label_id
+            LEFT JOIN labels ON labels.id = job_label.label_id AND labels.type <> 'job-progress'
             LEFT JOIN job_materials as material_rb ON material_rb.job_id = jobs.id and material_rb.name='rb'
             LEFT JOIN job_materials as material_sand ON material_sand.job_id = jobs.id and material_sand.name='sand' 
             LEFT JOIN paver_groups ON paver_groups.job_id = jobs.id
@@ -221,7 +221,7 @@ class LeadController extends Controller
             $leads = new LengthAwarePaginator($currentItems, $counters['leads'], $perPage, $currentPage);
 
             //** notes */
-            $this->process_job_notes($leads);
+            LeadController::process_job_notes($leads);
 //            dd($leads);\
 
             if($request->fmt == 'json')
@@ -265,7 +265,7 @@ class LeadController extends Controller
         ->paginate($this->perpage);*/
     }
 
-    private function process_job_notes($leads)
+    public static function process_job_notes($leads)
     {
         foreach($leads as &$lead)
         {
@@ -273,11 +273,11 @@ class LeadController extends Controller
             $paver_notes = [];
             $other_notes = [];
             foreach ($notes as $note) {
-                if(!$this->startsWith($note, '#'))
+                if(!LeadController::startsWith($note, '#'))
                 {
                     $other_notes[] = $note;
                 }
-                else if ($this->startsWith(strtolower($note), '#paver'))
+                else if (LeadController::startsWith(strtolower($note), '#paver'))
                 {
                     $paver_notes[] = str_replace('#paver', '', $note);
                 }
@@ -593,7 +593,7 @@ class LeadController extends Controller
          ]);
     }
 
-    private function startsWith($haystack, $needle)
+    public static function startsWith($haystack, $needle)
     {
         return (0 === strpos($haystack, $needle));
     }
