@@ -155,7 +155,7 @@
 
     {{--<script src="/js/jspdf.js"></script>--}}
     {{--<script src="/js/home.js"></script>--}}
-    <script src="/js/app.js"></script>
+    <script src="/js/app.js?v=20170224"></script>
 
 </body>
 </html>

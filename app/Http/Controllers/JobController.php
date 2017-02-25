@@ -112,19 +112,15 @@ class JobController extends Controller
             jobs.code,
             jobs.id,
             GROUP_CONCAT(DISTINCT labels.name ORDER BY labels.display_order SEPARATOR '<br>') as job_labels,
-			GROUP_CONCAT(DISTINCT DATE_FORMAT(jobs.start_date, '%e-%b') ORDER BY jobs.id SEPARATOR '<br>') as start_date,
-            GROUP_CONCAT(DISTINCT DATE_FORMAT(jobs.date_sold, '%e-%b') ORDER BY jobs.id SEPARATOR '<br>') as date_sold,
+			DATE_FORMAT(jobs.start_date, '%m/%d/%Y') as start_date,
+            DATE_FORMAT(jobs.date_sold, '%m/%d/%Y') as date_sold,
             GROUP_CONCAT(DISTINCT jobs.size ORDER BY jobs.id SEPARATOR '<br>') as job_size,
             GROUP_CONCAT(DISTINCT j_notes.note ORDER BY j_notes.job_id SEPARATOR '. ') as job_notes,
             GROUP_CONCAT(DISTINCT CONCAT(DATE_FORMAT(paver_groups.delivery_at, '%c/%e'), if(paver_groups.delivered is null, '', ' &#x2714;'))  ORDER BY paver_groups.job_id,paver_groups.id SEPARATOR '<br>') as pavers_delivery,
             GROUP_CONCAT(DISTINCT concat(material_rb.qty, 'x', material_rb.delivered) ORDER BY material_rb.job_id SEPARATOR '<br>')  as rb_qty,
             GROUP_CONCAT(DISTINCT concat(material_sand.qty, 'x', material_sand.delivered) ORDER BY material_sand.job_id  SEPARATOR '<br>') as sand_qty,
-            GROUP_CONCAT(DISTINCT jobs.id ORDER BY jobs.id SEPARATOR ' ') as job_ids,
             GROUP_CONCAT(DISTINCT if(jobs.needs_skid=1,'&#x2714;', '') ORDER BY jobs.id SEPARATOR ' ') as skid,
-            GROUP_CONCAT(DISTINCT jobs.crew ORDER BY jobs.id SEPARATOR ' ') as crew,
-            IF(DATE(appointment) = DATE(NOW()),1,0) today,
-            IF(DATE(appointment) = ADDDATE(DATE(NOW()),1),1,0) tomorrow,
-            IF(appointment >= DATE(now()) AND appointment < ADDDATE(DATE(NOW()), INTERVAL 1 WEEK),1,0) week
+            GROUP_CONCAT(DISTINCT jobs.crew ORDER BY jobs.id SEPARATOR ' ') as crew
             FROM leads
             LEFT JOIN notes ON notes.lead_id = leads.id
             LEFT JOIN jobs ON jobs.lead_id=leads.id
