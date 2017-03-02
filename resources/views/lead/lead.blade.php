@@ -9,7 +9,17 @@
     <form>
         {!! csrf_field() !!}
         <div class="row row-extra-pad">
-            <h2>Customer</h2>
+            <div class="col-sm-3"><h2>Customer</h2></div>
+            <div class="col-sm-9" >
+                <div class="pull-right lead-labels">
+                @foreach($lead->labels as $label)
+                    <!-- id = job_labels.id  data-label=job_labels.label_id  -->
+                        <button type="button" class="btn btn-info btn-xs" id="{{ $label->pivot->id }}" data-label="{{ $label->id }}" >{{ $label->name}}
+                            <span class="job-label-btn" aria-hidden="true">X</span>
+                        </button>
+                    @endforeach
+                </div>
+            </div>
         </div>
     <div class="row">
         <div class="col-md-6">
@@ -254,6 +264,37 @@
             @endcan
             @can('delete-user')
             <button type="button" class="btn btn-primary" id="printlead">Print</button>
+            @endcan
+            {{-- job progress --}}
+            @can('read')
+            <!-- Split button -->
+            <div class="btn-group dropup" >
+                <button type="button" class="btn btn-default dropdown-toggle"
+                        data-toggle="dropdown" title="Labels" aria-haspopup="true" aria-expanded="false">
+                    <span class="glyphicon glyphicon-tags" aria-hidden="true"></span>
+                    <span class="caret"></span>
+                    <span class="sr-only">Toggle Button</span>
+                </button>
+                <ul class="dropdown-menu lead-label-menu">
+                    <?php
+                       $lead_labels_ids = labelIds($lead->labels);
+                    ?>
+                    @foreach($lead_labels as $label)
+                        <li class="label-list-item">
+                            <div class="checkbox">
+                                  <label><input type="checkbox" class="lead-label-menu-item" id="{{$label->id }}"
+                                                data-order="{{ $label->display_order }}"
+                                                value="{{ isLabelChecked($label->id, $lead_labels_ids) }}"
+                                            {{ isLabelChecked($label->id, $lead_labels_ids) }} >{{ $label->name }}</label>
+                            </div>
+                        </li>
+                    @endforeach
+                    <li role="separator" class="divider"></li>
+                    <li><a id="{{$lead->id}}" style="display: none" class="lead-label-menu-apply">Apply</a></li>
+                    <li><a id="create-lead-label" class="create-lead-label">Create new</a></li>
+                    <li><a id="edit-lead-label" class="edit-lead-label" href="/labels/edit">Manage labels</a></li>
+                </ul>
+            </div>
             @endcan
         </div>
     </form>

@@ -92,15 +92,15 @@
                   <span class="badge">0</span>
               </a>
 
-              {{--jobs progress  move to jobs page--}}
-              {{--<a href="#" class="list-group-item list-header">Jobs Progress</a>--}}
-              {{--@foreach($labels_count as $label)--}}
-                  {{--<a  class="list-group-item thin-item">--}}
-                      {{--<input class="tbfilter" type="checkbox" name="labels_count" value="{{ $label->name  }}" aria-label="labels">--}}
-                      {{--{{ $label->name }}--}}
-                      {{--<span class="badge">{{ $label->count }}</span>--}}
-                  {{--</a>--}}
-              {{--@endforeach--}}
+              {{--leads labels  --}}
+              <a href="#" class="list-group-item list-header">Labels</a>
+              @foreach($labels_count as $label)
+                  <a  class="list-group-item thin-item">
+                      <input class="tbfilter" type="checkbox" name="labels_count" value="{{ $label->name  }}" aria-label="labels">
+                      {{ $label->name }}
+                      <span class="badge">{{ $label->count }}</span>
+                  </a>
+              @endforeach
 
           </div>
       </div><!--/.sidebar-offcanvas-->

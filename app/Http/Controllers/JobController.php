@@ -38,9 +38,9 @@ class JobController extends Controller
     {
         $job = Job::findOrFail($id);
 
-        $job->load('notes', 'features', 'removals', 'materials', 'proposal');
-
         $this->authorize('read-job', $job);
+
+        $job->load('notes', 'features', 'removals', 'materials', 'proposal');
 
         $arr = [
             'job' => $job,
@@ -130,7 +130,7 @@ class JobController extends Controller
             LEFT JOIN taken_by ON taken_by.id = leads.taken_by_id
             LEFT JOIN sources ON sources.id = leads.source_id
             LEFT JOIN job_label ON job_label.job_id = jobs.id and job_label.deleted_at is null
-            LEFT JOIN labels ON labels.id = job_label.label_id AND labels.type = 'job-progress'
+            LEFT JOIN labels ON labels.id = job_label.label_id AND labels.type = 'job'
             LEFT JOIN job_materials as material_rb ON material_rb.job_id = jobs.id and material_rb.name='rb'
             LEFT JOIN job_materials as material_sand ON material_sand.job_id = jobs.id and material_sand.name='sand' 
             LEFT JOIN paver_groups ON paver_groups.job_id = jobs.id
@@ -188,7 +188,7 @@ class JobController extends Controller
         }
         else
         {
-            $labels = DB::select("SELECT name, 0 as count FROM labels ORDER BY display_order");
+            $labels = Label::job()->select('name', DB::raw('0 as count'))->get();
             return view('job.index',
                 [
                     'jobs' => [],

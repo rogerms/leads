@@ -65,7 +65,8 @@ class LeadController extends Controller
             'customer_types' => DB::table('customer_types')->get(),
             'job_types' => DB::table('job_types')->Orderby('name', 'asc')->get(),
             'features' => DB::table('features')->Orderby('name', 'asc')->get(),
-            'labels' => Label::orderBy('display_order')->get()
+            'job_labels' => Label::job()->get(),
+            'lead_labels' => Label::lead()->get()
 
         ];
 
@@ -103,7 +104,7 @@ class LeadController extends Controller
             sales_reps.name as sales_rep_name,
             taken_by.name as taken_by_name,
             sources.name as source_name,
-            GROUP_CONCAT(DISTINCT labels.name ORDER BY labels.display_order SEPARATOR '<br>') as job_labels,
+            GROUP_CONCAT(DISTINCT labels.name ORDER BY labels.display_order SEPARATOR ';') as lead_labels,
 			GROUP_CONCAT(DISTINCT DATE_FORMAT(jobs.start_date, '%e-%b') ORDER BY jobs.id SEPARATOR '<br>') as start_date,
             GROUP_CONCAT(DISTINCT DATE_FORMAT(jobs.date_sold, '%e-%b') ORDER BY jobs.id SEPARATOR '<br>') as date_sold,
             GROUP_CONCAT(DISTINCT jobs.size ORDER BY jobs.id SEPARATOR '<br>') as job_size,
@@ -125,8 +126,8 @@ class LeadController extends Controller
             LEFT JOIN sales_reps ON sales_reps.id = leads.sales_rep_id
             LEFT JOIN taken_by ON taken_by.id = leads.taken_by_id
             LEFT JOIN sources ON sources.id = leads.source_id
-            LEFT JOIN job_label ON job_label.job_id = jobs.id and job_label.deleted_at is null
-            LEFT JOIN labels ON labels.id = job_label.label_id AND labels.type <> 'job-progress'
+            LEFT JOIN lead_label ON lead_label.lead_id = leads.id and lead_label.deleted_at is null
+            LEFT JOIN labels ON labels.id = lead_label.label_id AND labels.type <> 'job-progress'
             LEFT JOIN job_materials as material_rb ON material_rb.job_id = jobs.id and material_rb.name='rb'
             LEFT JOIN job_materials as material_sand ON material_sand.job_id = jobs.id and material_sand.name='sand' 
             LEFT JOIN paver_groups ON paver_groups.job_id = jobs.id
@@ -246,8 +247,8 @@ class LeadController extends Controller
         else
         {
             $status = DB::select("SELECT name, 0 as count FROM status ORDER BY display_order");
-            $reps = DB::select("SELECT name, 0 as count FROM sales_reps");
-            $labels = DB::select("SELECT name, 0 as count FROM labels ORDER BY display_order");
+            $reps = DB::table('sales_reps')->select('name', DB::raw('0 as count'))->get();
+            $labels = Label::lead()->get();
 
             return view('lead.index',
                 [
@@ -306,7 +307,7 @@ class LeadController extends Controller
             if(!isset($reps_count[$lead->sales_rep_name]))
                 $reps_count[$lead->sales_rep_name] = 0;
 
-            $labels = explode("<br>", $lead->job_labels);
+            $labels = explode(";", $lead->lead_labels);
             foreach($labels as $label)
             {
                 if(!isset($labels_count[$label]))
@@ -364,7 +365,22 @@ class LeadController extends Controller
         return response()->json(['result' => $deleted]);
     }
 
-    public function update_label(Request $request)
+    public function delete_label_lead(Request $request)
+    {
+        $this->authorize('read');
+        //-- hard delete
+        //$deleted = DB::delete('delete from job_progress where job_id=? and progress_id=?', [$request->jobid, $request->id]);
+        //soft delete
+        $deleted = DB::update('update lead_label set deleted_at=? where id=?',
+            [
+                date('Y-m-d H:i:s'),
+                $request->id
+            ]);
+
+        return response()->json(['result' => $deleted]);
+    }
+
+    public function update_label(Request $request)//todo: move to job controller
     {
         $this->authorize('read');
         $result = true;
@@ -386,6 +402,47 @@ class LeadController extends Controller
         $labels = $job->labels()->get();
 
         return response()->json(['result' => $result, 'labels' => $labels]);
+    }
+
+    public function update_label_lead(Request $request)
+    {
+        $this->authorize('read');
+        $result = true;
+        $lead = Lead::find($request->leadid);
+
+
+        if($request->add)
+        {
+            $lead->labels()->attach($request->add);
+        }
+
+        if($request->remove) {
+            $result &= DB::table('lead_label')
+                ->where('lead_id', $request->leadid)
+                ->whereIn('label_id', $request->remove)
+                ->update(['deleted_at' => DB::raw('NOW()')]);
+        }
+
+        $labels = $lead->labels()->get();
+
+        return response()->json(['result' => $result, 'labels' => $labels]);
+    }
+
+    public function create_label(Request $request)
+    {
+        $this->authorize('read');
+
+        $result = Label::create([
+            'name' => $request->name,
+            'display_order' => $request->order,
+            'type' => $request->type
+        ]);
+
+        $labels = ($request->type == 'job')? Label::job()->get(): Label::lead()->get();
+
+        return response()->json(['result' => ($result != null), 'labels' => $labels]);
+
+
     }
 
     public function api_create()

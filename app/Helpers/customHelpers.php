@@ -221,12 +221,12 @@
 
     if(!function_exists('labelIds'))
     {
-        function labelIds($job_progress)
+        function labelIds($labels)
         {
-            if(count($job_progress) == 0) return [];
+            if(count($labels) == 0) return [];
 
             $result = [];
-            foreach ($job_progress as $item)
+            foreach ($labels as $item)
             {
                 $result[] = $item['id'];
             }

@@ -46,4 +46,12 @@ class Lead extends Model
     {
         return $this->hasMany('App\Phone');
     }
+
+    public function labels()
+    {
+        return $this->belongsToMany('App\Label', 'lead_label')
+            ->withPivot('id')
+            ->wherePivot('deleted_at', null)
+            ->withTimestamps();
+    }
 }

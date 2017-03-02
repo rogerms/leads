@@ -322,7 +322,7 @@
                     </button>
                     <ul class="dropdown-menu label-menu">
                         <?php $job_labels_ids = labelIds($job->labels) ?>
-                        @foreach($labels as $label)
+                        @foreach($job_labels as $label)
                             <li>
                                 <div class="checkbox">
                                       <label><input type="checkbox" class="label-menu-item" id="{{$label->id }}" value="{{ isLabelChecked($label->id, $job_labels_ids) }}" {{ isLabelChecked($label->id, $job_labels_ids) }} >{{ $label->name }}</label>

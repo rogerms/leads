@@ -35,7 +35,7 @@
 
         <div id="navbar" class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
-              <li class="{{ isActive(['/','leads']) }}" id="main"><a href="/">Main</a></li>
+              <li class="{{ isActive(['/','leads']) }}" id="main"><a href="/">Leads</a></li>
               <li class="{{ isActive(['jobs']) }}" id="main"><a href="/jobs">Jobs</a></li>
            <!-- <li><a href="#about">About</a></li> -->
             {{--<li><a href="#contact">Contact</a></li>--}}
@@ -52,6 +52,7 @@
                   <li><a href="{{ url('/user/create') }}">Add New User</a></li>
                   <li><a href="{{ url('/reps') }}">Update Reps</a></li>
                   <li><a href="{{ url('/lists') }}">Update Lists</a></li>
+                  <li><a href="{{ url('/labels/edit') }}">Manage Labels</a></li>
                   <li><a href="{{ url('/users') }}">List Users</a></li>
                   @endcan
 

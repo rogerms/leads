@@ -70,7 +70,8 @@ class HomeController extends Controller
         $this->authorize('edit-user');
         $takers = TakenBy::all();
         $statuses = Status::OrderBy('display_order')->get();
-        $labels = Label::OrderBy('display_order')->get();
+        $job_labels = Label::job()->get();
+        $lead_labels = Label::lead()->get();
         $sources = Source::all();
         $features = Feature::all();
 
@@ -78,7 +79,59 @@ class HomeController extends Controller
         $customer_types = DB::table('customer_types')->get();
         $job_types = DB::table('job_types')->get();
 
-        return view('lists', compact('takers', 'statuses', 'sources', 'property_types', 'customer_types', 'job_types', 'features', 'labels'));
+        return view('lists', compact(
+            'takers',
+            'statuses',
+            'sources',
+            'property_types',
+            'customer_types',
+            'job_types',
+            'features',
+            'lead_labels',
+            'job_labels'
+        ));
+    } //        return view('label.edit');
+
+    public  function labels()
+    {
+        $this->authorize('edit');
+        $job_labels = Label::job()
+            ->leftJoin('job_label', function ($join) {
+                $join->on('job_label.label_id', '=', 'labels.id')
+                     ->whereNull('deleted_at');
+            })
+            ->select(DB::raw('labels.*, COUNT(job_label.id) as number'))
+            ->groupBy('labels.id')
+            ->get();
+
+        $lead_labels = Label::lead()
+            ->leftJoin('lead_label', function ($join) {
+                $join->on('lead_label.label_id', '=', 'labels.id')
+                    ->whereNull('deleted_at');
+            })
+            ->select(DB::raw('labels.*, COUNT(lead_label.id) as number'))
+            ->groupBy('labels.id')
+            ->get();
+
+
+
+        return view('label.edit', compact(
+            'lead_labels',
+            'job_labels'
+        ));
+    }
+
+    public  function delete_label($id)
+    {
+        $label = Label::find($id);
+        if(\Gate::allows('edit'))
+        {
+            $label->jobs()->detach();
+            $label->leads()->detach();
+            $result = $label->delete();
+            return response()->json(['result' => $result]);
+        }
+        return response()->json(['result' => false]);
     }
 
     public  function update_list(Request $request, $id)
@@ -88,7 +141,8 @@ class HomeController extends Controller
         $obj = null;
         $table_name =  null;
         $result = false;
-        $action = "Updated";
+        $action = "Created/Updated";
+        $label_type = null;
         if(empty($request->name)) return false;
 
         switch ($request->type)
@@ -96,8 +150,9 @@ class HomeController extends Controller
             case 'status':
                 $obj = Status::findOrNew($id);
                 break;
-            case 'label':
+            case 'job_label':
                 $obj = Label::findOrNew($id);
+                $label_type = 'job';
                 break;
             case 'takenby':
                 $obj = TakenBy::findOrNew($id);
@@ -107,6 +162,10 @@ class HomeController extends Controller
                 break;
             case 'feature':
                 $obj = Feature::findOrNew($id);
+                break;
+            case 'lead_label':
+                $obj = Label::findOrNew($id);
+                $label_type = 'lead';
                 break;
             default:
                 $table_name = $request->type;
@@ -118,13 +177,17 @@ class HomeController extends Controller
             if($request->order != null)
                 $obj->display_order = $request->order;
 
+            if(!empty($label_type))//only for labels table
+            {
+                $obj->type = $label_type;
+            }
+
             $result = $obj->save();
         }
         elseif (!empty($table_name)) {
             if ($id == 0) {
-                $result = DB::table($table_name)->insert(
-                    ['name' => $request->name, 'updated_at' => date("Y-m-d H:i:s")]
-                );
+                $data = ['name' => $request->name, 'updated_at' => date("Y-m-d H:i:s")];
+                $result = DB::table($table_name)->insert($data);
                 $action = "Created";
             } else {
                 $result = DB::table($table_name)
@@ -132,8 +195,7 @@ class HomeController extends Controller
                     ->update(['name' => $request->name, 'updated_at' => date("Y-m-d H:i:s")]);
             }
         }
-
-        $message = sprintf('Item %s successfully', $action);
+        $message = sprintf('Item %s table successfully', $action);
         Helper::flash_message($message, $result);
         return response()->json($message);
     }

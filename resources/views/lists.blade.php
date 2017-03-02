@@ -175,40 +175,6 @@
                 <button type="button" id="0" class="btn btn-info update-lists" data-type="status">Add</button>
             </div>
         </div>
-
-        {{-- job progress --}}
-        <div class="col-sm-6 update-div">
-            <div class="row">
-                <h4>Job Progress</h4>
-            </div>
-            @foreach($labels as $label)
-                <div class="row update-row">
-                    <div class="form-group">
-                        <label class="sr-only" for="name">Name</label>
-                        <input type="text" class="form-control" id="name" value="{{ $label->name }}">
-                    </div>
-                    <div class="form-group">
-                        <label class="sr-only" for="order">Display Order</label>
-                        <input type="text" class="form-control" id="order" value="{{ $label->display_order }}" placeholder="display order">
-                    </div>
-                    <button type="button" id="{{ $label->id }}" class="btn btn-default update-lists" data-type="label">Update</button>
-                </div>
-            @endforeach
-            <div class="row reps-add" style="margin-bottom:15px">
-                <div class="form-group">
-                    <label class="sr-only" for="name">Name</label>
-                    <input type="text" class="form-control" id="name"  placeholder="Alive">
-                </div>
-                {{--<div class="form-group">--}}
-                    {{--<label class="sr-only" for="order">Display Order</label>--}}
-                    {{--<input type="text" class="form-control" id="order" placeholder="display order">--}}
-                {{--</div>--}}
-                <button type="button" id="0" class="btn btn-info update-lists" data-type="label">Add</button>
-            </div>
-
-            {{--job progress--}}
-        </div>
-
 </form>
 </div>
 </div>

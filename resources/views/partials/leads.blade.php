@@ -1,6 +1,6 @@
 @foreach($leads as $lead)
     <tr data-id="{{ $lead->id }}">
-        <td>{!! $lead->job_labels !!}</td>  <!-- status -->
+        <td>{!! $lead->lead_labels !!}</td>  <!-- status -->
         <td>{{ $lead->customer_name }}</td>
         <td>{{ $lead->city }}</td>
         <td>{{ $lead->street }}</td>

@@ -52,9 +52,15 @@ $(function () {
 
     $('.job-labels').on('click', '.job-label-btn', deleteJobLabel);
 
+    $('.lead-labels').on('click', '.job-label-btn', deleteLeadLabel);
+
     $('.label-menu-apply').on('click', updateJobLabel);
 
     $('.label-menu-item').on('click', labelMenuClicked);
+
+    $('.lead-label-menu-apply').on('click', updateLeadLabel);
+
+    $('.lead-label-menu-item').on('click', leadLabelMenuClicked);
 
 	$('#searchbt').on('click', searchLeads);
 
@@ -111,6 +117,10 @@ $(function () {
     $("#addjobbt").on('click', addJob);
 
     $('#emailtocustomer').on('click', emailToCustomer);
+
+    $('#create-lead-label').on('click', createLeadLabel);
+
+    $('.delete-label-btn').on('click', deleteLabel);
 
     tinymceInit();
 
@@ -889,6 +899,8 @@ function deleteJobLabel(){
         if (msg.result > 0) {
             //showResult('label removed');
             var label_id = button.data('label');
+           // var menu_item = button.parents('form').find('.label-menu-item#'+label_id);
+
             var menu_item = button.parents('form').find('.label-menu-item#'+label_id);
             //uncheck it on the dropdown list
             menu_item.prop('checked', false);
@@ -900,8 +912,64 @@ function deleteJobLabel(){
     });
 }
 
-function updateJobLabel(event) {
+function deleteLeadLabel(){//trail button
+    var button =  $(this).parent('button');
+    var id = button.attr('id');
 
+    $.ajax({
+        url: "/label/delete/lead",
+        data: { id: id},
+        type: 'POST'
+    }).done(function (msg) {
+        if (msg.result > 0) {
+            //showResult('label removed');
+            var label_id = button.data('label');
+            var menu_item = button.parents('form').find('.lead-label-menu-item#'+label_id);
+            //uncheck it on the dropdown list
+            menu_item.prop('checked', false);
+            menu_item.val('');
+            button.remove();
+        }
+    }).fail(function (){
+        console.log('Error trying to delete label');
+    });
+}
+
+function deleteLabel(){//manage lead page
+    var row =  $(this).parent('.update-row');
+    var id = $(this).data('labelid');
+    var dialog = $('#delete-confirmation');
+    var _type = $(this).data('type').replace("_label", "s");
+    //remove any listener leftover from older calls
+    dialog.find('#confirmOk').off('click');
+    dialog.find('#message')
+          .html('Remove the label <b>"'+$(this).data('name')+
+              '"</b> from '+$(this).data('number')+' '+
+              _type+' and delete the label');
+    //delete item if OK button is pressed
+    dialog.find('#confirmOk').on('click', function () {
+        dialog.modal('hide');
+        $(this).off( "click");
+
+        $.ajax({
+        url: "/labels/delete/"+id,
+        type: 'POST'
+        })
+        .fail(function (data){
+            showResult('Error trying to delete label', true);
+        })
+        .done(function(data){
+            if(data.result) {
+                showResult('label deleted ');
+                row.remove();
+            }
+        });
+    });
+
+    dialog.modal('show');
+}
+
+function updateJobLabel(event) {
     var applybtn = $(this);
     var form = $(this).parents('form');
     var menu = applybtn.parents('.label-menu');
@@ -914,14 +982,39 @@ function updateJobLabel(event) {
         data: {add: changed.add, remove: changed.remove, jobid: applybtn.attr('id')},
         type: 'POST'
     }).done(function (msg) {
-        console.log(msg);
+        //console.log(msg);
         if (msg.result == true) {
-
             resetLabelTrail(form, msg.labels);
             applybtn.addClass('disabled');
         }
     }).fail(function (){
         console.log('Error trying to update job label!', true);
+    });
+}
+
+function updateLeadLabel(event) {
+    var applybtn = $(this);
+    var form = $(this).parents('form');
+    var menu = applybtn.parents('.lead-label-menu');
+
+    //only sending changes
+    var changed = getChangedLabels(menu, '.lead-label-menu-item');
+
+    $.ajax({
+        url: "/label/update/lead",
+        data: {add: changed.add, remove: changed.remove, leadid: applybtn.attr('id')},
+        type: 'POST'
+    }).done(function (msg) {
+       // console.log(msg);
+        if (msg.result == true) {
+
+            resetLeadLabelTrail(form, msg.labels);
+            applybtn.hide();
+            form.find('.create-lead-label').show();
+            form.find('.edit-lead-label').show();
+        }
+    }).fail(function (){
+        console.log('Error trying to update lead label!', true);
     });
 }
 
@@ -935,11 +1028,22 @@ function resetLabelTrail(form, labels)
     });
 }
 
-function getChangedLabels(menu)
+function resetLeadLabelTrail(form, labels)
+{
+    var leadlabels = form.find('.lead-labels');
+    leadlabels.find('button').remove();//empty list
+
+    $.each(labels, function (index, label) {
+        leadlabels.append(jobLabelButton(label.pivot.id, label.id, label.name));
+    });
+}
+
+function getChangedLabels(menu, tagname)
 {
     var add = [];
     var remove = [];
-    var items = menu.find('.label-menu-item');
+    var tname = (tagname != undefined)? tagname: '.label-menu-item';
+    var items = menu.find(tname);
     items.each(function(){ //loop all menu items
         var checkbox = $(this);
         var checked = checkbox.val() == 'checked';//original value
@@ -990,6 +1094,40 @@ function labelMenuClicked(event) {
         applybtn.removeClass('disabled');
     else
         applybtn.addClass('disabled');
+}
+
+function leadLabelMenuClicked(event) {
+    event.stopPropagation();
+    console.log('leadLabelMenuClicked ');
+    var menu = $(this).parents('.lead-label-menu');
+    var haschanges = false;
+
+    menu.find('.lead-label-menu-item').each(function(){ //loop all menu items
+        var checkbox = $(this);
+        var checked = checkbox.val() == 'checked';
+        if(checked !== checkbox.prop('checked'))
+        {
+            haschanges = true;
+            return false; //break out of the loop
+        }
+    });
+
+    var applybtn = menu.find('.lead-label-menu-apply');
+    var createbtn = menu.find('.create-lead-label');
+    var editbtn = menu.find('.edit-lead-label');
+
+    if(haschanges == true)
+    {
+        applybtn.show();
+        createbtn.hide();
+        editbtn.hide();
+    }
+    else
+    {
+        applybtn.hide();
+        createbtn.show();
+        editbtn.show();
+    }
 }
 
 function tableRowGoto () {
@@ -1336,6 +1474,55 @@ function deleteDrawing(target, drawingid)
     });
 
     dialog.modal('show');
+}
+
+function createLeadLabel(target)
+{
+    // var tag = $('#drawing-'+drawingid).parent('a');
+    var menu = $(this).parents('.lead-label-menu');
+    var order = +menu.find('.lead-label-menu-item').last().data('order');
+    order++;
+
+    var dialog = $('#new-label-dialog');
+    //remove any listener leftover from older calls
+    dialog.find('#confirmOk').off('click');
+    //delete item if OK button is pressed
+    dialog.find('#confirmOk').on('click', function () {
+
+        dialog.modal('hide');
+        $(this).off( "click");
+        var name = dialog.find('#label-name').val();
+        console.log('label name '+name);
+        $.ajax({
+            url: '/label/add',
+            data: {name: name, order: order, type: 'lead'},
+            type: 'POST'
+        })
+            .fail(function (data){
+                console.info('creating lead label failed');
+                console.log(data);
+                showResult('Error trying to create label', true);
+            })
+            .done(function(data){
+                if(data.result) {
+                    menu.find('.label-list-item:last').after(menuItem(data.labels[data.labels.length - 1]));
+                    $('.lead-label-menu-item:last').on('click', leadLabelMenuClicked);
+                    dialog.find('#label-name').val('');
+                    showResult('label created');
+                }
+            });
+    });
+
+    dialog.modal('show');
+}
+
+function menuItem(label)
+{
+  return '<li class="label-list-item" style="margin-left: 7px;"><div class="checkbox">'+
+         '<label><input type="checkbox" class="lead-label-menu-item" id="'+label.id+'"'+
+         'data-order="'+label.display_order+'" value=""'+
+     '>'+label.name+'</label>'+
+     '</div></li>';
 }
 
 // Catch the form submit and upload the files
@@ -2048,7 +2235,7 @@ function confirm2(options, action)
         '<div class="modal-body">'+
     '<p>'+
     '<span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>'+
-        'Are you sure you want to delete this item?'+
+        'Are you sure you want to delete this item ?'+
         '</p>'+
     '</div>'+
     '<div class="modal-footer">'+
