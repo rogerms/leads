@@ -150,20 +150,26 @@
             <div class="row">
                 <h4>Status</h4>
             </div>
+            <div class="row">
+            <ul class="sortable">
             @foreach($statuses as $status)
+                <li class="ui-state-default" id="status_{{$status->id}}"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
                 <div class="row update-row">
                     <div class="form-group">
                         <label class="sr-only" for="name">Name</label>
                         <input type="text" class="form-control" id="name" value="{{ $status->name }}">
                     </div>
-                    <div class="form-group">
-                        <label class="sr-only" for="order">Display Order</label>
-                        <input type="text" class="form-control" id="order" value="{{ $status->display_order }}" placeholder="display order">
-                    </div>
+                    {{--<div class="form-group">--}}
+                        {{--<label class="sr-only" for="order">Display Order</label>--}}
+                        {{--<input type="text" class="form-control" id="order" value="{{ $status->display_order }}" placeholder="display order">--}}
+                    {{--</div>--}}
                     <button type="button" id="{{ $status->id }}" class="btn btn-default update-lists" data-type="status">Update</button>
                 </div>
+                </li>
             @endforeach
-            <div class="row reps-add">
+            </ul>
+            </div>
+            <div class="row reps-add" style="padding-left: 16px;">
                 <div class="form-group">
                     <label class="sr-only" for="name">Name</label>
                     <input type="text" class="form-control" id="name"  placeholder="Alive">

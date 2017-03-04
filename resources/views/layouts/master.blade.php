@@ -8,7 +8,7 @@
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <!-- Bootstrap -->
     <title>SRP Leads - @yield('title')</title>
-    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css"><!-- check for updates -->
     <link href="/css/bootstrap.min.css" rel="stylesheet">
     <link href="/libs/datepicker/css/bootstrap-datepicker.min.css" rel="stylesheet">
     <link href="{{ URL::asset('css/style.css') }}" rel="stylesheet">

@@ -5,7 +5,6 @@
 @section('content')
 <div class="container">
     @include('partials.feedback')
-
 <div class="row">
     <form class="form-inline" action="">
 
@@ -15,24 +14,30 @@
                 <h4>Job Progress</h4>
             </div>
             <?php $max_order=0; ?>
+            <div class="row">
+            <ul class="sortable">
             @foreach($job_labels as $label)
-                <div class="row update-row">
-                    <div class="form-group">
-                        <label class="sr-only" for="name">Name</label>
-                        <input type="text" class="form-control" id="name" value="{{ $label->name }}">
+                <li class="ui-state-default" id="item_{{$label->id}}"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
+                    <div class="row update-row">
+                        <div class="form-group">
+                            <label class="sr-only" for="name">Name</label>
+                            <input type="text" class="form-control" id="name" value="{{ $label->name }}">
+                        </div>
+                        {{--<div class="form-group">--}}
+                            {{--<label class="sr-only" for="order">Display Order</label>--}}
+                            {{--<input type="text" class="form-control" id="order" value="{{ $label->display_order }}" placeholder="display order">--}}
+                        {{--</div>--}}
+                        <button type="button" id="{{ $label->id }}" class="btn btn-default update-lists" data-type="job_label">Update</button>
+                        <button type="button" data-labelid="{{ $label->id }}"
+                                data-name="{{ $label->name }}" data-number="{{ $label->number }}"
+                                class="btn btn-danger delete-label-btn" data-type="job_label">Delete</button>
                     </div>
-                    <div class="form-group">
-                        <label class="sr-only" for="order">Display Order</label>
-                        <input type="text" class="form-control" id="order" value="{{ $label->display_order }}" placeholder="display order">
-                    </div>
-                    <button type="button" id="{{ $label->id }}" class="btn btn-default update-lists" data-type="job_label">Update</button>
-                    <button type="button" data-labelid="{{ $label->id }}"
-                            data-name="{{ $label->name }}" data-number="{{ $label->number }}"
-                            class="btn btn-danger delete-label-btn" data-type="job_label">Delete</button>
-                </div>
+                </li>
                 <?php $max_order=$label->display_order; ?>
             @endforeach
-            <div class="row reps-add" style="margin-bottom:15px">
+            </ul>
+            </div>
+            <div class="row reps-add" style="margin-bottom:15px; padding-left:16px;">
                 <div class="form-group">
                     <label class="sr-only" for="name">Name</label>
                     <input type="text" class="form-control" id="name"  placeholder="Alive">
@@ -51,24 +56,30 @@
                 <h4>Lead Labels</h4>
             </div>
             <?php $max_order=0; ?>
+            <div class="row">
+            <ul class="sortable">
             @foreach($lead_labels as $label)
-                <div class="row update-row">
-                    <div class="form-group">
-                        <label class="sr-only" for="name">Name</label>
-                        <input type="text" class="form-control" id="name" value="{{ $label->name }}">
+                <li class="ui-state-default" id="item_{{$label->id}}"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
+                    <div class="row update-row">
+                        <div class="form-group">
+                            <label class="sr-only" for="name">Name</label>
+                            <input type="text" class="form-control" id="name" value="{{ $label->name }}">
+                        </div>
+                        {{--<div class="form-group">--}}
+                            {{--<label class="sr-only" for="order">Display Order</label>--}}
+                            {{--<input type="text" class="form-control" id="order" value="{{ $label->display_order }}" placeholder="display order">--}}
+                        {{--</div>--}}
+                        <button type="button" id="{{ $label->id }}" class="btn btn-default update-lists" data-type="lead_label">Update</button>
+                        <button type="button" data-labelid="{{ $label->id }}"
+                                data-name="{{ $label->name }}" data-number="{{ $label->number  }}"
+                                class="btn btn-danger delete-label-btn" data-type="lead_label">Delete</button>
                     </div>
-                    <div class="form-group">
-                        <label class="sr-only" for="order">Display Order</label>
-                        <input type="text" class="form-control" id="order" value="{{ $label->display_order }}" placeholder="display order">
-                    </div>
-                    <button type="button" id="{{ $label->id }}" class="btn btn-default update-lists" data-type="lead_label">Update</button>
-                    <button type="button" data-labelid="{{ $label->id }}"
-                            data-name="{{ $label->name }}" data-number="{{ $label->number  }}"
-                            class="btn btn-danger delete-label-btn" data-type="lead_label">Delete</button>
-                </div>
+                </li>
                 <?php $max_order=$label->display_order; ?>
             @endforeach
-            <div class="row reps-add" style="margin-bottom:15px">
+            </ul>
+            </div>
+            <div class="row reps-add" style="margin-bottom:15px; padding-left:16px; ">
                 <div class="form-group">
                     <label class="sr-only" for="name">Name</label>
                     <input type="text" class="form-control" id="name"  placeholder="Sent Email">

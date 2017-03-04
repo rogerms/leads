@@ -144,19 +144,21 @@ Route::group(['middleware' => 'web'], function () {
 
     Route::get('sqlt', 'HomeController@sqltest');
 
-    Route::post( 'label/delete', 'LeadController@delete_label'); //todo move to home
+    Route::post('label/delete', 'LeadController@delete_label'); //todo move to home
 
-    Route::post( 'label/update', 'LeadController@update_label');
+    Route::post('label/update', 'LeadController@update_label');
 
-    Route::post( 'label/delete/lead', 'LeadController@delete_label_lead');
+    Route::post('label/delete/lead', 'LeadController@delete_label_lead');
 
-    Route::post( 'label/update/lead', 'LeadController@update_label_lead');
+    Route::post('label/update/lead', 'LeadController@update_label_lead');
 
-    Route::post( 'label/add', 'LeadController@create_label');
+    Route::post('label/add', 'LeadController@create_label');
 
-    Route::get( 'labels/edit', 'HomeController@labels');
+    Route::get('labels/edit', 'HomeController@labels');
 
-    Route::post( 'labels/delete/{id}', 'HomeController@delete_label');
+    Route::post('labels/delete/{id}', 'HomeController@delete_label');
+
+    Route::post('labels/sort', 'HomeController@sort_labels');
 
 //----------------------------------------------------
 // note

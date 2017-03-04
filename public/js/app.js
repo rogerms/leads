@@ -122,9 +122,23 @@ $(function () {
 
     $('.delete-label-btn').on('click', deleteLabel);
 
+    initSortable();
+
     tinymceInit();
 
 });
+
+function initSortable()
+{
+    $( ".sortable" ).sortable({
+        axis:'y',
+        placeholder: 'sortable-placeholder',
+        opacity: 0.8,
+        update: sortLabelLists,
+        cursor: "move"
+    });
+    $( ".sortable" ).disableSelection();
+}
 
 function toggleData()
 {
@@ -273,6 +287,21 @@ function customRTEButtons (editor) {
         }
     });
 
+}
+
+function sortLabelLists()
+{
+    var _data = $(this).sortable('serialize');
+    $.ajax({
+        url: '/labels/sort',
+        type: 'POST',
+        data: _data
+    }).done(function(result){
+        if(result == false) {
+            console.log('List didn\'t sorted correctly');
+            //location.reload();
+        }
+    })
 }
 
 function addCalendarEvent()

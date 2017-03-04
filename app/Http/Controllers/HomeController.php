@@ -134,6 +134,29 @@ class HomeController extends Controller
         return response()->json(['result' => false]);
     }
 
+    public  function sort_labels(Request $request)
+    {
+        $display_order = 0;
+        $result = true;
+        if(!empty($request->item))
+        foreach ($request->item as $id)
+        {
+            $result &= DB::table('labels')
+                ->where('id', $id)
+                ->update(['display_order' => $display_order++]);
+        }
+
+        if(!empty($request->status))
+        foreach ($request->status as $id)
+        {
+            $result &= DB::table('status')
+                ->where('id', $id)
+                ->update(['display_order' => $display_order++]);
+        }
+
+        return response()->json(['result' => $result]);
+    }
+
     public  function update_list(Request $request, $id)
     {
         $this->authorize('edit-user');
