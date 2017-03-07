@@ -98,6 +98,12 @@
             <input type="text" class="form-control date" id="delivered" placeholder="mm/dd/yyyy" >
         </div>
     </div>
+    <div class="row">
+        <div class="form-group col-md-3">
+            <label for="invoice">Invoice Number</label>
+            <input type="text" class="form-control" id="invoice" value="" >
+        </div>
+    </div>
     <div class="print-btns">
         <div >
             <a href="" class="btn btn-primary update-group">Update Group</a>
