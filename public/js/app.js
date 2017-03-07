@@ -1243,7 +1243,7 @@ function deletePaver () {
     });
 }
 
-function updateGroup () {
+function updateGroup () {//update paver group
     event.preventDefault();
 
     var form  = $('form');
@@ -1334,7 +1334,8 @@ function getPaverGroups(form, selected)
                 note: $(this).find('#note').val(),
                 orderdate: $(this).find('#orderdate').val(),
                 addr: $(this).find('#deliveryaddr').val(),
-                delivered: $(this).find('#delivered').val()
+                delivered: $(this).find('#delivered').val(),
+                invoice: $(this).find('#invoice').val()
             };
 
             $(this).find('.paver-row').each(function () {
@@ -1376,7 +1377,8 @@ function getPaverGroup(group)
         note: group.find('#note').val(),
         orderdate: group.find('#orderdate').val(),
         addr: group.find('#deliveryaddr').val(),
-        delivered: group.find('#delivered').val()
+        delivered: group.find('#delivered').val(),
+        invoice: group.find('#invoice').val()
     };
 
     group.find('.paver-row').each(function () {

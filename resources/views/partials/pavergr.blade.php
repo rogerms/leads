@@ -107,6 +107,12 @@
             <input type="text" class="form-control date" id="delivered" value="{{ format_date($pavergroup->delivered) }}" placeholder="mm/dd/yyyy" >
         </div>
     </div>
+    <div class="row">
+        <div class="form-group col-md-3">
+            <label for="invoice">Invoice Number</label>
+            <input type="text" class="form-control" id="invoice" value="{{ $pavergroup->invoice }}" >
+        </div>
+    </div>
     <div class="print-btns">
         <a href="" class="btn btn-primary update-group">Update Group</a>
         <a href="/paver/pdf/{{ $pavergroup->id  }}" class="btn btn-default">View PDF</a>

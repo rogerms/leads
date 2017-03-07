@@ -73,6 +73,7 @@ class PaverController extends Controller
             $group->order_date =  Helper::db_date($sgroup['orderdate']);
             $group->delivered = Helper::db_date($sgroup['delivered']);
             $group->delivery_addr = $sgroup['addr'];
+            $group->invoice = $sgroup['invoice'];
 
             if(empty($sgroup['addr']))
             {
