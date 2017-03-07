@@ -856,3 +856,11 @@ font-family: FontAwesome;
     height: 40px;
     background-color: #fcf8e3;
 }
+.lead-label-menu, .label-menu{
+    min-width: 200px;
+}
+
+.lead-label-menu label, .label-menu label
+{
+    display: inline;
+}
