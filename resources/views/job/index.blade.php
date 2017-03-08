@@ -20,7 +20,7 @@
     {{--<button type="submit" class="btn btn-info" id="createbt">Create New Lead</button>--}}
     {{--@endcan--}}
     {{--</div>--}}
- {{--searches--}}
+
     <div class="fullscreen-container">
         <div class="row row-sidebar row-offcanvas row-offcanvas-right" style="min-height:100vh;">
             <div class="col-xs-10" style="overflow-x: auto; min-height: 90vh" >
