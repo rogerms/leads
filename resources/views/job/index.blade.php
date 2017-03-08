@@ -1,7 +1,3 @@
-       <!-- #7D1935
-#4A96AD
-#F5F3EE
-#FFFFFF -->
 @extends('layouts.master')
 
 @section('title', 'All Jobs')
