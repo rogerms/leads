@@ -31,14 +31,14 @@
                             <th style="min-width:80px">ID</th>
                             <th style="min-width:80px">Job#</th>
                             <th style="min-width:280px">Customer Name</th>
-                            <th style="min-width:70px">Date Sold</th>
+                            <th style="min-width:90px">Date Sold</th>
                             <th style="min-width:120px">City</th>
                             <th style="min-width:70px">Rep</th>
                             <th style="min-width:50px">S/F</th>
                             <th style="min-width:100px">Pavers</th>
                             <th style="min-width:70px">RB</th>
                             <th style="min-width:70px">Sand</th>
-                            <th style="min-width:70px">Start Date</th>
+                            <th style="min-width:90px">Start Date</th>
                             <th style="min-width:70px">Skid</th>
                             <th style="min-width:70px">Crew</th>
                             <th style="min-width:400px">Notes</th>

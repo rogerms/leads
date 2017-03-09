@@ -62,9 +62,14 @@ $(function () {
 
     $('.lead-label-menu-item').on('click', leadLabelMenuClicked);
 
-	$('#searchbt').on('click', searchLeads);
+	var searchbar = $('#searchbar');
+    var jobsearchbar = $('#jobs-searchbar');
 
-    $('#searchtx').keypress(seachLeadsEnter);
+    searchbar.find('#searchbt').on('click', searchLeads);
+
+    jobsearchbar.find('#searchbt').on('click', sortJobs);
+
+    $('#searchtx').keypress(seachTextfieldChanged);
 
     addSearchAutoComplete();
 
@@ -899,11 +904,19 @@ function addSearchAutoComplete()
     });
 }
 
-function seachLeadsEnter (e) {
-    if (e.which == 13) {
+function seachTextfieldChanged (e) {
+    if (e.which == 13) { //Enter key
         e.preventDefault();
         $('#searchtx').autocomplete('close');
-        searchLeads(e);
+
+        if($(this).parents('#jobs-searchbar').length > 0)
+        {
+            sortJobs(e);
+        }
+        else
+        {
+            searchLeads(e);
+        }
     }
 }
 
@@ -1721,13 +1734,13 @@ function sortJobs()
     // if the same heading is click twice change sort direction
     sortdirection = (sortby == title)? sortdirection*-1: 1;
     sortby = title;
-
-   // alert(sortby);
-
+    //console.log('sort by '+sortby);
     $.ajax({
             url: '/jobs?page=1',
             data: {
                 labels: getFilters('labels_count'),
+                searchtx: $('#searchtx').val(),
+                searchby: $('small#searchby').text(),
                 sortby: sortby,
                 sortdirection: sortdirection
             },

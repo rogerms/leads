@@ -87,9 +87,10 @@
 
           </ul>
 
-            @if(isPage(['/','leads']))
+            @if(isPage(['/','leads','jobs']))
             <!-- search bar -->
-            <form class="navbar-form navbar-left" id="searchbar" role="search">
+            <?php $prefix = isPage('jobs')? 'jobs-': '' ?>
+            <form class="navbar-form navbar-left" id="{{$prefix}}searchbar" role="search">
                 <div class="input-group">
                     <input type="text" class="form-control" id="searchtx" placeholder="Enter text..." aria-label="search">
                     <div class="input-group-btn">

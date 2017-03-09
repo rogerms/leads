@@ -62,41 +62,6 @@ class JobController extends Controller
     {
         if ($request->ajax())
         {
-//
-//            $sortby = ($request->sortby) ? $request->sortby : 'jobs.updated_at';
-//            $sortby = str_replace(
-//                ['ID', 'Job#', 'Customer Name', 'Date Sold', 'City', 'Sales Rep'],
-//                ['jobs.id', 'code', 'customer_name', 'date_sold', 'city', 'sales_reps.name'],
-//                $sortby
-//            );
-/*
-            $direction = ($request->sortdirection == 1) ? 'ASC' : 'DESC';
-
-            $jobs = Job::join('leads', 'jobs.lead_id', '=', 'leads.id')
-                ->join('sales_reps', 'sales_reps.id', '=', 'leads.sales_rep_id')
-                ->leftJoin('paver_groups', 'paver_groups.job_id', '=', 'jobs.id')
-                ->leftJoin('notes', function($join){
-                    $join->on('notes.job_id', '=', 'jobs.id')
-                        ->whereNull('notes.deleted_at')
-                        ->where('notes.note',  'not like',  '#%');
-                })
-
-                ->orderBy($sortby, $direction)
-                ->select('jobs.id', 'code', 'leads.id as lead_id', 'customer_name', 'date_sold', 'city',
-                    'sales_reps.name as sales_rep',
-                    'crew',
-                    'needs_skid as skid',
-                    'jobs.start_date',
-                    'jobs.size as job_size',
-                     DB::raw("GROUP_CONCAT(DISTINCT notes.note ORDER BY notes.job_id SEPARATOR ', ') as job_notes")
-// GROUP_CONCAT(DISTINCT CONCAT(DATE_FORMAT(paver_groups.delivery_at, '%c/%e'), if(paver_groups.delivered is null, '', ' &#x2714;'))  ORDER BY paver_groups.job_id,paver_groups.id SEPARATOR '<br>') as pavers_delivery,")
-                    )
-                ->groupBy('notes.job_id')
-                ->where('jobs.date_sold', '<>', '')
-                ->paginate(15);
-
-            $jobs->appends(['sortby' => $sortby, 'sortdirection' => $request->sortdirection]);
-            */
 
             $search = str_replace(["'", '"', 'delete', 'update'], ["\\'", "\\\"", ''], $request->searchtx);
 
@@ -136,6 +101,35 @@ class JobController extends Controller
             LEFT JOIN paver_groups ON paver_groups.job_id = jobs.id
             WHERE jobs.date_sold is not null";
 
+
+            if($request->searchby == 'Tag')
+            {
+                if(strpos($search, '#') === false || strpos($search, '#') != 0) $search = '#'.$search;
+//                $query .= sprintf(" AND notes.note LIKE '%s%%' ", $search);
+                $query .= " AND ((notes.note LIKE '$search%' AND notes.deleted_at is null) OR  (j_notes.note LIKE '$search%' AND j_notes.deleted_at is null))";
+            }
+            elseif($request->searchby == 'Addr')
+            {
+                $query .= " AND (leads.street LIKE '%$search%' OR leads.city LIKE '%$search%')";
+            }
+            elseif($request->searchby == 'Job#')
+            {
+                $query .= " AND (jobs.id = '$search' OR jobs.code LIKE '%$search%')";
+            }
+            elseif($request->searchby == 'Email')
+            {
+                $query .= " AND leads.email LIKE '%$search%' ";
+            }
+            elseif($request->searchby == 'Phone' && !empty($search))
+            {
+                $phone_number =  str_replace([' ', '(', ')', '-'], "", $search);
+                $query .= " AND REPLACE(REPLACE(REPLACE(REPLACE(leads.phone,' ',''),'(',''),')',''),'-', '') = $phone_number";
+            }
+            else
+            {
+                $query .= " AND (leads.customer_name LIKE '%$search%' OR leads.contact_name LIKE '%$search%')";
+            }
+
             if(count($request->labels) > 0)
             {
                 $query .= " AND labels.name IN (".implode(",", $request->labels).")";
@@ -144,12 +138,27 @@ class JobController extends Controller
             $sort = "jobs.updated_at desc";
             if($request->sortby)
             {
-                $sortby = str_replace(
-                    ['id', 'job#', 'customer name', 'date sold', 'city', 'sales rep', 's/f','pavers','rb','sand','date sold','start date','skid','notes'],
-                    ['jobs.id', 'jobs.code', 'customer_name', 'jobs.date_sold', 'city', 'sales_reps.name', 'size', '','material_rb.qty','material_sand.qty', 'jobs.date_sold','start_date','',''],
-                    strtolower($request->sortby)
-                );
-
+                $sort_terms =
+                    [
+                        'progress' => 'labels.name',
+                        'id' => 'jobs.id',
+                        'job#' => 'jobs.code',
+                        'customer name' => 'customer_name',
+                        'date sold' => 'jobs.date_sold',
+                        'city' => 'city',
+                        'rep' => 'sales_reps.name',
+                        's/f' => 'jobs.size',
+                        'pavers' => 'paver_groups.id',
+                        'rb' => 'material_rb.qty',
+                        'sand' => 'material_sand.qty',
+                        'start date' => 'start_date',
+                        'skid' => 'needs_skid',
+                        'notes' => 'notes.note',
+                        'crew' => 'crew',
+                        'name' => ''
+                    ];
+                $key = strtolower($request->sortby);
+                $sortby = (array_key_exists($key, $sort_terms))? $sort_terms[$key]: '';
                 if(!empty($sortby))
                 {
                     $direction = ($request->sortdirection == 1)? 'ASC': 'DESC';
