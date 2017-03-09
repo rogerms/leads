@@ -26,6 +26,7 @@
                 <button class="btn btn-warning" id="update-all-groups">Update All</button>
                 @endif
             </div>
+            <input type="hidden" id="customer_addr" value="{{$customer_addr}}" />
         </div>
     </form>
 </div>

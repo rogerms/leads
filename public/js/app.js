@@ -541,19 +541,19 @@ function addPaverGroup()
     var slist = $(this).parents('.paversgroups').find('.paver-sheets');
     var tag = $('#templates').find('.paver-sheet').first().clone();
     tag.find('.group-count').text(slist.find('.group-count').length + 1 + '*');
-
     //tag.attr('id', 0);
     //tag.find('input').val('');
     //tag.find('#tumbled ').prop('checked', false);
     slist.append(tag);
     //add autocomplete to new ones
-    //add listener to add paver button
+    //add listener to 'add paver' button
     datePickerInit();
     $('.update-group').on('click', updateGroup);
     tag.find('#paver').autocomplete({source: autocompleteLists['pavers']});
     tag.find('#manu').autocomplete({source: autocompleteLists['manus']});
     tag.find('#pavercolor').autocomplete({source: autocompleteLists['colors']});
     tag.find('#paversize').autocomplete({source: autocompleteLists['sizes']});
+    tag.find('#deliveryaddr').val($('#customer_addr').val());
 }
 
 function addmaterial()
@@ -1278,14 +1278,12 @@ function updateGroup () {//update paver group
             jobid: id
         };
 
-    console.log($(this).parents('.paver-sheet2').length);
-
     $.ajax({
         url: "/paver/update",
         data: fdata,
         type: 'POST'
     }).done(function (msg) {
-        console.log(msg);
+        // console.log(msg);
         if (msg.result == 'success') {
             form.find('.group-count').each(function(){
                 //remove *

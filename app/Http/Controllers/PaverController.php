@@ -22,14 +22,16 @@ class PaverController extends Controller
     public function show(Request $request, $job_id)
     {
         $job = Job::find($job_id);
-        $job->load('pavergroups');
+        $job->load('pavergroups', 'lead');
         $job->pavergroups->load('pavers');
+        $lead = $job->lead;
+        $customer_addr = "$lead->street, $lead->city, $lead->state $lead->zip";
 
         if($request->fmt == 'json')
         {
-            return response()->json(['pavergroups' =>  $job->pavergroups]);
+            return response()->json(['pavergroups' =>  $job->pavergroups, 'customer_addr' => $customer_addr]);
         }
-        return view('job.paver', compact('job'));
+        return view('job.paver', compact('job', 'customer_addr'));
     }
 
     public function update(Request $request)
@@ -63,6 +65,8 @@ class PaverController extends Controller
             //update group
             $id = $sgroup['id'];
             $group = PaverGroup::findOrNew($id);
+
+            if(empty($sgroup['manu'])) return false;
 
             $group->manufacturer = $sgroup['manu'];
             $group->portlands = $sgroup['portland'];
