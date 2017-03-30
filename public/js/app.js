@@ -127,6 +127,8 @@ $(function () {
 
     $('.delete-label-btn').on('click', deleteLabel);
 
+    $('.changeorder').on('click', showChangeOrderTag);
+
     initSortable();
 
     tinymceInit();
@@ -346,6 +348,20 @@ function addCalendarHash(e)
         note.val(msg);
         var evt = jQuery.Event('keypress', { which: 13});
         note.trigger(evt);
+    }
+}
+
+function showChangeOrderTag()
+{
+    var form = $(this).parents('form');
+
+    if($(this).prop('checked'))
+    {
+        form.find('.change-order-tag').removeClass('hidden');
+    }
+    else
+    {
+        form.find('.change-order-tag').addClass('hidden');
     }
 }
 
@@ -760,6 +776,7 @@ function jobFormData(form)
         prelien: form.find('#prelien').prop('checked'),
         bluestakes: form.find('#bluestakes').prop('checked'),
         noaddfee: form.find('#noaddfee').prop('checked'),
+        changeorder: form.find('.changeorder').prop('checked'),
         skid: form.find('#skid').prop('checked'),
         crew: form.find('#crew').val(),
         downpayment: form.find('#downpayment').val(),

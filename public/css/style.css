@@ -864,3 +864,15 @@ font-family: FontAwesome;
 {
     display: inline;
 }
+
+.change-order-tag
+{
+    position: relative;
+    left: 12px;
+    top: -5px;
+}
+
+.change-order-div
+{
+    position: absolute;
+}

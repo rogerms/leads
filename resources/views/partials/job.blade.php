@@ -2,6 +2,9 @@
     <form id="{{$job->id}}">
         <div class="row row-extra-pad">
             <div class="col-sm-3"><h2 id="job-num"> {{ \app\Helpers\Helper::show_job_num($job) }} </h2></div>
+            <div class="change-order-div">
+                <button type="button" class="btn btn-danger btn-xs change-order-tag {{ doHide($job->change_order) }}">Change Order</button>
+            </div>
             <div class="col-sm-9" >
                 <div class="pull-right job-labels">
                 @foreach($job->labels as $label)
@@ -141,6 +144,11 @@
             <div class="form-group col-md-2 cbox-valign">
                 <label class="checkbox-inline">
                     <input type="checkbox" id="noaddfee"  {{ isChecked($job->noadd_fee) }} value="additionalfee">No additional fees
+                </label>
+            </div>
+            <div class="form-group col-md-2 cbox-valign">
+                <label class="checkbox-inline">
+                    <input type="checkbox" class="changeorder" {{ isChecked($job->change_order) }} value="changeorder">Change Order
                 </label>
             </div>
             @endcan

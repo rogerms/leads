@@ -210,6 +210,17 @@
         }
     }
 
+    if(!function_exists('doHide'))
+    {
+        function doHide($value)
+        {
+            if($value == null) return 'hidden';
+            if($value)
+                return '';
+            return 'hidden';
+        }
+    }
+
     if(!function_exists('isLabelChecked'))
     {
         function isLabelChecked($label_id, $ids)
