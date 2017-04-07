@@ -19,7 +19,7 @@ class PhoneController extends Controller
         $result = false;
         $phone = new Phone();
         $phone->lead_id = $request->leadid;
-        $phone->number = $request->number;
+        $phone->number = $request->value;
         $phone->label = $request->label;
         $result &= $phone->save();
 
@@ -34,7 +34,7 @@ class PhoneController extends Controller
 
         $phone = new Phone();
         $phone->lead_id = $request->leadid;
-        $phone->number = $request->number;
+        $phone->number = $request->value;
         $phone->label = $request->label;
         $result = $phone->save();
 
@@ -56,8 +56,8 @@ class PhoneController extends Controller
 
         $phone = Phone::findOrFail($data['id']);
 
-        $phone->number = $d['number'];
-        $phone->label = $d['label'];
+        $phone->number = $data['value'];
+        $phone->label = $data['label'];
 
         return $phone->save();
     }

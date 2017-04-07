@@ -171,8 +171,13 @@ Route::group(['middleware' => 'web'], function () {
 // phone
 //-----------------------------------------------------
     Route::any('phone/add', 'PhoneController@add');
-    Route::post('phone/delete/{noteid}', 'PhoneController@delete');
+    Route::post('phone/delete/{id}', 'PhoneController@delete');
 
+//-----------------------------------------------------
+// email
+//-----------------------------------------------------
+    Route::any('email/add', 'EmailController@add');
+    Route::post('email/delete/{id}', 'EmailController@delete');
 
 
 //----------------------------------------------------

@@ -68,9 +68,33 @@
 
         </div>
         <div class="col-md-6">
-        <div class="form-group">
+        <div class="form-group email-group">
             <label for="email">Email</label>
-            <input type="email" class="form-control" id="email" value="{{$lead->email}}" placeholder="Email">
+            <div class="input-group">
+                <input type="email" class="form-control" id="email" value="{{$lead->email}}" placeholder="Email">
+                <div class="input-group-btn">
+                    <button type="button" class="btn btn-default disabled badge-btn">main</button>
+                    <a class="btn btn-default" role="button" href="mailto:{{ $lead->email }}"><span class="glyphicon glyphicon-envelope"></span></a>
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>
+                    @can('edit')
+                        <ul class="dropdown-menu dropdown-menu-right">
+                            <li><a href="#" class="icon" id="addemail"><span class="glyphicon glyphicon-plus"></span>Add Email</a></li>
+                        </ul>
+                    @endcan
+                </div><!-- /btn-group -->
+            </div><!-- /input-group -->
+
+            {{--other email addresses--}}
+            @foreach($lead->emails as $email)
+                <div class="input-group extra-email-group">
+                    <input type="email" class="form-control extra-email" aria-label="email" value="{{ $email->email }}" >
+                    <div class="input-group-btn">
+                        <button type="button" class="btn btn-default disabled badge-btn">{{ $email->label }}</button>
+                        <a class="btn btn-default" role="button" href="mailto:{{ $email->email }}"><span class="glyphicon glyphicon-envelope"></span></a>
+                        <button type="button" data-id="{{ $email->id }}" class="btn btn-default delete-email" ><span class="glyphicon glyphicon-trash"></span></button>
+                    </div><!-- /btn-group -->
+                </div><!-- /input-group -->
+            @endforeach
         </div>
         </div>
     </div>

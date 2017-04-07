@@ -117,7 +117,11 @@ $(function () {
 
     $(".delete-phone").on('click', deletePhone);
 
+    $(".delete-email").on('click', deleteEmail);
+
     $("#addphone").on('click', addPhone);
+
+    $("#addemail").on('click', addEmail);
 
     $("#addjobbt").on('click', addJob);
 
@@ -2088,18 +2092,85 @@ function deletePhone()
     dialog.modal('show');
 }
 
+function deleteEmail()
+{
+    event.preventDefault();
+    var emailid = $(this).data('id');
+    var email = $(this).parents('.extra-email-group');
+
+
+    bootbox.confirm({
+        title: "Delete",
+        message: "Are you sure you want to delete this email?",
+
+        callback: function(result){
+            if(result === true)
+            {
+                deleteEmailAjax(email, emailid)
+            }
+        }
+    });
+}
+
+function deleteEmailAjax(email, emailid)
+{
+    $.ajax({
+        url: '/email/delete/'+emailid,
+        type: 'POST'
+    })
+    .fail(function (data){
+        console.info('delete email ajax failed');
+        console.log(data);
+        showResult('Error trying to delete email', true);
+    })
+    .done(function(data){
+        // console.log(data);
+        if(data.result) {
+            email.remove();
+            showResult('Email deleted');
+        }
+    });
+}
+
 function addPhone(e)
+{
+    addPhoneOrEmail(e, 'phone');
+}
+
+function addEmail(e)
+{
+    addPhoneOrEmail(e, 'email');
+}
+
+function addPhoneOrEmail(e, type)
 {
     e.preventDefault();
 
+    var form = $('#add-phone-modal');
+    var title = "Add Phone Number";
+
+    if(type == 'email')
+    {
+        form.find('.item1-label').text('Email');
+        form.find('.item1-input').attr("placeholder", "name@email.com");
+        form.find('.item2-input').attr("placeholder", "other");
+        title = "Add Email";
+    }
+    else
+    {
+        form.find('.item1-label').text('Phone');
+        form.find('.item1-input').attr("placeholder", "000-999-0000");
+        form.find('.item2-input').attr("placeholder", "home");
+    }
+
     bootbox.dialog({
-        title: "Add Phone Number",
-        message: $('#add-phone-modal').html(),
+        title: title,
+        message: form.html(),
         buttons: {
             success: {
                 label: "Save",
                 className: "btn-success",
-                callback: addPhoneAjax
+                callback: function() { addPhoneAjax($(this), type); }
             },
             danger: {
                 label: "Cancel",
@@ -2110,37 +2181,66 @@ function addPhone(e)
     });
 }
 
-function addPhoneAjax()
+function isEmpty(value) {
+    return typeof value == 'string' && !value.trim() || typeof value == 'undefined' || value === null;
+}
+
+function addPhoneAjax(form, type)
 {
-    var _number = $(this).find('#number').val();
-    var _label = $(this).find('#label').val();
+    var _value = form.find('.item1-input').val();
+    var _label = form.find('.item2-input').val();
     var _leadid = $('#leadid').val();
+
+    if(isEmpty(_value) || isEmpty(_label) || isEmpty(_leadid))
+    {
+        showResult('Please complete all the fields');
+        return;
+    }
+
+    var url = (type == 'email')? "/email/add": "/phone/add";
 
     $.ajax(
         {
-            url: "/phone/add",
+            url: url,
             data: {
-                number: _number, 
-                label: _label, 
+                value: _value,
+                label: _label,
                 leadid: _leadid
             },
             type: 'POST'
         }).done(function(data){
             if(data.result) {
-                var tag = $('#templates').find('#phone').clone();
+                if(type == 'phone')
+                {
+                    var tag = $('#templates').find('#phone').clone();
 
-                tag.find('.badge-btn').first().text(data.label);
-                tag.find('.extra-phone-num').first().val(data.number);
-                tag.find('a').attr('href', 'tel:'+data.number);
-                tag.find(".delete-phone").data('id', data.id);
-                tag.find(".delete-phone").on('click', deletePhone);
-                
-                $('.phone-group').append(tag);
+                    tag.find('.badge-btn').first().text(data.label);
+                    tag.find('.extra-phone-num').first().val(data.number);
+                    tag.find('a').attr('href', 'tel:'+data.number);
+                    tag.find(".delete-phone").data('id', data.id);
+                    tag.find(".delete-phone").on('click', deletePhone);
 
-                showResult('Phone number added');
+                    $('.phone-group').append(tag);
+
+                    showResult('Phone added successfully');
+                }
+                else if(type == 'email')
+                {
+                    tag = $('#templates').find('#email').clone();
+
+                    tag.find('.badge-btn').first().text(data.label);
+                    tag.find('.extra-email').first().val(data.email);
+                    tag.find('a').attr('href', 'mailto:'+data.email);
+                    tag.find(".delete-email").data('id', data.id);
+                    tag.find(".delete-email").on('click', deleteEmail);
+
+                    $('.email-group').append(tag);
+
+                    showResult('Email added successfully');
+                }
             }
             else{
-                showResult('Error adding phone number', true);
+                showResult('Error adding item', true);
             }
         });
 }

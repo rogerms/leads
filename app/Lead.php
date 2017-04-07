@@ -47,6 +47,11 @@ class Lead extends Model
         return $this->hasMany('App\Phone');
     }
 
+    public function emails()
+    {
+        return $this->hasMany('App\Email');
+    }
+
     public function labels()
     {
         return $this->belongsToMany('App\Label', 'lead_label')

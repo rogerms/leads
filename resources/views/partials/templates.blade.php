@@ -141,4 +141,13 @@
             <button type="button" data-id="" class="btn btn-default delete-phone" ><span class="glyphicon glyphicon-trash"></span></button>
         </div><!-- /btn-group -->
     </div><!-- /input-group -->
+
+    <div id="email" class="input-group extra-email-group">
+        <input type="email" class="form-control extra-email" aria-label="email" value="" >
+        <div class="input-group-btn">
+            <button type="button" class="btn btn-default disabled badge-btn"></button>
+            <a class="btn btn-default" role="button" href=""><span class="glyphicon glyphicon-envelope"></span></a>
+            <button type="button" data-id="" class="btn btn-default delete-email" ><span class="glyphicon glyphicon-trash"></span></button>
+        </div><!-- /btn-group -->
+    </div><!-- /input-group -->
 </div>
