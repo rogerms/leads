@@ -125,7 +125,7 @@ class ReportController extends Controller
                     'JobID' => $job->id,
                     'JobNumber' => job_number($job),
                     'JobName' => job_name($job),
-                    'DateSold' => $job->date_sold->format('m/d/Y'),
+                    'DateSold' => (empty($job->date_sold))? "": $job->date_sold->format('m/d/Y'),
                     'CustomerName' =>  $lead->customer_name,
                     'Phone' =>  $lead->phone,
                     'Email' =>  $lead->email,
