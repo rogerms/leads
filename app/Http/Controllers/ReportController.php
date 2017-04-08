@@ -131,7 +131,7 @@ class ReportController extends Controller
                     'Email' =>  $lead->email,
                     'StreetAddress' => $lead->street,
                     'City' =>  $lead->city,
-                    'State' =>  'UT',
+                    'State' =>  $lead->state,
                     'ProposalAmount' => $job->proposal_amount,
                     'DownPaymentPercentage' => number_fmt($job->downpayment, true).'%',
             ];
