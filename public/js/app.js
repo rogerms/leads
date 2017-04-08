@@ -2185,6 +2185,16 @@ function isEmpty(value) {
     return typeof value == 'string' && !value.trim() || typeof value == 'undefined' || value === null;
 }
 
+function isEmail(email) {
+    var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+    return regex.test(email);
+}
+
+function isPhone(phone) {
+    var regex = /^[(]{0,1}[0-9]{3}[)]{0,1}[-\s\.]{0,1}[0-9]{3}[-\s\.]{0,1}[0-9]{4}$/;
+    return regex.test(phone);
+}
+
 function addPhoneAjax(form, type)
 {
     var _value = form.find('.item1-input').val();
@@ -2193,7 +2203,17 @@ function addPhoneAjax(form, type)
 
     if(isEmpty(_value) || isEmpty(_label) || isEmpty(_leadid))
     {
-        showResult('Please complete all the fields');
+        showResult('Please complete all the fields', true);
+        return;
+    }
+    if(type == 'email' && isEmail(_value) == false)
+    {
+        showResult('The email entered is invalid', true);
+        return;
+    }
+    if(type == 'phone' && isPhone(_value) == false)
+    {
+        showResult('The phone number entered is invalid', true);
         return;
     }
 
