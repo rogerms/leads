@@ -602,7 +602,7 @@ class JobController extends Controller
         $email_body = urldecode($request->message);
 
         $v = Validator::make($request->all(), [
-            'email' => 'required|email|max:100',
+            'email.*' => 'required|email',
             'message'  => 'required',
             'subject'  => 'required'
         ]);

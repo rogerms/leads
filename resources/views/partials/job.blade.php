@@ -310,7 +310,7 @@
                 <ul class="dropdown-menu">
                     {{--<li><a href="/email/job/{{$job->id}}">Email PDF</a></li>--}}
                     @can('edit-job')
-                    <li><a id="emailtocustomer" href="/email/customer/{{$job->id}}">Email Customer</a></li>
+                    <li><a class="emailtocustomer" href="/email/customer/{{$job->id}}">Email Customer</a></li>
                     <li><a href="/report/job/{{$job->id}}">Export Excel</a></li>
                     @endcan
                     @can('read')

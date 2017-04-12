@@ -125,7 +125,7 @@ $(function () {
 
     $("#addjobbt").on('click', addJob);
 
-    $('#emailtocustomer').on('click', emailToCustomer);
+    $('.emailtocustomer').on('click', emailToCustomer);
 
     $('#create-lead-label').on('click', createLeadLabel);
 
@@ -2281,10 +2281,13 @@ function emailToCustomer(e)
 {
     e.preventDefault();
     var url = $(this).attr('href');
-    var _email = $('#email').val();
+    var emails = [];
+    emails.push($('#email').val());
+    $('.extra-email').each(function(index) { emails.push($(this).val()); });
+
     var _message = $('#email-customer-modal').html();
 
-    _message = _message.replace('=email=', _email);
+    _message = _message.replace('=email=', emails.join('; '));
 
     bootbox.dialog({
         title: "Email:",
@@ -2297,8 +2300,18 @@ function emailToCustomer(e)
                 {
                     var subject = $(this).find('#subject').val();
                     var msg = $(this).find('#message').val();
-                    var email = $(this).find('#email').val();
-                    window.location = url+'?subject='+subject+'&message='+encodeURI(msg)+'&email='+email;
+                    var emails = "";
+                    var emailArr = $(this).find('#email').val().split(';');
+
+                    $.each(emailArr, function( index, value ) {
+                        var email = value.trim();
+                        if(email != "")
+                        {
+                            emails += "&email[]="+email;
+                        }
+                    });
+
+                    window.location = url+'?subject='+subject+'&message='+encodeURI(msg)+emails;
                 }
             },
             danger: {
