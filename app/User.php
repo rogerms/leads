@@ -29,4 +29,13 @@ class User extends Authenticatable
     {
         return $this->belongsTo('App\Role');
     }
+
+    public function is($roleName)
+    {
+        if ($this->role->name == $roleName)
+        {
+            return true;
+        }
+        return false;
+    }
 }

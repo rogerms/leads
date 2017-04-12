@@ -92,6 +92,11 @@ class LeadController extends Controller
     public function index(Request $request)
     {
         //$leads = DB::table('leads')->paginate(15);
+        if (Auth()->user()->is('Viewer'))//viewers are only allowed to see jobs
+        {
+            return redirect('/jobs');
+        }
+        //$this->authorize('edit');
 
         if ($request->ajax() || $request->fmt == 'json')
         {
