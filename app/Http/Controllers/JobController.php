@@ -691,13 +691,13 @@ class JobController extends Controller
         $jobid = $job->id;
         $leadid = $job->lead_id;
 
+        //---- google chrome extension notifications
         $message = json_encode(['data' => [
             'name' => $jobname,
             'jobid' => $jobid,
             'leadurl' => $leadurl
             ]
         ]);
-
 
         $notification = new Notification("gcm", $message);
         $hub->sendNotification($notification, ""); //param: notification, tag

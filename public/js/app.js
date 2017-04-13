@@ -1726,36 +1726,23 @@ function sortLeads()
 
 function nextJobsPage(e)
 {
-
     e.preventDefault();
     var url = $(this).attr('href');
-
-    $.ajax({
-            url: url,
-            type: 'GET'
-        })
-        .done(function (result) {
-            var tbody = $('#jobstb > tbody');
-            tbody.html(result.jobs);
-            $('.jobs-pagelinks').html(result.links);
-        })
-        .fail(function () {
-            showResult('Error trying to get next page', true);
-        });
+    sortJobs(e, url);
 }
 
-function sortJobs()
+function sortJobs(event, url)
 {
     if (processingSearch == true) return;
     processingSearch = true;
-
+    var hasUrl = (url != undefined);
     var title = $(this).text();
     // if the same heading is click twice change sort direction
     sortdirection = (sortby == title)? sortdirection*-1: 1;
     sortby = title;
     //console.log('sort by '+sortby);
     $.ajax({
-            url: '/jobs?page=1',
+            url: hasUrl? url: '/jobs?page=1',
             data: {
                 labels: getFilters('labels_count'),
                 searchtx: $('#searchtx').val(),
