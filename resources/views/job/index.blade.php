@@ -55,7 +55,11 @@
             <div class="col-xs-2 sidebar-offcanvas" id="sidebar">
                 <div class="list-group">
                                             {{--jobs progress--}}
-                <a href="#" class="list-group-item list-header">Jobs Progress <span class="badge" id="labels_count_total"></span></a>
+                <a href="#" class="list-group-item list-header">
+                    <input class="checkall_labels" type="checkbox" name="checkall_labels" aria-label="checkall labels">
+                    Jobs Progress
+                    <span class="badge" id="labels_count_total"></span>
+                </a>
                 @foreach($labels_count as $label)
                     <a  class="list-group-item thin-item">
                         <input class="jobtbfilter" type="checkbox" name="labels_count" value="{{ $label->name  }}" aria-label="labels">
@@ -63,6 +67,13 @@
                         <span class="badge">{{ $label->count }}</span>
                     </a>
                 @endforeach
+            </div>
+            <div class="row row-extra-bm-pad" style="margin-left: -5px;">
+                <div class="btn-group btn-toggle">
+                    <button class="btn btn-xs btn-default">SHOW</button>
+                    <button class="btn btn-xs btn-primary active">HIDE</button>
+                </div>
+                <span style="color: darkgrey">Paid+Completed</span>
             </div>
         </div><!--/.sidebar-offcanvas-->
 

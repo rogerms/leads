@@ -134,6 +134,10 @@ class JobController extends Controller
             {
                 $query .= " AND labels.name IN (".implode(",", $request->labels).")";
             }
+            if(count($request->labels) == 0  && $request->showAll == 'false')
+            {
+                $query .= " AND (labels.name <> 'Paid+Completed' OR labels.name is null) ";
+            }
 
             $sort = "jobs.updated_at desc";
             if($request->sortby)

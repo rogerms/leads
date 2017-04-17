@@ -5,6 +5,7 @@ var autocompleteLists = [];
 var sortby = '';
 var sortdirection = 1; // 1=asc -1=desc
 var versionbuttons = {};
+var showCompletedJobs = false;
 
 $(function () {
 
@@ -133,9 +134,13 @@ $(function () {
 
     $('.changeorder').on('click', showChangeOrderTag);
 
+    $('.checkall_labels').on('click', toggleCheckAll);
+
     initSortable();
 
     tinymceInit();
+
+    $('.btn-toggle').on('click', toggleShowCompletedJobs);
 
 });
 
@@ -298,6 +303,35 @@ function customRTEButtons (editor) {
         }
     });
 
+}
+
+function toggleCheckAll()
+{
+    var isChecked = $(this).prop("checked");
+    var jobtbfilter = $('.jobtbfilter');
+    jobtbfilter.prop("checked", isChecked);
+    jobtbfilter.trigger('change');
+}
+
+function toggleShowCompletedJobs(e) {
+    $(this).find('.btn').toggleClass('active');
+
+    if ($(this).find('.btn-primary').size()>0) {
+        $(this).find('.btn').toggleClass('btn-primary');
+    }
+    else if ($(this).find('.btn-danger').size()>0) {
+        $(this).find('.btn').toggleClass('btn-danger');
+    }
+    else if ($(this).find('.btn-success').size()>0) {
+        $(this).find('.btn').toggleClass('btn-success');
+    }
+    else if ($(this).find('.btn-info').size()>0) {
+        $(this).find('.btn').toggleClass('btn-info');
+    }
+
+    $(this).find('.btn').toggleClass('btn-default');
+    showCompletedJobs = $(this).find('.btn-default').text() == 'HIDE';
+    sortJobs(e);
 }
 
 function sortLabelLists()
@@ -1748,7 +1782,8 @@ function sortJobs(event, url)
                 searchtx: $('#searchtx').val(),
                 searchby: $('small#searchby').text(),
                 sortby: sortby,
-                sortdirection: sortdirection
+                sortdirection: sortdirection,
+                showAll: showCompletedJobs
             },
             type: 'GET'
         })
