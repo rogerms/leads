@@ -1774,7 +1774,7 @@ function sortJobs(event, url)
     // if the same heading is click twice change sort direction
     sortdirection = (sortby == title)? sortdirection*-1: 1;
     sortby = title;
-    //console.log('sort by '+sortby);
+
     $.ajax({
             url: hasUrl? url: '/jobs?page=1',
             data: {
@@ -1806,7 +1806,11 @@ function sortJobs(event, url)
             $('#labels_count_total').text(result.count);
             processingSearch = false;
         })
-        .fail(function () {
+        .fail(function (result) {
+            if(result.status == 401) {
+                window.location = "/jobs";
+                return;
+            }
             showResult('Error trying to get jobs!', true);
         });
 }
@@ -1910,6 +1914,10 @@ function searchLeads(event, url) {
         })
         .fail(function () {
             processingSearch = false;
+            if(result.status == 401) {
+                location.reload();
+                return;
+            }
             showResult('Error trying to get leads', true);
         });
 }
