@@ -15,6 +15,7 @@ $(function () {
     datePickerInit();
     populateTable();
     populateJobsTable();
+    setGoBackButton();
     initPrototype();
     //needs to add listener after a new job is added if using modal form
 	$('#leadnote,.jobnote').keypress(addnote);
@@ -1228,7 +1229,11 @@ function leadLabelMenuClicked(event) {
 }
 
 function tableRowGoto () {
-    window.location.href = "/lead/" + $(this).data('id');
+    var data = (location.pathname == '/jobs')? $.param(dataSearchJobs()): $.param(searchLeadsData());
+    var page = $('.pagination').find('.active').text();
+    if(page.length > 0) page = '&page='+page;
+
+    window.location.href = "/lead/" + $(this).data('id')+'?path='+location.pathname+page+'&'+data;
     //open in a new tab
     // var win = window.open("/lead/"+ $(this).data('id'), '_blank');
     // win.focus();
@@ -1697,7 +1702,22 @@ function parseQueryString() {
     str.replace(
         new RegExp( "([^?=&]+)(=([^&]*))?", "g" ),
         function( $0, $1, $2, $3 ){
-            objURL[ $1 ] = $3;
+            var key = decodeURI($1);
+            var value = decodeURI($3);
+
+            if(key.indexOf('[]') > 1)
+            {
+                key = key.replace('[]', '');
+                if(objURL[key] == null)
+                {
+                    objURL[key] = [];
+                }
+                objURL[key].push(value);
+            }
+            else
+            {
+                objURL[key] = value;
+            }
         }
     );
     return objURL;
@@ -1769,22 +1789,21 @@ function sortJobs(event, url)
 {
     if (processingSearch == true) return;
     processingSearch = true;
-    var hasUrl = (url != undefined);
+    var _url = (url != undefined)? url: '/jobs?page=1';
     var title = $(this).text();
     // if the same heading is click twice change sort direction
     sortdirection = (sortby == title)? sortdirection*-1: 1;
     sortby = title;
+    var data = dataSearchJobs();
+
+    if(location.hash == '#search'){
+        data = null;
+        _url = '/jobs'+location.search;
+    }
 
     $.ajax({
-            url: hasUrl? url: '/jobs?page=1',
-            data: {
-                labels: getFilters('labels_count'),
-                searchtx: $('#searchtx').val(),
-                searchby: $('small#searchby').text(),
-                sortby: sortby,
-                sortdirection: sortdirection,
-                showAll: showCompletedJobs
-            },
+            url: _url,
+            data: data,
             type: 'GET'
         })
         .done(function (result) {
@@ -1803,7 +1822,12 @@ function sortJobs(event, url)
                     $(this).siblings('.badge').text(result.labels[value]);
                 }
             });
+            if (data == null)
+            {
+                mapJobDataToFields(location.search);
+            }
             $('#labels_count_total').text(result.count);
+            location.hash = '';
             processingSearch = false;
         })
         .fail(function (result) {
@@ -1813,6 +1837,19 @@ function sortJobs(event, url)
             }
             showResult('Error trying to get jobs!', true);
         });
+}
+
+function mapJobDataToFields(search)
+{
+    var data = parseQueryString(search);
+    $('#searchtx').val(data.searchtx);
+    $('small#searchby').text(decodeURIComponent(data.searchby));
+
+    $.each(data.labels, function(index, label){
+        label = label.replace(/\+/g, ' ');
+        label = decodeURIComponent(label);
+        $('.jobtbfilter[value='+label+']').prop('checked', true);
+    });
 }
 
 function populateTable (event) {
@@ -1832,11 +1869,51 @@ function populateJobsTable()
     }
 }
 
+function setGoBackButton()
+{
+    if(location.pathname.startsWith('/lead'))
+    {
+        var elem = $('.navbar-brand');
+        elem.text('Go Back');
+        var query = parseQueryString();
+        elem.attr('href', query.path+location.search+'#search');
+    }
+}
+
 function nextLeadsPage(e)
 {
     e.preventDefault();
     var url = $(this).attr('href');
     searchLeads(e, url);
+}
+
+function searchLeadsData()
+{
+    return {
+        searchtx: $('#searchtx').val(),
+        statuses: getFilters('status_count'),
+        reps: getFilters('reps_count'),
+        appts: getFilters('appts_count'),
+        labels: getFilters('labels_count'),
+        today: $('input[name="today"]:checked').length,
+        tomorrow: $('input[name="tomorrow"]:checked').length,
+        week: $('input[name="week"]:checked').length,
+        searchby: $('small#searchby').text(),
+        sortby: sortby,
+        sortdirection: sortdirection
+    };
+}
+
+function dataSearchJobs()
+{
+    return {
+        labels: getFilters('labels_count'),
+        searchtx: $('#searchtx').val(),
+        searchby: $('small#searchby').text(),
+        sortby: sortby,
+        sortdirection: sortdirection,
+        showAll: showCompletedJobs
+    };
 }
 
 function searchLeads(event, url) {
@@ -1845,19 +1922,7 @@ function searchLeads(event, url) {
     var hasUrl = (url != undefined);
     $.ajax({
             url: hasUrl? url: '/?page=1',
-            data: {
-                searchtx: $('#searchtx').val(),
-                statuses: getFilters('status_count'),
-                reps: getFilters('reps_count'),
-                appts: getFilters('appts_count'),
-                labels: getFilters('labels_count'),
-                today: $('input[name="today"]:checked').length,
-                tomorrow: $('input[name="tomorrow"]:checked').length,
-                week: $('input[name="week"]:checked').length,
-                searchby: $('small#searchby').text(),
-                sortby: sortby,
-                sortdirection: sortdirection
-            },
+            data: searchLeadsData(),
             type: 'GET'
         })
         .done(function (result) {
