@@ -93,7 +93,11 @@
               </a>
 
               {{--leads labels  --}}
-              <a href="#" class="list-group-item list-header">Labels</a>
+              <div class="list-group-wrap">
+              <a href="#" class="list-group-item list-header">
+                  <input class="checkall_labels" type="checkbox" name="checkall_labels" aria-label="checkall labels">
+                  Labels
+              </a>
               @foreach($labels_count as $label)
                   <a  class="list-group-item thin-item">
                       <input class="tbfilter" type="checkbox" name="labels_count" value="{{ $label->name  }}" aria-label="labels">
@@ -101,7 +105,7 @@
                       <span class="badge">{{ $label->count }}</span>
                   </a>
               @endforeach
-
+              </div>
           </div>
       </div><!--/.sidebar-offcanvas-->
 

@@ -309,7 +309,7 @@ function customRTEButtons (editor) {
 function toggleCheckAll()
 {
     var isChecked = $(this).prop("checked");
-    var jobtbfilter = $('.jobtbfilter');
+    var jobtbfilter = (location.pathname == '/jobs')? $('.jobtbfilter'): $(this).parents('.list-group-wrap').find('.tbfilter');
     jobtbfilter.prop("checked", isChecked);
     jobtbfilter.trigger('change');
 }

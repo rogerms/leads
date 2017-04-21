@@ -332,6 +332,11 @@ a.list-header, a.list-header:focus, a.list-header:hover{
     margin-top: 15px;
 }
 
+.list-group-wrap
+{
+    margin-top: 15px;
+}
+
 .thin-item
 {
     padding-top: 3px;
