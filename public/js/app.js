@@ -1229,7 +1229,7 @@ function leadLabelMenuClicked(event) {
 }
 
 function tableRowGoto () {
-    var data = (location.pathname == '/jobs')? $.param(dataSearchJobs()): $.param(searchLeadsData());
+    var data = (location.pathname == '/jobs')? $.param(dataSearchJobs()): $.param(dataSearchLeads());
     var page = $('.pagination').find('.active').text();
     if(page.length > 0) page = '&page='+page;
 
@@ -1794,11 +1794,16 @@ function sortJobs(event, url)
     // if the same heading is click twice change sort direction
     sortdirection = (sortby == title)? sortdirection*-1: 1;
     sortby = title;
-    var data = dataSearchJobs();
 
-    if(location.hash == '#search'){
-        data = null;
+    var data = null;
+    if(location.hash == '#search')
+    {
+        location.hash = '';
         _url = '/jobs'+location.search;
+    }
+    else
+    {
+        data = dataSearchJobs();
     }
 
     $.ajax({
@@ -1827,7 +1832,7 @@ function sortJobs(event, url)
                 mapJobDataToFields(location.search);
             }
             $('#labels_count_total').text(result.count);
-            location.hash = '';
+
             processingSearch = false;
         })
         .fail(function (result) {
@@ -1845,10 +1850,47 @@ function mapJobDataToFields(search)
     $('#searchtx').val(data.searchtx);
     $('small#searchby').text(decodeURIComponent(data.searchby));
 
+    if(data.labels != null)
     $.each(data.labels, function(index, label){
         label = label.replace(/\+/g, ' ');
         label = decodeURIComponent(label);
         $('.jobtbfilter[value='+label+']').prop('checked', true);
+    });
+}
+
+function mapLeadDataToFields(search)
+{
+   //'&searchby=Name&sortby=&sortdirection=1#
+    var data = parseQueryString(search);
+    $('#searchtx').val(decodeURIComponent(data.searchtx));
+    $('small#searchby').text(decodeURIComponent(data.searchby));
+
+    if(data.labels != null)
+    $.each(data.labels, function(index, label){
+        label = label.replace(/\+/g, ' ');
+        label = decodeURIComponent(label);
+        $('.tbfilter[value='+label+']').prop('checked', true);
+    });
+
+    if(data.statuses != null)
+    $.each(data.statuses, function(index, label){
+        label = label.replace(/\+/g, ' ');
+        label = decodeURIComponent(label);
+        $('.tbfilter[value='+label+']').prop('checked', true);
+    });
+
+    if(data.reps != null)
+        $.each(data.reps, function(index, label){
+            label = label.replace(/\+/g, ' ');
+            label = decodeURIComponent(label);
+            $('.tbfilter[value='+label+']').prop('checked', true);
+        });
+
+    $.each(['today', 'tomorrow', 'week'], function (index, label){
+        if(data[label] == 1)
+        {
+            $('.tbfilter[value='+label+']').prop('checked', true);
+        }
     });
 }
 
@@ -1887,7 +1929,7 @@ function nextLeadsPage(e)
     searchLeads(e, url);
 }
 
-function searchLeadsData()
+function dataSearchLeads()
 {
     return {
         searchtx: $('#searchtx').val(),
@@ -1919,10 +1961,20 @@ function dataSearchJobs()
 function searchLeads(event, url) {
     if (processingSearch == true) return;
     processingSearch = true;
-    var hasUrl = (url != undefined);
+    var _url = (url != undefined)? url: '/?page=1';
+    var data = null;
+
+    if(location.hash == '#search'){
+        _url = '/'+location.search;
+        location.hash = '';
+    }
+    else {
+        data = dataSearchLeads();
+    }
+
     $.ajax({
-            url: hasUrl? url: '/?page=1',
-            data: searchLeadsData(),
+            url: _url,
+            data: data,
             type: 'GET'
         })
         .done(function (result) {
@@ -1971,13 +2023,16 @@ function searchLeads(event, url) {
             $('input[name="tomorrow"]').siblings('.badge').text(result.tomorrow);
             $('input[name="week"]').siblings('.badge').text(result.week);
 
-            if(!hasUrl)
+            if(data == null)
+            {
+                mapLeadDataToFields(location.search);
+            }
             showResult('Total: ' + result.count + ' leads found');
             // console.log(result.status);
             // console.log(result.reps);
             processingSearch = false;
         })
-        .fail(function () {
+        .fail(function (result) {
             processingSearch = false;
             if(result.status == 401) {
                 location.reload();
