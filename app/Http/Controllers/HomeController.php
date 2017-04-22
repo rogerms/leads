@@ -67,7 +67,7 @@ class HomeController extends Controller
 
     public  function lists()
     {
-        $this->authorize('edit-user');
+        $this->authorize('delete-job');
         $takers = TakenBy::all();
         $statuses = Status::OrderBy('display_order')->get();
         $job_labels = Label::job()->get();
