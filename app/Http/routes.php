@@ -160,6 +160,8 @@ Route::group(['middleware' => 'web'], function () {
 
     Route::post('labels/sort', 'HomeController@sort_labels');
 
+    Route::get('qunit', 'HomeController@qunit');
+
 //----------------------------------------------------
 // note
 //----------------------------------------------------

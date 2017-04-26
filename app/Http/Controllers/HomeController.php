@@ -345,4 +345,16 @@ class HomeController extends Controller
         phpinfo();
         return 'done';
     }
+
+    public function qunit()
+    {
+        if(\Config::get('app.debug'))
+        {
+            return view('tests');
+        }
+        else
+        {
+            return '<h3>QUnit test page</h3>';
+        }
+    }
 }
